@@ -34,4 +34,5 @@ export default function Plan() {
       Here’s what thrives in your area:
     </p>
   </main>
-);
+ );
+}
