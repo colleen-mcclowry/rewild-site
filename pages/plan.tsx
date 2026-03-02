@@ -23,3 +23,11 @@ export default function Plan() {
       region = "Northeast";
     }
   }
+
+  return (
+    <main style={{ padding: 40 }}>
+      <h1>Your Rewild Plan</h1>
+      <p>Region: {region}</p>
+    </main>
+  );
+}
