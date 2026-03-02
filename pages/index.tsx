@@ -6,6 +6,9 @@ export default function Home() {
   const router = useRouter();
 
   const goWithZip = () => {
+    <button onClick={useLocation}>
+  Use my location
+</button>
     const cleaned = zip.trim();
     if (cleaned.length >= 5) {
       router.push(`/plan?zip=${cleaned}`);
