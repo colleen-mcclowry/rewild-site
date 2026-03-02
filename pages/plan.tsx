@@ -24,10 +24,14 @@ export default function Plan() {
     }
   }
 
-  return (
-    <main style={{ padding: 40 }}>
-      <h1>Your Rewild Plan</h1>
-      <p>Region: {region}</p>
-    </main>
-  );
-}
+ return (
+  <main style={{ padding: 40 }}>
+    <h1>Your Rewild Plan</h1>
+    <p style={{ fontSize: 18 }}>
+      Based on your location, you're in the <strong>{region}</strong>.
+    </p>
+    <p>
+      Here’s what thrives in your area:
+    </p>
+  </main>
+);
