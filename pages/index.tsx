@@ -22,12 +22,10 @@ export default function Home() {
     );
   };
 
-  const goWithZip = () => {
-    const cleaned = zip.trim();
-    if (cleaned.length >= 5) {
+  const goWithZip = (value?: string) => {
+    const cleaned = (value ?? zip).trim();
+    if (cleaned.length === 5) {
       router.push(`/plan?zip=${cleaned}`);
-    } else {
-      alert("Please enter a 5-digit ZIP code.");
     }
   };
 
@@ -44,7 +42,9 @@ export default function Home() {
         textAlign: "center",
       }}
     >
-      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>🌿 Rewild</h1>
+      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>
+        🌿 Rewild
+      </h1>
 
       <p style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>
         Your yard can be part of nature’s best hope.
@@ -64,32 +64,42 @@ export default function Home() {
           backgroundColor: "black",
           color: "white",
           cursor: "pointer",
-          marginBottom: "1rem",
+          marginBottom: "0.75rem",
         }}
       >
         Start My Rewild Plan
       </button>
 
-   <p style={{ marginTop: "0.75rem", fontSize: "0.9rem", opacity: 0.6 }}>
-  Uses your location to find native plants
-</p>
+      <p style={{ fontSize: "0.9rem", opacity: 0.6 }}>
+        Uses your location to find native plants
+      </p>
 
-<p style={{ marginTop: "2rem", opacity: 0.6 }}>or enter ZIP</p>
+      <p style={{ marginTop: "2rem", opacity: 0.6 }}>
+        or enter ZIP
+      </p>
 
-<input
-  placeholder="60302"
-  value={zip}
-  onChange={(e) => setZip(e.target.value)}
-  onKeyDown={(e) => e.key === "Enter" && goWithZip()}
-  style={{
-    padding: "0.75rem",
-    fontSize: "1rem",
-    borderRadius: "8px",
-    border: "1px solid #ccc",
-    width: "200px",
-    marginTop: "0.5rem"
-  }}
-/>
+      <input
+        placeholder="60302"
+        value={zip}
+        inputMode="numeric"
+        autoComplete="postal-code"
+        onChange={(e) => {
+          const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+          setZip(value);
+
+          if (value.length === 5) {
+            goWithZip(value);
+          }
+        }}
+        style={{
+          padding: "0.75rem",
+          fontSize: "1rem",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          width: "200px",
+          marginTop: "0.5rem",
+        }}
+      />
 
       <p style={{ marginTop: "2rem", fontSize: "0.9rem", opacity: 0.6 }}>
         Inspired by <em>Nature’s Best Hope</em>.
