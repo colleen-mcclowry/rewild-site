@@ -55,20 +55,24 @@ export default function Home() {
         Find native plants and a simple plan to get started.
       </p>
 
-      <button
-        onClick={useLocation}
-        style={{
-          padding: "0.75rem 1.5rem",
-          fontSize: "1rem",
-          borderRadius: "10px",
-          border: "none",
-          backgroundColor: "black",
-          color: "white",
-          cursor: "pointer",
-        }}
-      >
-        Start My Rewild Plan
-      </button>
+     <button
+  type="button"
+  onClick={() => {
+    alert("CTA CLICKED ✅ (if you see this, the handler is firing)");
+    useLocation();
+  }}
+  style={{
+    padding: "0.75rem 1.5rem",
+    fontSize: "1rem",
+    borderRadius: "10px",
+    border: "none",
+    backgroundColor: "black",
+    color: "white",
+    cursor: "pointer",
+  }}
+>
+  Start My Rewild Plan ✅✅✅
+</button>
 
       <p style={{ marginTop: "0.75rem", fontSize: "0.9rem", opacity: 0.6 }}>
         Uses your location to find native plants
