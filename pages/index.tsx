@@ -44,7 +44,7 @@ export default function Home() {
         textAlign: "center",
       }}
     >
-      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>Rewild 🌿</h1>
+      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>🌿 Rewild</h1>
 
       <p style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>
         Your yard can be part of nature’s best hope.
@@ -70,35 +70,26 @@ export default function Home() {
         Start My Rewild Plan
       </button>
 
-      <p style={{ marginBottom: "0.5rem", opacity: 0.7 }}>or enter ZIP</p>
+   <p style={{ marginTop: "0.75rem", fontSize: "0.9rem", opacity: 0.6 }}>
+  Uses your location to find native plants
+</p>
 
-      <input
-        placeholder="60302"
-        value={zip}
-        onChange={(e) => setZip(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && goWithZip()}
-        style={{
-          padding: "0.75rem",
-          fontSize: "1rem",
-          borderRadius: "8px",
-          border: "1px solid #ccc",
-          width: "200px",
-          marginBottom: "0.5rem",
-        }}
-      />
+<p style={{ marginTop: "2rem", opacity: 0.6 }}>or enter ZIP</p>
 
-      <button
-        onClick={goWithZip}
-        style={{
-          padding: "0.5rem 1rem",
-          borderRadius: "8px",
-          border: "1px solid black",
-          background: "white",
-          cursor: "pointer",
-        }}
-      >
-        Get Plan
-      </button>
+<input
+  placeholder="60302"
+  value={zip}
+  onChange={(e) => setZip(e.target.value)}
+  onKeyDown={(e) => e.key === "Enter" && goWithZip()}
+  style={{
+    padding: "0.75rem",
+    fontSize: "1rem",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    width: "200px",
+    marginTop: "0.5rem"
+  }}
+/>
 
       <p style={{ marginTop: "2rem", fontSize: "0.9rem", opacity: 0.6 }}>
         Inspired by <em>Nature’s Best Hope</em>.
