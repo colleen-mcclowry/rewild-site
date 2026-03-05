@@ -8,26 +8,42 @@ export default function Home() {
 
   const goWithZip = (value?: string) => {
     const cleaned = (value ?? zip).trim();
+
     if (cleaned.length === 5) {
+      console.log("ZIP submit:", cleaned);
       router.push(`/plan?zip=${cleaned}`);
     }
   };
 
-  const useLocation = () => {
+  const handleLocation = () => {
+    console.log("CTA clicked");
+
     if (!navigator.geolocation) {
+      console.log("Geolocation not supported");
       alert("Geolocation not supported. Please enter your ZIP code instead.");
       setShowZip(true);
       return;
     }
 
+    console.log("Requesting geolocation...");
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+
+        console.log("Location success:", latitude, longitude);
+
         router.push(`/plan?lat=${latitude}&lng=${longitude}`);
       },
-      () => {
-        alert("We couldn't access your location. You can enter your ZIP instead.");
+      (error) => {
+        console.log("Location error:", error);
+
+        alert("We couldn't access your location. Please enter your ZIP instead.");
         setShowZip(true);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 8000,
       }
     );
   };
@@ -45,7 +61,9 @@ export default function Home() {
         textAlign: "center",
       }}
     >
-      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>Rewild 🌿</h1>
+      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>
+        Rewild 🌿
+      </h1>
 
       <p style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>
         Your yard can be part of nature’s best hope.
@@ -55,24 +73,21 @@ export default function Home() {
         Find native plants and a simple plan to get started.
       </p>
 
-     <button
-  type="button"
-  onClick={() => {
-    alert("CTA CLICKED ✅ (if you see this, the handler is firing)");
-    useLocation();
-  }}
-  style={{
-    padding: "0.75rem 1.5rem",
-    fontSize: "1rem",
-    borderRadius: "10px",
-    border: "none",
-    backgroundColor: "black",
-    color: "white",
-    cursor: "pointer",
-  }}
->
-  Start My Rewild Plan ✅✅✅
-</button>
+      <button
+        type="button"
+        onClick={handleLocation}
+        style={{
+          padding: "0.75rem 1.5rem",
+          fontSize: "1rem",
+          borderRadius: "10px",
+          border: "none",
+          backgroundColor: "black",
+          color: "white",
+          cursor: "pointer",
+        }}
+      >
+        Start My Rewild Plan
+      </button>
 
       <p style={{ marginTop: "0.75rem", fontSize: "0.9rem", opacity: 0.6 }}>
         Uses your location to find native plants
@@ -80,6 +95,7 @@ export default function Home() {
 
       {!showZip ? (
         <button
+          type="button"
           onClick={() => setShowZip(true)}
           style={{
             marginTop: "1.25rem",
@@ -95,7 +111,9 @@ export default function Home() {
         </button>
       ) : (
         <div style={{ marginTop: "1.5rem" }}>
-          <p style={{ opacity: 0.6, marginBottom: "0.75rem" }}>Enter ZIP</p>
+          <p style={{ opacity: 0.6, marginBottom: "0.75rem" }}>
+            Enter ZIP
+          </p>
 
           <input
             placeholder="60302"
