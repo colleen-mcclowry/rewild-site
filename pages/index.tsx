@@ -26,6 +26,7 @@ export default function Home() {
         router.push(`/plan?lat=${latitude}&lng=${longitude}`);
       },
       () => {
+        alert("We couldn't access your location. You can enter your ZIP instead.");
         setShowZip(true);
       }
     );
@@ -44,9 +45,7 @@ export default function Home() {
         textAlign: "center",
       }}
     >
-      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>
-        🌿 Rewild
-      </h1>
+      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>Rewild 🌿</h1>
 
       <p style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>
         Your yard can be part of nature’s best hope.
@@ -92,9 +91,7 @@ export default function Home() {
         </button>
       ) : (
         <div style={{ marginTop: "1.5rem" }}>
-          <p style={{ opacity: 0.6, marginBottom: "0.75rem" }}>
-            Enter ZIP
-          </p>
+          <p style={{ opacity: 0.6, marginBottom: "0.75rem" }}>Enter ZIP</p>
 
           <input
             placeholder="60302"
