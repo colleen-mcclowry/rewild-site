@@ -46,8 +46,12 @@ export default function Home() {
     >
       <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>Rewild 🌿</h1>
 
-      <p style={{ fontSize: "1.25rem", marginBottom: "2rem" }}>
-        Turn your yard into habitat.
+      <p style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>
+        Your yard can be part of nature’s best hope.
+      </p>
+
+      <p style={{ marginBottom: "2rem", opacity: 0.75 }}>
+        Find native plants and a simple plan to get started.
       </p>
 
       <button
@@ -63,7 +67,7 @@ export default function Home() {
           marginBottom: "1rem",
         }}
       >
-        Use My Location
+        Start My Rewild Plan
       </button>
 
       <p style={{ marginBottom: "0.5rem", opacity: 0.7 }}>or enter ZIP</p>
@@ -95,6 +99,10 @@ export default function Home() {
       >
         Get Plan
       </button>
+
+      <p style={{ marginTop: "2rem", fontSize: "0.9rem", opacity: 0.6 }}>
+        Inspired by <em>Nature’s Best Hope</em>.
+      </p>
     </main>
   );
 }
