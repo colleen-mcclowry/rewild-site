@@ -5,16 +5,6 @@ export default function Home() {
   const [zip, setZip] = useState("");
   const router = useRouter();
 
-  const goWithZip = () => {
-    <button onClick={useLocation}>
-  Use my location
-</button>
-    const cleaned = zip.trim();
-    if (cleaned.length >= 5) {
-      router.push(`/plan?zip=${cleaned}`);
-    }
-  };
-
   const useLocation = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported.");
@@ -32,20 +22,29 @@ export default function Home() {
     );
   };
 
+  const goWithZip = () => {
+    const cleaned = zip.trim();
+    if (cleaned.length >= 5) {
+      router.push(`/plan?zip=${cleaned}`);
+    } else {
+      alert("Please enter a 5-digit ZIP code.");
+    }
+  };
+
   return (
-    <main style={{
-      minHeight: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center",
-      fontFamily: "system-ui",
-      padding: "2rem",
-      textAlign: "center"
-    }}>
-      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>
-        Rewild 🌿
-      </h1>
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "system-ui",
+        padding: "2rem",
+        textAlign: "center",
+      }}
+    >
+      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>Rewild 🌿</h1>
 
       <p style={{ fontSize: "1.25rem", marginBottom: "2rem" }}>
         Turn your yard into habitat.
@@ -61,7 +60,7 @@ export default function Home() {
           backgroundColor: "black",
           color: "white",
           cursor: "pointer",
-          marginBottom: "1rem"
+          marginBottom: "1rem",
         }}
       >
         Use My Location
@@ -80,7 +79,7 @@ export default function Home() {
           borderRadius: "8px",
           border: "1px solid #ccc",
           width: "200px",
-          marginBottom: "0.5rem"
+          marginBottom: "0.5rem",
         }}
       />
 
@@ -91,7 +90,7 @@ export default function Home() {
           borderRadius: "8px",
           border: "1px solid black",
           background: "white",
-          cursor: "pointer"
+          cursor: "pointer",
         }}
       >
         Get Plan
