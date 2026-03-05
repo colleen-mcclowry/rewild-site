@@ -1,70 +1,108 @@
+import { useState } from "react";
 import { useRouter } from "next/router";
 
-export default function Plan() {
+export default function Home() {
+  const [zip, setZip] = useState("");
   const router = useRouter();
-  const { zip, lat, lng } = router.query;
 
-  let region = "Your Region";
-
-  if (zip === "60302") {
-    region = "Oak Park, IL";
-  } else if (typeof zip === "string" && zip.startsWith("60")) {
-    region = "Midwest";
-  }
-
-  if (lat && lng) {
-    const latitude = parseFloat(lat as string);
-
-    if (latitude > 39 && latitude < 45) {
-      region = "Midwest";
-    } else if (latitude > 36 && latitude < 39) {
-      region = "Northern California";
-    } else if (latitude > 40 && latitude < 45) {
-      region = "Northeast";
+  const useLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported.");
+      return;
     }
-  }
 
-  let plants: string[] = [];
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        router.push(`/plan?lat=${latitude}&lng=${longitude}`);
+      },
+      () => {
+        alert("Location permission denied.");
+      }
+    );
+  };
 
-  if (region === "Midwest" || region === "Oak Park, IL") {
-    plants = [
-      "Purple Coneflower",
-      "Butterfly Milkweed",
-      "Little Bluestem"
-    ];
-  }
-
-  if (region === "Northern California") {
-    plants = [
-      "California Poppy",
-      "Yarrow",
-      "Blue Wildrye"
-    ];
-  }
-
-  if (region === "Northeast") {
-    plants = [
-      "Wild Bergamot",
-      "Black Eyed Susan",
-      "Switchgrass"
-    ];
-  }
+  const goWithZip = () => {
+    const cleaned = zip.trim();
+    if (cleaned.length >= 5) {
+      router.push(`/plan?zip=${cleaned}`);
+    } else {
+      alert("Please enter a 5-digit ZIP code.");
+    }
+  };
 
   return (
-    <main style={{ padding: 40, fontFamily: "system-ui" }}>
-      <h1>Your Rewild Plan</h1>
+    <main
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "system-ui",
+        padding: "2rem",
+        textAlign: "center",
+      }}
+    >
+      <h1 style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>Rewild 🌿</h1>
 
-      <p style={{ fontSize: 18 }}>
-        Based on your location, you're in the <strong>{region}</strong>.
+      <p style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>
+        Your yard can be part of nature’s best hope.
       </p>
 
-      <h2 style={{ marginTop: 30 }}>Native Starter Plants</h2>
+      <p style={{ marginBottom: "2rem", opacity: 0.75 }}>
+        Find native plants and a simple plan to get started.
+      </p>
 
-      <ul style={{ fontSize: 18, lineHeight: 1.8 }}>
-        {plants.map((plant) => (
-          <li key={plant}>{plant}</li>
-        ))}
-      </ul>
+      <button
+        onClick={useLocation}
+        style={{
+          padding: "0.75rem 1.5rem",
+          fontSize: "1rem",
+          borderRadius: "10px",
+          border: "none",
+          backgroundColor: "black",
+          color: "white",
+          cursor: "pointer",
+          marginBottom: "1rem",
+        }}
+      >
+        Start My Rewild Plan
+      </button>
+
+      <p style={{ marginBottom: "0.5rem", opacity: 0.7 }}>or enter ZIP</p>
+
+      <input
+        placeholder="60302"
+        value={zip}
+        onChange={(e) => setZip(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && goWithZip()}
+        style={{
+          padding: "0.75rem",
+          fontSize: "1rem",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          width: "200px",
+          marginBottom: "0.5rem",
+        }}
+      />
+
+      <button
+        onClick={goWithZip}
+        style={{
+          padding: "0.5rem 1rem",
+          borderRadius: "8px",
+          border: "1px solid black",
+          background: "white",
+          cursor: "pointer",
+        }}
+      >
+        Get Plan
+      </button>
+
+      <p style={{ marginTop: "2rem", fontSize: "0.9rem", opacity: 0.6 }}>
+        Inspired by <em>Nature’s Best Hope</em>.
+      </p>
     </main>
   );
 }
