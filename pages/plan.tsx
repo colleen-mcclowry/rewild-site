@@ -48,6 +48,7 @@ export default function Plan() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [plantsLoading, setPlantsLoading] = useState(false);
   const [ecosystem, setEcosystem] = useState("Local native plant ecosystem");
+  const [shareMessage, setShareMessage] = useState("");
   const [planDetails, setPlanDetails] = useState<PlanDetails>({
     sun: "full-sun",
     sunLabel: "Full sun",
@@ -164,6 +165,16 @@ export default function Plan() {
     run();
   }, [goal, region, router.isReady, space, sun, zip]);
 
+  useEffect(() => {
+    if (!shareMessage) return;
+
+    const timeout = window.setTimeout(() => {
+      setShareMessage("");
+    }, 2600);
+
+    return () => window.clearTimeout(timeout);
+  }, [shareMessage]);
+
   const hasParams =
     (typeof zip === "string" && zip.length > 0) ||
     (typeof lat === "string" && typeof longitude === "string");
@@ -178,8 +189,64 @@ export default function Plan() {
     region === "Your Region"
       ? planDetails.title
       : `${planDetails.sunLabel} plan for ${region}`;
+  const shareTitle = `My Rewild plan for ${regionLabel}`;
+  const shareText = `A ${planDetails.sunLabel.toLowerCase()} native planting plan for a ${planDetails.spaceLabel.toLowerCase()} with a ${planDetails.goalLabel.toLowerCase()} focus.`;
   const cardSurface = "rgba(255,255,255,0.78)";
   const warmBorder = "1px solid rgba(104, 130, 90, 0.16)";
+
+  const copyPlanLink = async () => {
+    if (typeof window === "undefined") return;
+
+    const currentUrl = window.location.href;
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(currentUrl);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = currentUrl;
+        textArea.setAttribute("readonly", "true");
+        textArea.style.position = "absolute";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+      }
+
+      setShareMessage("Plan link copied");
+    } catch (error) {
+      console.error("copy plan link failed", error);
+      setShareMessage("Couldn’t copy the link");
+    }
+  };
+
+  const sharePlan = async () => {
+    if (typeof window === "undefined") return;
+
+    const currentUrl = window.location.href;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: currentUrl,
+        });
+        setShareMessage("Plan shared");
+        return;
+      }
+
+      await copyPlanLink();
+    } catch (error) {
+      if ((error as Error)?.name === "AbortError") {
+        return;
+      }
+
+      console.error("share plan failed", error);
+      setShareMessage("Couldn’t share the plan");
+    }
+  };
 
   if (!hasParams) {
     return (
@@ -505,6 +572,81 @@ export default function Plan() {
                 ? `Using ZIP ${zip} as your planning signal.`
                 : "Using your current location as your planning signal."}
             </p>
+
+            <div
+              style={{
+                marginTop: "1.2rem",
+                paddingTop: "1.15rem",
+                borderTop: "1px solid rgba(104, 130, 90, 0.12)",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 0.45rem",
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#61725d",
+                  fontWeight: 700,
+                }}
+              >
+                Save or share
+              </p>
+              <p style={{ margin: "0 0 0.85rem", color: "#4f5d4d", lineHeight: 1.6 }}>
+                Keep this version handy or send it to someone you want to rewild with.
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "0.7rem",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={copyPlanLink}
+                  style={{
+                    borderRadius: "999px",
+                    border: "1px solid rgba(76, 100, 67, 0.18)",
+                    background: "rgba(255,255,255,0.94)",
+                    color: "#30412c",
+                    fontWeight: 600,
+                    fontSize: "0.95rem",
+                    padding: "0.78rem 1rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  Copy plan link
+                </button>
+                <button
+                  type="button"
+                  onClick={sharePlan}
+                  style={{
+                    borderRadius: "999px",
+                    border: "none",
+                    background: "#304d2e",
+                    color: "#f8f5ec",
+                    fontWeight: 600,
+                    fontSize: "0.95rem",
+                    padding: "0.78rem 1rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  Share this plan
+                </button>
+              </div>
+              <p
+                aria-live="polite"
+                style={{
+                  minHeight: "1.25rem",
+                  margin: "0.75rem 0 0",
+                  fontSize: "0.88rem",
+                  color: "#6a7766",
+                }}
+              >
+                {shareMessage || "Your plan link keeps your location, light, size, and goal choices."}
+              </p>
+            </div>
           </aside>
         </section>
 
