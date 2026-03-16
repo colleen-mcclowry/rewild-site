@@ -81,9 +81,7 @@ export default function Home() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        router.push(
-          buildPlanUrl({ lat: String(latitude), lon: String(longitude) })
-        );
+        router.push(buildPlanUrl({ lat: String(latitude), lon: String(longitude) }));
       },
       () => {
         alert("We couldn't access your location. Please enter your ZIP instead.");
@@ -103,17 +101,16 @@ export default function Home() {
         fontFamily:
           '"Avenir Next", Avenir, Montserrat, "Segoe UI", "Helvetica Neue", sans-serif',
         background:
-          "radial-gradient(circle at top left, rgba(219, 233, 209, 0.98), transparent 32%), radial-gradient(circle at 85% 20%, rgba(246, 225, 188, 0.8), transparent 24%), linear-gradient(180deg, #f3efe4 0%, #faf8f1 52%, #f4f6ee 100%)",
+          "radial-gradient(circle at top left, rgba(219, 233, 209, 0.98), transparent 30%), radial-gradient(circle at 84% 14%, rgba(246, 225, 188, 0.72), transparent 22%), linear-gradient(180deg, #f3efe4 0%, #fbf8f2 50%, #f4f6ee 100%)",
         color: "#1c2d22",
-        overflow: "hidden",
       }}
     >
       <div
         style={{
           position: "relative",
-          maxWidth: "1180px",
+          maxWidth: "960px",
           margin: "0 auto",
-          padding: "2rem 1.25rem 4rem",
+          padding: "2.5rem 1.25rem 4rem",
         }}
       >
         <div
@@ -121,13 +118,13 @@ export default function Home() {
           className="float-slow"
           style={{
             position: "absolute",
-            top: "5.5rem",
-            left: "-3rem",
-            width: "12rem",
-            height: "12rem",
+            top: "3.5rem",
+            left: "-2rem",
+            width: "11rem",
+            height: "11rem",
             borderRadius: "999px",
-            background: "rgba(173, 204, 157, 0.24)",
-            filter: "blur(8px)",
+            background: "rgba(173, 204, 157, 0.18)",
+            filter: "blur(10px)",
           }}
         />
         <div
@@ -135,392 +132,253 @@ export default function Home() {
           className="float-delayed"
           style={{
             position: "absolute",
-            right: "-2rem",
-            top: "12rem",
-            width: "15rem",
-            height: "15rem",
+            right: "-1rem",
+            top: "8rem",
+            width: "12rem",
+            height: "12rem",
             borderRadius: "999px",
-            background: "rgba(235, 206, 153, 0.22)",
-            filter: "blur(8px)",
+            background: "rgba(235, 206, 153, 0.18)",
+            filter: "blur(10px)",
           }}
         />
 
         <section
+          className="fade-up"
           style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1.15fr) minmax(300px, 0.85fr)",
-            gap: "1.25rem",
-            alignItems: "stretch",
+            position: "relative",
+            borderRadius: "34px",
+            padding: "2rem",
+            background:
+              "linear-gradient(145deg, rgba(29, 47, 34, 0.97), rgba(53, 79, 48, 0.92))",
+            color: "#f8f5ec",
+            boxShadow: "0 28px 70px rgba(30, 46, 33, 0.16)",
+            overflow: "hidden",
           }}
         >
           <div
-            className="fade-up"
+            aria-hidden="true"
             style={{
-              position: "relative",
-              borderRadius: "34px",
-              padding: "2rem",
-              background:
-                "linear-gradient(145deg, rgba(29, 47, 34, 0.97), rgba(53, 79, 48, 0.92))",
-              color: "#f8f5ec",
-              boxShadow: "0 28px 70px rgba(30, 46, 33, 0.18)",
-              overflow: "hidden",
+              position: "absolute",
+              inset: "auto -5rem -5rem auto",
+              width: "15rem",
+              height: "15rem",
+              borderRadius: "999px",
+              background: "rgba(246, 210, 146, 0.1)",
+            }}
+          />
+
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              borderRadius: "999px",
+              padding: "0.5rem 0.9rem",
+              background: "rgba(255,255,255,0.1)",
+              fontSize: "0.8rem",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              fontWeight: 700,
             }}
           >
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                inset: "auto -5rem -5rem auto",
-                width: "15rem",
-                height: "15rem",
-                borderRadius: "999px",
-                background: "rgba(246, 210, 146, 0.12)",
-              }}
-            />
+            Native planting, made simple
+          </div>
 
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.55rem",
-                borderRadius: "999px",
-                padding: "0.5rem 0.9rem",
-                background: "rgba(255,255,255,0.1)",
-                fontSize: "0.82rem",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                fontWeight: 700,
-              }}
-            >
-              Native planting, made simple
-            </div>
+          <h1
+            style={{
+              fontSize: "clamp(3rem, 8vw, 5.4rem)",
+              lineHeight: 0.92,
+              letterSpacing: "-0.08em",
+              margin: "1rem 0 0.85rem",
+              fontWeight: 700,
+              maxWidth: "10ch",
+            }}
+          >
+            Rewild your yard one patch at a time.
+          </h1>
 
-            <h1
-              style={{
-                fontSize: "clamp(3.2rem, 9vw, 6.2rem)",
-                lineHeight: 0.9,
-                letterSpacing: "-0.08em",
-                margin: "1rem 0 0.9rem",
-                fontWeight: 700,
-                maxWidth: "11ch",
-              }}
-            >
-              Rewild your yard one patch at a time.
-            </h1>
+          <p
+            style={{
+              maxWidth: "34rem",
+              margin: 0,
+              fontSize: "1.02rem",
+              lineHeight: 1.7,
+              color: "rgba(248, 245, 236, 0.82)",
+            }}
+          >
+            Your backyard can be part of nature&apos;s best hope. Pick your light and yard
+            size, then we&apos;ll turn your location into a native planting plan that feels
+            doable, personal, and wildlife-friendly.
+          </p>
 
-            <p
-              style={{
-                maxWidth: "35rem",
-                margin: 0,
-                fontSize: "1.06rem",
-                lineHeight: 1.72,
-                color: "rgba(248, 245, 236, 0.82)",
-              }}
-            >
-              Tell us where you are and Rewild turns that into a gentle first step:
-              native plants, habitat value, and a garden plan that feels actually doable.
-            </p>
+          <div
+            style={{
+              display: "grid",
+              gap: "1rem",
+              marginTop: "1.35rem",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.5rem",
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.09em",
+                  textTransform: "uppercase",
+                  opacity: 0.76,
+                }}
+              >
+                Light
+              </p>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gap: "0.7rem",
+                }}
+              >
+                {sunOptions.map((option) => {
+                  const isActive = option.value === sun;
 
-            <div
-              style={{
-                display: "grid",
-                gap: "1rem",
-                marginTop: "1.35rem",
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    margin: "0 0 0.5rem",
-                    fontSize: "0.8rem",
-                    letterSpacing: "0.09em",
-                    textTransform: "uppercase",
-                    opacity: 0.78,
-                  }}
-                >
-                  Light
-                </p>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                    gap: "0.7rem",
-                  }}
-                >
-                  {sunOptions.map((option) => {
-                    const isActive = option.value === sun;
-
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => setSun(option.value)}
-                        style={{
-                          textAlign: "left",
-                          borderRadius: "18px",
-                          border: isActive
-                            ? "1px solid rgba(243, 221, 175, 0.9)"
-                            : "1px solid rgba(255,255,255,0.14)",
-                          background: isActive
-                            ? "rgba(243, 221, 175, 0.14)"
-                            : "rgba(255,255,255,0.06)",
-                          color: "#f8f5ec",
-                          padding: "0.85rem",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>
-                          {option.label}
-                        </div>
-                        <div style={{ fontSize: "0.88rem", opacity: 0.78, lineHeight: 1.45 }}>
-                          {option.notes}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div>
-                <p
-                  style={{
-                    margin: "0 0 0.5rem",
-                    fontSize: "0.8rem",
-                    letterSpacing: "0.09em",
-                    textTransform: "uppercase",
-                    opacity: 0.78,
-                  }}
-                >
-                  Space
-                </p>
-                <div style={{ display: "grid", gap: "0.7rem" }}>
-                  {spaceOptions.map((option) => {
-                    const isActive = option.value === space;
-
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => setSpace(option.value)}
-                        style={{
-                          textAlign: "left",
-                          borderRadius: "20px",
-                          border: isActive
-                            ? "1px solid rgba(243, 221, 175, 0.9)"
-                            : "1px solid rgba(255,255,255,0.14)",
-                          background: isActive
-                            ? "rgba(243, 221, 175, 0.14)"
-                            : "rgba(255,255,255,0.06)",
-                          color: "#f8f5ec",
-                          padding: "0.9rem 1rem",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>
-                          {option.label}
-                        </div>
-                        <div style={{ fontSize: "0.9rem", opacity: 0.8, lineHeight: 1.5 }}>
-                          {option.notes}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setSun(option.value)}
+                      style={{
+                        textAlign: "left",
+                        borderRadius: "18px",
+                        border: isActive
+                          ? "1px solid rgba(243, 221, 175, 0.9)"
+                          : "1px solid rgba(255,255,255,0.14)",
+                        background: isActive
+                          ? "rgba(243, 221, 175, 0.14)"
+                          : "rgba(255,255,255,0.06)",
+                        color: "#f8f5ec",
+                        padding: "0.85rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
+                      <div style={{ fontSize: "0.88rem", opacity: 0.78, lineHeight: 1.45 }}>
+                        {option.notes}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "0.85rem",
-                marginTop: "1.5rem",
-              }}
-            >
-              <button
-                type="button"
-                onClick={handleLocation}
-                className="cta-pop"
+            <div>
+              <p
                 style={{
-                  padding: "0.95rem 1.55rem",
-                  fontSize: "1rem",
-                  fontWeight: 700,
-                  letterSpacing: "-0.02em",
-                  borderRadius: "999px",
-                  border: "none",
-                  backgroundColor: "#f3ddaf",
-                  color: "#213426",
-                  cursor: "pointer",
-                  boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
+                  margin: "0 0 0.5rem",
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.09em",
+                  textTransform: "uppercase",
+                  opacity: 0.76,
                 }}
               >
-                Use my location
-              </button>
+                Space
+              </p>
+              <div style={{ display: "grid", gap: "0.7rem" }}>
+                {spaceOptions.map((option) => {
+                  const isActive = option.value === space;
 
-              <button
-                type="button"
-                onClick={() => setShowZip(true)}
-                style={{
-                  padding: "0.95rem 1.35rem",
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  borderRadius: "999px",
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  background: "rgba(255,255,255,0.08)",
-                  color: "#f8f5ec",
-                  cursor: "pointer",
-                }}
-              >
-                Enter ZIP instead
-              </button>
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gap: "0.8rem",
-                marginTop: "1.6rem",
-              }}
-            >
-              <div
-                style={{
-                  borderRadius: "20px",
-                  padding: "0.95rem",
-                  background: "rgba(255,255,255,0.08)",
-                }}
-              >
-                <p style={{ margin: 0, fontSize: "0.78rem", opacity: 0.72 }}>Starts with</p>
-                <p style={{ margin: "0.28rem 0 0", fontSize: "1.35rem", fontWeight: 700 }}>
-                  Your location
-                </p>
-              </div>
-              <div
-                style={{
-                  borderRadius: "20px",
-                  padding: "0.95rem",
-                  background: "rgba(255,255,255,0.08)",
-                }}
-              >
-                <p style={{ margin: 0, fontSize: "0.78rem", opacity: 0.72 }}>Delivers</p>
-                <p style={{ margin: "0.28rem 0 0", fontSize: "1.35rem", fontWeight: 700 }}>
-                  {recommendationCounts[space]}
-                </p>
-              </div>
-              <div
-                style={{
-                  borderRadius: "20px",
-                  padding: "0.95rem",
-                  background: "rgba(255,255,255,0.08)",
-                }}
-              >
-                <p style={{ margin: 0, fontSize: "0.78rem", opacity: 0.72 }}>Built for</p>
-                <p style={{ margin: "0.28rem 0 0", fontSize: "1.35rem", fontWeight: 700 }}>
-                  {spaceOptions.find((option) => option.value === space)?.label}
-                </p>
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setSpace(option.value)}
+                      style={{
+                        textAlign: "left",
+                        borderRadius: "20px",
+                        border: isActive
+                          ? "1px solid rgba(243, 221, 175, 0.9)"
+                          : "1px solid rgba(255,255,255,0.14)",
+                        background: isActive
+                          ? "rgba(243, 221, 175, 0.14)"
+                          : "rgba(255,255,255,0.06)",
+                        color: "#f8f5ec",
+                        padding: "0.9rem 1rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
+                      <div style={{ fontSize: "0.9rem", opacity: 0.8, lineHeight: 1.5 }}>
+                        {option.notes}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          <aside
-            className="fade-up delay-2"
+          <div
             style={{
-              display: "grid",
-              gap: "1rem",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "0.85rem",
+              alignItems: "center",
+              marginTop: "1.5rem",
             }}
           >
-            <div
+            <button
+              type="button"
+              onClick={handleLocation}
+              className="cta-pop"
               style={{
-                borderRadius: "30px",
-                padding: "1.45rem",
-                background: "rgba(255,255,255,0.7)",
-                border: "1px solid rgba(98, 126, 86, 0.15)",
-                boxShadow: "0 22px 45px rgba(59, 79, 44, 0.08)",
-                backdropFilter: "blur(14px)",
+                padding: "0.95rem 1.55rem",
+                fontSize: "1rem",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: "#f3ddaf",
+                color: "#213426",
+                cursor: "pointer",
+                boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
               }}
             >
-              <p
-                style={{
-                  margin: "0 0 0.55rem",
-                  fontSize: "0.82rem",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  color: "#667561",
-                  fontWeight: 700,
-                }}
-              >
-                What you get
-              </p>
-              <h2
-                style={{
-                  margin: "0 0 0.75rem",
-                  fontSize: "1.8rem",
-                  lineHeight: 1.03,
-                  letterSpacing: "-0.05em",
-                }}
-              >
-                A native plan that feels personal immediately
-              </h2>
-              <div style={{ display: "grid", gap: "0.75rem" }}>
-                {[
-                  "A region-aware starter plant set",
-                  "A size recommendation with example dimensions",
-                  "A clearer first weekend action plan",
-                ].map((item) => (
-                  <div
-                    key={item}
-                    style={{
-                      borderRadius: "18px",
-                      background: "#f6f4eb",
-                      padding: "0.95rem 1rem",
-                      color: "#42513d",
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-            </div>
+              Use my location
+            </button>
 
-            <div
+            <button
+              type="button"
+              onClick={() => setShowZip(true)}
               style={{
-                borderRadius: "30px",
-                padding: "1.45rem",
-                background:
-                  "linear-gradient(180deg, rgba(245, 241, 228, 0.98), rgba(238, 243, 229, 0.98))",
-                border: "1px solid rgba(125, 146, 108, 0.18)",
-                boxShadow: "0 18px 36px rgba(59, 79, 44, 0.06)",
+                padding: "0.95rem 1.35rem",
+                fontSize: "1rem",
+                fontWeight: 600,
+                borderRadius: "999px",
+                border: "1px solid rgba(255,255,255,0.18)",
+                background: "rgba(255,255,255,0.08)",
+                color: "#f8f5ec",
+                cursor: "pointer",
               }}
             >
-              <p
-                style={{
-                  margin: "0 0 0.5rem",
-                  color: "#677564",
-                  fontSize: "0.82rem",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  fontWeight: 700,
-                }}
-              >
-                Gentle onboarding
-              </p>
-              <p style={{ margin: 0, color: "#475544", lineHeight: 1.65 }}>
-                Rewild is designed to feel more like a thoughtful guide than a dense tool.
-                Start with the light and yard size you actually have, then build outward.
-              </p>
-            </div>
-          </aside>
+              Enter ZIP instead
+            </button>
+
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.92rem",
+                color: "rgba(248, 245, 236, 0.7)",
+              }}
+            >
+              {recommendationCounts[space]} tailored for {sunOptions.find((option) => option.value === sun)?.label.toLowerCase()}
+            </p>
+          </div>
         </section>
 
         {showZip && (
           <section
-            className="fade-up delay-3"
+            className="fade-up delay-2"
             style={{
-              maxWidth: "540px",
-              marginTop: "1.2rem",
-              borderRadius: "30px",
-              padding: "1.4rem",
+              marginTop: "1rem",
+              borderRadius: "28px",
+              padding: "1.35rem",
               background: "rgba(255,255,255,0.72)",
               border: "1px solid rgba(109, 137, 97, 0.16)",
               boxShadow: "0 18px 34px rgba(58, 77, 43, 0.08)",
@@ -528,8 +386,8 @@ export default function Home() {
           >
             <p
               style={{
-                margin: "0 0 0.55rem",
-                fontSize: "0.82rem",
+                margin: "0 0 0.45rem",
+                fontSize: "0.8rem",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "#667561",
@@ -538,16 +396,16 @@ export default function Home() {
             >
               ZIP fallback
             </p>
-            <h3
+            <h2
               style={{
-                margin: "0 0 0.75rem",
-                fontSize: "1.5rem",
-                lineHeight: 1.05,
+                margin: "0 0 0.8rem",
+                fontSize: "1.35rem",
+                lineHeight: 1.06,
                 letterSpacing: "-0.04em",
               }}
             >
               Use your ZIP to start your plan
-            </h3>
+            </h2>
             <div
               style={{
                 display: "flex",
@@ -586,6 +444,69 @@ export default function Home() {
             </div>
           </section>
         )}
+
+        <section
+          className="fade-up delay-3"
+          style={{
+            display: "grid",
+            gap: "0.9rem",
+            marginTop: "1rem",
+          }}
+        >
+          <div
+            style={{
+              borderRadius: "26px",
+              padding: "1.25rem 1.35rem",
+              background: "rgba(255,255,255,0.7)",
+              border: "1px solid rgba(98, 126, 86, 0.15)",
+              boxShadow: "0 16px 30px rgba(59, 79, 44, 0.06)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.8rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#667561",
+                fontWeight: 700,
+              }}
+            >
+              What you get
+            </p>
+            <p style={{ margin: 0, color: "#475544", lineHeight: 1.65 }}>
+              A region-aware native plant set, example dimensions for your yard size, and a
+              first weekend plan that feels manageable.
+            </p>
+          </div>
+
+          <div
+            style={{
+              borderRadius: "26px",
+              padding: "1.25rem 1.35rem",
+              background: "rgba(247, 244, 234, 0.9)",
+              border: "1px solid rgba(125, 146, 108, 0.16)",
+              boxShadow: "0 14px 28px rgba(59, 79, 44, 0.05)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.8rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#677564",
+                fontWeight: 700,
+              }}
+            >
+              Why it feels lighter
+            </p>
+            <p style={{ margin: 0, color: "#475544", lineHeight: 1.65 }}>
+              Rewild is designed to help you start with one good patch, not master your whole
+              yard at once.
+            </p>
+          </div>
+        </section>
       </div>
 
       <style jsx>{`
@@ -644,9 +565,9 @@ export default function Home() {
           }
         }
 
-        @media (max-width: 900px) {
-          section {
-            grid-template-columns: 1fr !important;
+        @media (max-width: 720px) {
+          main {
+            overflow-x: clip;
           }
         }
       `}</style>
