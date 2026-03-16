@@ -2,6 +2,9 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 
+type SunPreference = "full-sun" | "part-shade" | "mostly-shade";
+type SpacePreference = "small-patch" | "medium-yard" | "large-yard";
+
 type Plant = {
   name: string;
   latin?: string;
@@ -17,9 +20,19 @@ type GeoInfo = {
   displayName?: string;
 };
 
+type PlanDetails = {
+  sun: SunPreference;
+  sunLabel: string;
+  space: SpacePreference;
+  spaceLabel: string;
+  sizeRange: string;
+  strategy: string;
+  title: string;
+};
+
 export default function Plan() {
   const router = useRouter();
-  const { zip, lat, lon, lng } = router.query;
+  const { zip, lat, lon, lng, sun, space } = router.query;
   const longitude = typeof lon === "string" ? lon : typeof lng === "string" ? lng : undefined;
 
   const [geoInfo, setGeoInfo] = useState<GeoInfo | null>(null);
@@ -27,6 +40,15 @@ export default function Plan() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [plantsLoading, setPlantsLoading] = useState(false);
   const [ecosystem, setEcosystem] = useState("Local native plant ecosystem");
+  const [planDetails, setPlanDetails] = useState<PlanDetails>({
+    sun: "full-sun",
+    sunLabel: "Full sun",
+    space: "small-patch",
+    spaceLabel: "Small patch",
+    sizeRange: "About 3 x 6 ft to 8 x 10 ft",
+    strategy: "Start with one compact habitat pocket that looks intentional fast.",
+    title: "Starter plan",
+  });
 
   useEffect(() => {
     if (
@@ -95,6 +117,12 @@ export default function Plan() {
         if (typeof zip === "string" && zip.length > 0) {
           params.set("zip", zip);
         }
+        if (typeof sun === "string" && sun.length > 0) {
+          params.set("sun", sun);
+        }
+        if (typeof space === "string" && space.length > 0) {
+          params.set("space", space);
+        }
 
         const response = await fetch(`/api/plants?${params.toString()}`);
         const data = await response.json();
@@ -109,6 +137,9 @@ export default function Plan() {
             ? data.ecosystem
             : "Local native plant ecosystem"
         );
+        if (data.plan) {
+          setPlanDetails(data.plan);
+        }
       } catch (error) {
         console.error("plant plan failed", error);
         setPlants([]);
@@ -118,7 +149,7 @@ export default function Plan() {
     };
 
     run();
-  }, [region, router.isReady, zip]);
+  }, [region, router.isReady, space, sun, zip]);
 
   const hasParams =
     (typeof zip === "string" && zip.length > 0) ||
@@ -131,7 +162,9 @@ export default function Plan() {
         : "Location";
   const regionLabel = region === "Your Region" ? "your area" : region;
   const planTitle =
-    region === "Your Region" ? "Your starter rewilding plan" : `A starter plan for ${region}`;
+    region === "Your Region"
+      ? planDetails.title
+      : `${planDetails.sunLabel} plan for ${region}`;
   const cardSurface = "rgba(255,255,255,0.78)";
   const warmBorder = "1px solid rgba(104, 130, 90, 0.16)";
 
@@ -268,6 +301,19 @@ export default function Plan() {
             >
               {ecosystem}
               </span>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  borderRadius: "999px",
+                  padding: "0.45rem 0.8rem",
+                  background: "rgba(255,255,255,0.12)",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                }}
+              >
+                {planDetails.spaceLabel}
+              </span>
             </div>
 
             <h1
@@ -292,8 +338,9 @@ export default function Plan() {
                 letterSpacing: "-0.01em",
               }}
             >
-              We turned {regionLabel} into a soft first step: three native plants that
-              bring pollinators in, create habitat, and still feel easy to begin with.
+              We turned {regionLabel} into a {planDetails.sunLabel.toLowerCase()} starter
+              plan for a {planDetails.spaceLabel.toLowerCase()}. Expect three native plants
+              that support pollinators while staying manageable for the space you picked.
             </p>
 
             <div
@@ -322,9 +369,9 @@ export default function Plan() {
                 background: "rgba(255,255,255,0.08)",
                 backdropFilter: "blur(4px)",
               }}
-            >
-                <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Patch size</p>
-                <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>3 x 6 ft</p>
+              >
+                <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Light</p>
+                <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>{planDetails.sunLabel}</p>
               </div>
               <div
                 style={{
@@ -333,9 +380,11 @@ export default function Plan() {
                 background: "rgba(255,255,255,0.08)",
                 backdropFilter: "blur(4px)",
               }}
-            >
-                <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Best for</p>
-                <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>Pollinators</p>
+              >
+                <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Size guide</p>
+                <p style={{ margin: "0.3rem 0 0", fontSize: "1.1rem", lineHeight: 1.25 }}>
+                  {planDetails.sizeRange}
+                </p>
               </div>
             </div>
 
@@ -380,7 +429,7 @@ export default function Plan() {
             </h2>
             <p style={{ margin: 0, color: "#4f5d4d", lineHeight: 1.65 }}>
               This mix balances bloom, structure, and habitat so the space feels alive
-              quickly instead of looking sparse for months.
+              quickly without outgrowing your {planDetails.spaceLabel.toLowerCase()}.
             </p>
 
             <div
@@ -391,9 +440,9 @@ export default function Plan() {
               }}
             >
               {[
-                "One flowering anchor plant for easy color",
-                "One pollinator magnet to increase wildlife visits",
-                "One native grass for movement and shelter",
+                `Matched to ${planDetails.sunLabel.toLowerCase()} conditions`,
+                `Sized for a ${planDetails.spaceLabel.toLowerCase()}`,
+                planDetails.strategy,
               ].map((item) => (
                 <div
                   key={item}
@@ -453,8 +502,8 @@ export default function Plan() {
             </h2>
           </div>
           <p style={{ margin: 0, maxWidth: "28rem", color: "#5f6d58", lineHeight: 1.6 }}>
-            A small, location-aware set to help you start with confidence instead of
-            decision fatigue.
+            A location-aware plant set shaped by your light and space choices, so it
+            feels like a plan instead of a generic list.
           </p>
         </section>
 
@@ -613,14 +662,13 @@ export default function Plan() {
               Start with one small patch, not the whole yard
             </h2>
             <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
-              Even a 3 x 6 foot area can begin creating habitat. The goal is momentum,
-              not perfection.
+              {planDetails.sizeRange}. The goal is momentum, not perfection.
             </p>
             <div style={{ display: "grid", gap: "0.7rem" }}>
               {[
-                "Pick the sunniest small area you can actually maintain.",
+                `Choose a ${planDetails.sunLabel.toLowerCase()} area you can realistically maintain.`,
                 "Plant in loose clusters so the bed feels intentional quickly.",
-                "Leave room for the native grass to soften the edge and hold structure.",
+                planDetails.strategy,
               ].map((step) => (
                 <div
                   key={step}

@@ -1,16 +1,67 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 
+type SunPreference = "full-sun" | "part-shade" | "mostly-shade";
+type SpacePreference = "small-patch" | "medium-yard" | "large-yard";
+
+const sunOptions: Array<{ value: SunPreference; label: string; notes: string }> = [
+  {
+    value: "full-sun",
+    label: "Full sun",
+    notes: "6+ hours of direct light",
+  },
+  {
+    value: "part-shade",
+    label: "Part shade",
+    notes: "Morning sun or dappled light",
+  },
+  {
+    value: "mostly-shade",
+    label: "Mostly shade",
+    notes: "Protected from strong afternoon sun",
+  },
+];
+
+const spaceOptions: Array<{ value: SpacePreference; label: string; notes: string }> = [
+  {
+    value: "small-patch",
+    label: "Small patch",
+    notes: "About 3 x 6 ft to 8 x 10 ft",
+  },
+  {
+    value: "medium-yard",
+    label: "Medium yard",
+    notes: "About 200 to 1,000 sq ft, roughly 10 x 20 ft to 20 x 50 ft",
+  },
+  {
+    value: "large-yard",
+    label: "Large yard / plot",
+    notes: "About 1,000 sq ft+ up to 1/4 acre or more",
+  },
+];
+
 export default function Home() {
   const [zip, setZip] = useState("");
   const [showZip, setShowZip] = useState(false);
+  const [sun, setSun] = useState<SunPreference>("full-sun");
+  const [space, setSpace] = useState<SpacePreference>("small-patch");
   const router = useRouter();
+
+  const buildPlanUrl = (params: Record<string, string>) => {
+    const search = new URLSearchParams({
+      ...params,
+      sun,
+      space,
+    });
+
+    return `/plan?${search.toString()}`;
+  };
 
   const goWithZip = (value?: string) => {
     const cleaned = (value ?? zip).trim();
 
     if (cleaned.length === 5) {
-      router.push(`/plan?zip=${cleaned}`);
+      router.push(buildPlanUrl({ zip: cleaned }));
     }
   };
 
@@ -24,7 +75,9 @@ export default function Home() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        router.push(`/plan?lat=${latitude}&lon=${longitude}`);
+        router.push(
+          buildPlanUrl({ lat: String(latitude), lon: String(longitude) })
+        );
       },
       () => {
         alert("We couldn't access your location. Please enter your ZIP instead.");
@@ -164,10 +217,118 @@ export default function Home() {
 
             <div
               style={{
+                display: "grid",
+                gap: "1rem",
+                marginTop: "1.35rem",
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    margin: "0 0 0.5rem",
+                    fontSize: "0.8rem",
+                    letterSpacing: "0.09em",
+                    textTransform: "uppercase",
+                    opacity: 0.78,
+                  }}
+                >
+                  Light
+                </p>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                    gap: "0.7rem",
+                  }}
+                >
+                  {sunOptions.map((option) => {
+                    const isActive = option.value === sun;
+
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setSun(option.value)}
+                        style={{
+                          textAlign: "left",
+                          borderRadius: "18px",
+                          border: isActive
+                            ? "1px solid rgba(243, 221, 175, 0.9)"
+                            : "1px solid rgba(255,255,255,0.14)",
+                          background: isActive
+                            ? "rgba(243, 221, 175, 0.14)"
+                            : "rgba(255,255,255,0.06)",
+                          color: "#f8f5ec",
+                          padding: "0.85rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>
+                          {option.label}
+                        </div>
+                        <div style={{ fontSize: "0.88rem", opacity: 0.78, lineHeight: 1.45 }}>
+                          {option.notes}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <p
+                  style={{
+                    margin: "0 0 0.5rem",
+                    fontSize: "0.8rem",
+                    letterSpacing: "0.09em",
+                    textTransform: "uppercase",
+                    opacity: 0.78,
+                  }}
+                >
+                  Space
+                </p>
+                <div style={{ display: "grid", gap: "0.7rem" }}>
+                  {spaceOptions.map((option) => {
+                    const isActive = option.value === space;
+
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setSpace(option.value)}
+                        style={{
+                          textAlign: "left",
+                          borderRadius: "20px",
+                          border: isActive
+                            ? "1px solid rgba(243, 221, 175, 0.9)"
+                            : "1px solid rgba(255,255,255,0.14)",
+                          background: isActive
+                            ? "rgba(243, 221, 175, 0.14)"
+                            : "rgba(255,255,255,0.06)",
+                          color: "#f8f5ec",
+                          padding: "0.9rem 1rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>
+                          {option.label}
+                        </div>
+                        <div style={{ fontSize: "0.9rem", opacity: 0.8, lineHeight: 1.5 }}>
+                          {option.notes}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
                 display: "flex",
                 flexWrap: "wrap",
                 gap: "0.85rem",
-                marginTop: "1.4rem",
+                marginTop: "1.5rem",
               }}
             >
               <button
@@ -249,7 +410,7 @@ export default function Home() {
               >
                 <p style={{ margin: 0, fontSize: "0.78rem", opacity: 0.72 }}>Built for</p>
                 <p style={{ margin: "0.28rem 0 0", fontSize: "1.35rem", fontWeight: 700 }}>
-                  Small wins
+                  {spaceOptions.find((option) => option.value === space)?.label}
                 </p>
               </div>
             </div>
@@ -297,7 +458,7 @@ export default function Home() {
               <div style={{ display: "grid", gap: "0.75rem" }}>
                 {[
                   "A region-aware starter plant set",
-                  "A simple patch-size recommendation",
+                  "A size recommendation with example dimensions",
                   "A clearer first weekend action plan",
                 ].map((item) => (
                   <div
@@ -340,7 +501,7 @@ export default function Home() {
               </p>
               <p style={{ margin: 0, color: "#475544", lineHeight: 1.65 }}>
                 Rewild is designed to feel more like a thoughtful guide than a dense tool.
-                Start with one sunny patch, watch what shows up, and grow from there.
+                Start with the light and yard size you actually have, then build outward.
               </p>
             </div>
           </aside>

@@ -1,5 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+type SunPreference = "full-sun" | "part-shade" | "mostly-shade";
+type SpacePreference = "small-patch" | "medium-yard" | "large-yard";
+
 type Plant = {
   name: string;
   latin?: string;
@@ -8,21 +11,55 @@ type Plant = {
   image: string;
 };
 
+type PlanDetails = {
+  sun: SunPreference;
+  sunLabel: string;
+  space: SpacePreference;
+  spaceLabel: string;
+  sizeRange: string;
+  strategy: string;
+  title: string;
+};
+
 type PlantsResponse = {
   ecosystem: string;
   plants: Plant[];
+  plan: PlanDetails;
+};
+
+const sunLabels: Record<SunPreference, string> = {
+  "full-sun": "Full sun",
+  "part-shade": "Part shade",
+  "mostly-shade": "Mostly shade",
+};
+
+const spaceDetails: Record<
+  SpacePreference,
+  { label: string; sizeRange: string; strategy: string }
+> = {
+  "small-patch": {
+    label: "Small patch",
+    sizeRange: "About 3 x 6 ft to 8 x 10 ft",
+    strategy: "Start with one compact habitat pocket that looks intentional fast.",
+  },
+  "medium-yard": {
+    label: "Medium yard",
+    sizeRange: "About 200 to 1,000 sq ft, roughly 10 x 20 ft to 20 x 50 ft",
+    strategy: "Build one anchor bed first, then connect it to a second planting zone.",
+  },
+  "large-yard": {
+    label: "Large yard / plot",
+    sizeRange: "About 1,000 sq ft+ up to 1/4 acre or more",
+    strategy: "Think in habitat zones so the planting feels manageable instead of overwhelming.",
+  },
 };
 
 function getRegionFromQuery(region: string | undefined, zip: string | undefined): string {
-  if (region) {
-    return region;
-  }
-
+  if (region) return region;
   if (zip === "60302") return "Oak Park, Illinois";
   if (zip?.startsWith("60")) return "Illinois";
   if (zip?.startsWith("94")) return "California";
   if (zip?.startsWith("10") || zip?.startsWith("11")) return "New York";
-
   return "Your Region";
 }
 
@@ -133,16 +170,84 @@ function getPlantsForRegion(region: string): Plant[] {
   return midwest;
 }
 
+function parseSunPreference(value: string | undefined): SunPreference {
+  if (value === "part-shade" || value === "mostly-shade" || value === "full-sun") {
+    return value;
+  }
+
+  return "full-sun";
+}
+
+function parseSpacePreference(value: string | undefined): SpacePreference {
+  if (value === "medium-yard" || value === "large-yard" || value === "small-patch") {
+    return value;
+  }
+
+  return "small-patch";
+}
+
+function tailorPlants(
+  plants: Plant[],
+  sun: SunPreference,
+  space: SpacePreference
+): Plant[] {
+  const sunGuidance: Record<SunPreference, string> = {
+    "full-sun": "Best in a sunny spot with 6+ hours of light.",
+    "part-shade": "Happy with softer light and some afternoon shade.",
+    "mostly-shade": "A better fit for gentler light and cooler edges of the yard.",
+  };
+
+  const spaceGuidance: Record<SpacePreference, string> = {
+    "small-patch": "Ideal for a compact starter planting.",
+    "medium-yard": "Works well as part of a layered medium-size bed.",
+    "large-yard": "Can anchor one zone within a larger rewilding plan.",
+  };
+
+  return plants.map((plant, index) => ({
+    ...plant,
+    notes: `${plant.notes} ${sunGuidance[sun]} ${spaceGuidance[space]}${
+      index === 0 ? " This one makes a strong first anchor plant." : ""
+    }`,
+  }));
+}
+
+function buildPlanDetails(
+  region: string,
+  sun: SunPreference,
+  space: SpacePreference
+): PlanDetails {
+  const regionLabel = region === "Your Region" ? "your area" : region;
+  const spaceInfo = spaceDetails[space];
+
+  return {
+    sun,
+    sunLabel: sunLabels[sun],
+    space,
+    spaceLabel: spaceInfo.label,
+    sizeRange: spaceInfo.sizeRange,
+    strategy: spaceInfo.strategy,
+    title: `${sunLabels[sun]} plan for ${regionLabel}`,
+  };
+}
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<PlantsResponse | { error: string }>
 ) {
   const region = typeof req.query.region === "string" ? req.query.region : undefined;
   const zip = typeof req.query.zip === "string" ? req.query.zip : undefined;
+  const sun = parseSunPreference(
+    typeof req.query.sun === "string" ? req.query.sun : undefined
+  );
+  const space = parseSpacePreference(
+    typeof req.query.space === "string" ? req.query.space : undefined
+  );
   const resolvedRegion = getRegionFromQuery(region, zip);
+  const plants = tailorPlants(getPlantsForRegion(resolvedRegion), sun, space);
 
   res.status(200).json({
     ecosystem: getEcosystemLabel(resolvedRegion),
-    plants: getPlantsForRegion(resolvedRegion),
+    plants,
+    plan: buildPlanDetails(resolvedRegion, sun, space),
   });
 }
