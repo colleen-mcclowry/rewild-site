@@ -9,6 +9,9 @@ type Plant = {
   latin?: string;
   benefit: string;
   notes: string;
+  role?: string;
+  fitReasons?: string[];
+  placementNote?: string;
   image?: string;
   imageSourceLabel?: string;
   imageSourceUrl?: string;
@@ -674,15 +677,35 @@ function getPlantsForPlan(
   const availablePlants = plantCatalog[regionKey][sun];
   const targetCount = spaceDetails[space].plantCount;
 
-  return availablePlants.slice(0, targetCount).map((plant) => {
+  return availablePlants.slice(0, targetCount).map((plant, index) => {
     const curated = curatedImageByPlantName[plant.name];
+    const role =
+      index === 0
+        ? "Anchor plant"
+        : index === targetCount - 1
+          ? "Structure plant"
+          : "Supporting plant";
+    const placementPrefix: Record<SpacePreference, string> = {
+      "small-patch": "Use this in a tight cluster so the bed feels intentional quickly.",
+      "medium-yard": "Repeat this in a few small drifts to make the planting feel connected.",
+      "large-yard": "Use this as one layer within a larger habitat zone, not as a one-off.",
+    };
+    const fitReasons = [
+      `${sunLabels[sun]} conditions`,
+      `${spaceDetails[space].label.toLowerCase()} scale`,
+      index === 0 ? "fast visual payoff" : index === targetCount - 1 ? "structure and habitat" : "supports pollinators and flow",
+    ];
+    const placementNote = `${placementPrefix[space]} ${spaceDetails[space].strategy}`;
 
     if (curated) {
-      return { ...plant, ...curated };
+      return { ...plant, ...curated, role, fitReasons, placementNote };
     }
 
     return {
       ...plant,
+      role,
+      fitReasons,
+      placementNote,
       image: undefined,
       imageSourceLabel: undefined,
       imageSourceUrl: undefined,

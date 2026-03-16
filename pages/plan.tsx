@@ -9,6 +9,9 @@ type Plant = {
   name: string;
   latin?: string;
   benefit: string;
+  role?: string;
+  fitReasons?: string[];
+  placementNote?: string;
   image?: string;
   imageSourceLabel?: string;
   imageSourceUrl?: string;
@@ -678,9 +681,76 @@ export default function Plan() {
                   >
                     {plant.benefit}
                   </p>
+                  {plant.role && (
+                    <p
+                      style={{
+                        margin: "0 0 0.7rem",
+                        fontSize: "0.84rem",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        color: "#73806e",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {plant.role}
+                    </p>
+                  )}
                   <p style={{ margin: 0, color: "#566453", lineHeight: 1.6 }}>
                     {plant.notes}
                   </p>
+                  {plant.fitReasons && plant.fitReasons.length > 0 && (
+                    <div
+                      style={{
+                        marginTop: "0.85rem",
+                        paddingTop: "0.85rem",
+                        borderTop: "1px solid rgba(104, 130, 90, 0.12)",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: "0 0 0.45rem",
+                          fontSize: "0.8rem",
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          color: "#6b7867",
+                          fontWeight: 700,
+                        }}
+                      >
+                        Why it fits
+                      </p>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
+                        {plant.fitReasons.map((reason) => (
+                          <span
+                            key={reason}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              borderRadius: "999px",
+                              padding: "0.38rem 0.65rem",
+                              background: "rgba(235, 241, 229, 0.95)",
+                              color: "#446040",
+                              fontSize: "0.82rem",
+                            }}
+                          >
+                            {reason}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {plant.placementNote && (
+                    <p
+                      style={{
+                        margin: "0.85rem 0 0",
+                        padding: "0.85rem 0 0",
+                        borderTop: "1px solid rgba(104, 130, 90, 0.12)",
+                        color: "#5b6857",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      <strong style={{ color: "#40503d" }}>Placement:</strong> {plant.placementNote}
+                    </p>
+                  )}
                   {plant.imageSourceUrl && (
                     <p style={{ margin: "0.8rem 0 0", fontSize: "0.85rem", color: "#687565" }}>
                       <a
