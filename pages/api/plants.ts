@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 type SunPreference = "full-sun" | "part-shade" | "mostly-shade";
 type SpacePreference = "small-patch" | "medium-yard" | "large-yard";
+type GoalPreference = "pollinators" | "low-maintenance" | "bird-habitat" | "color";
 type RegionKey = "midwest" | "california" | "northeast";
 
 type Plant = {
@@ -22,6 +23,8 @@ type PlanDetails = {
   sunLabel: string;
   space: SpacePreference;
   spaceLabel: string;
+  goal: GoalPreference;
+  goalLabel: string;
   sizeRange: string;
   strategy: string;
   title: string;
@@ -47,6 +50,13 @@ const sunLabels: Record<SunPreference, string> = {
   "full-sun": "Full sun",
   "part-shade": "Part shade",
   "mostly-shade": "Mostly shade",
+};
+
+const goalLabels: Record<GoalPreference, string> = {
+  pollinators: "Pollinators",
+  "low-maintenance": "Low maintenance",
+  "bird-habitat": "Bird habitat",
+  color: "Color",
 };
 
 const spaceDetails: Record<
@@ -670,16 +680,30 @@ function parseSpacePreference(value: string | undefined): SpacePreference {
   return "small-patch";
 }
 
+function parseGoalPreference(value: string | undefined): GoalPreference {
+  if (
+    value === "pollinators" ||
+    value === "low-maintenance" ||
+    value === "bird-habitat" ||
+    value === "color"
+  ) {
+    return value;
+  }
+
+  return "pollinators";
+}
+
 function getPlantsForPlan(
   region: string,
   sun: SunPreference,
-  space: SpacePreference
+  space: SpacePreference,
+  goal: GoalPreference
 ): Plant[] {
   const regionKey = getRegionKey(region);
   const availablePlants = plantCatalog[regionKey][sun];
   const targetCount = spaceDetails[space].plantCount;
 
-  return availablePlants
+  const curatedPlants = availablePlants
     .map((plant) => {
       const curated = curatedImageByPlantName[plant.name];
 
@@ -689,7 +713,29 @@ function getPlantsForPlan(
 
       return { ...plant, ...curated } satisfies CuratedPlant;
     })
-    .filter((plant): plant is CuratedPlant => plant !== null)
+    .filter((plant): plant is CuratedPlant => plant !== null);
+
+  const goalScores: Record<GoalPreference, string[]> = {
+    pollinators: ["pollinator", "nectar", "bees", "butterfl", "hummingbird", "insect"],
+    "low-maintenance": ["forgiving", "tough", "reliable", "structure", "durable", "groundcover"],
+    "bird-habitat": ["seed", "shelter", "structure", "habitat", "cover", "grass"],
+    color: ["bright", "color", "bloom", "flowers", "cheerful", "bold"],
+  };
+
+  const rankedPlants = curatedPlants
+    .map((plant) => {
+      const haystack = `${plant.benefit} ${plant.notes}`.toLowerCase();
+      const score = goalScores[goal].reduce(
+        (sum, keyword) => sum + (haystack.includes(keyword) ? 1 : 0),
+        0
+      );
+
+      return { plant, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .map((entry) => entry.plant);
+
+  return rankedPlants
     .slice(0, targetCount)
     .map((plant, index) => {
     const role =
@@ -706,6 +752,7 @@ function getPlantsForPlan(
     const fitReasons = [
       `${sunLabels[sun]} conditions`,
       `${spaceDetails[space].label.toLowerCase()} scale`,
+      `${goalLabels[goal].toLowerCase()} focus`,
       index === 0 ? "fast visual payoff" : index === targetCount - 1 ? "structure and habitat" : "supports pollinators and flow",
     ];
     const placementNote = `${placementPrefix[space]} ${spaceDetails[space].strategy}`;
@@ -722,7 +769,8 @@ function getPlantsForPlan(
 function buildPlanDetails(
   region: string,
   sun: SunPreference,
-  space: SpacePreference
+  space: SpacePreference,
+  goal: GoalPreference
 ): PlanDetails {
   const regionLabel = region === "Your Region" ? "your area" : region;
   const spaceInfo = spaceDetails[space];
@@ -732,9 +780,11 @@ function buildPlanDetails(
     sunLabel: sunLabels[sun],
     space,
     spaceLabel: spaceInfo.label,
+    goal,
+    goalLabel: goalLabels[goal],
     sizeRange: spaceInfo.sizeRange,
     strategy: spaceInfo.strategy,
-    title: `${sunLabels[sun]} plan for ${regionLabel}`,
+    title: `${goalLabels[goal]} plan for ${regionLabel}`,
   };
 }
 
@@ -750,11 +800,14 @@ export default function handler(
   const space = parseSpacePreference(
     typeof req.query.space === "string" ? req.query.space : undefined
   );
+  const goal = parseGoalPreference(
+    typeof req.query.goal === "string" ? req.query.goal : undefined
+  );
   const resolvedRegion = getRegionFromQuery(region, zip);
 
   res.status(200).json({
     ecosystem: getEcosystemLabel(resolvedRegion),
-    plants: getPlantsForPlan(resolvedRegion, sun, space),
-    plan: buildPlanDetails(resolvedRegion, sun, space),
+    plants: getPlantsForPlan(resolvedRegion, sun, space, goal),
+    plan: buildPlanDetails(resolvedRegion, sun, space, goal),
   });
 }

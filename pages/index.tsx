@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 
 type SunPreference = "full-sun" | "part-shade" | "mostly-shade";
 type SpacePreference = "small-patch" | "medium-yard" | "large-yard";
+type GoalPreference = "pollinators" | "low-maintenance" | "bird-habitat" | "color";
 
 const sunOptions: Array<{ value: SunPreference; label: string; notes: string }> = [
   {
@@ -40,11 +41,35 @@ const spaceOptions: Array<{ value: SpacePreference; label: string; notes: string
   },
 ];
 
+const goalOptions: Array<{ value: GoalPreference; label: string; notes: string }> = [
+  {
+    value: "pollinators",
+    label: "Pollinators",
+    notes: "More nectar, bloom, and insect activity",
+  },
+  {
+    value: "low-maintenance",
+    label: "Low maintenance",
+    notes: "Easier structure and forgiving planting choices",
+  },
+  {
+    value: "bird-habitat",
+    label: "Bird habitat",
+    notes: "More cover, seed, and layered shelter",
+  },
+  {
+    value: "color",
+    label: "Color",
+    notes: "A brighter, more visibly blooming mix",
+  },
+];
+
 export default function Home() {
   const [zip, setZip] = useState("");
   const [showZip, setShowZip] = useState(false);
   const [sun, setSun] = useState<SunPreference>("full-sun");
   const [space, setSpace] = useState<SpacePreference>("small-patch");
+  const [goal, setGoal] = useState<GoalPreference>("pollinators");
   const router = useRouter();
 
   const buildPlanUrl = (params: Record<string, string>) => {
@@ -52,6 +77,7 @@ export default function Home() {
       ...params,
       sun,
       space,
+      goal,
     });
 
     return `/plan?${search.toString()}`;
@@ -384,6 +410,58 @@ export default function Home() {
                 })}
               </div>
             </div>
+
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.5rem",
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.09em",
+                  textTransform: "uppercase",
+                  opacity: 0.76,
+                }}
+              >
+                What matters most
+              </p>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gap: "0.7rem",
+                }}
+              >
+                {goalOptions.map((option) => {
+                  const isActive = option.value === goal;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setGoal(option.value)}
+                      style={{
+                        textAlign: "left",
+                        borderRadius: "18px",
+                        border: isActive
+                          ? "1px solid rgba(243, 221, 175, 0.9)"
+                          : "1px solid rgba(255,255,255,0.14)",
+                        background: isActive
+                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
+                          : "rgba(255,255,255,0.06)",
+                        color: "#f8f5ec",
+                        padding: "0.9rem 1rem",
+                        cursor: "pointer",
+                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
+                      <div style={{ fontSize: "0.88rem", opacity: 0.8, lineHeight: 1.45 }}>
+                        {option.notes}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           <div
@@ -440,7 +518,8 @@ export default function Home() {
               }}
             >
               Personalized native picks tailored for{" "}
-              {sunOptions.find((option) => option.value === sun)?.label.toLowerCase()}
+              {sunOptions.find((option) => option.value === sun)?.label.toLowerCase()} with a{" "}
+              {goalOptions.find((option) => option.value === goal)?.label.toLowerCase()} focus
             </p>
           </div>
         </section>

@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 
 type SunPreference = "full-sun" | "part-shade" | "mostly-shade";
 type SpacePreference = "small-patch" | "medium-yard" | "large-yard";
+type GoalPreference = "pollinators" | "low-maintenance" | "bird-habitat" | "color";
 
 type Plant = {
   name: string;
@@ -30,6 +31,8 @@ type PlanDetails = {
   sunLabel: string;
   space: SpacePreference;
   spaceLabel: string;
+  goal: GoalPreference;
+  goalLabel: string;
   sizeRange: string;
   strategy: string;
   title: string;
@@ -37,7 +40,7 @@ type PlanDetails = {
 
 export default function Plan() {
   const router = useRouter();
-  const { zip, lat, lon, lng, sun, space } = router.query;
+  const { zip, lat, lon, lng, sun, space, goal } = router.query;
   const longitude = typeof lon === "string" ? lon : typeof lng === "string" ? lng : undefined;
 
   const [geoInfo, setGeoInfo] = useState<GeoInfo | null>(null);
@@ -50,6 +53,8 @@ export default function Plan() {
     sunLabel: "Full sun",
     space: "small-patch",
     spaceLabel: "Small patch",
+    goal: "pollinators",
+    goalLabel: "Pollinators",
     sizeRange: "About 3 x 6 ft to 8 x 10 ft",
     strategy: "Start with one compact habitat pocket that looks intentional fast.",
     title: "Starter plan",
@@ -128,6 +133,9 @@ export default function Plan() {
         if (typeof space === "string" && space.length > 0) {
           params.set("space", space);
         }
+        if (typeof goal === "string" && goal.length > 0) {
+          params.set("goal", goal);
+        }
 
         const response = await fetch(`/api/plants?${params.toString()}`);
         const data = await response.json();
@@ -154,7 +162,7 @@ export default function Plan() {
     };
 
     run();
-  }, [region, router.isReady, space, sun, zip]);
+  }, [goal, region, router.isReady, space, sun, zip]);
 
   const hasParams =
     (typeof zip === "string" && zip.length > 0) ||
@@ -319,6 +327,19 @@ export default function Plan() {
               >
                 {planDetails.spaceLabel}
               </span>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  borderRadius: "999px",
+                  padding: "0.45rem 0.8rem",
+                  background: "rgba(255,255,255,0.12)",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                }}
+              >
+                {planDetails.goalLabel}
+              </span>
             </div>
 
             <h1
@@ -344,7 +365,7 @@ export default function Plan() {
               }}
             >
               We turned {regionLabel} into a {planDetails.sunLabel.toLowerCase()} starter
-              plan for a {planDetails.spaceLabel.toLowerCase()}. Expect a curated set of
+              plan for a {planDetails.spaceLabel.toLowerCase()} with a {planDetails.goalLabel.toLowerCase()} focus. Expect a curated set of
               native plants that support pollinators while staying manageable for the
               space you picked.
             </p>
@@ -392,6 +413,19 @@ export default function Plan() {
                   {planDetails.sizeRange}
                 </p>
               </div>
+              <div
+                style={{
+                  borderRadius: "18px",
+                  padding: "0.95rem",
+                  background: "rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Priority</p>
+                <p style={{ margin: "0.3rem 0 0", fontSize: "1.2rem", lineHeight: 1.25 }}>
+                  {planDetails.goalLabel}
+                </p>
+              </div>
             </div>
 
             {geoLoading && (
@@ -435,7 +469,8 @@ export default function Plan() {
             </h2>
             <p style={{ margin: 0, color: "#4f5d4d", lineHeight: 1.65 }}>
               This mix balances bloom, structure, and habitat so the space feels alive
-              quickly without outgrowing your {planDetails.spaceLabel.toLowerCase()}.
+              quickly without outgrowing your {planDetails.spaceLabel.toLowerCase()}, while
+              leaning toward {planDetails.goalLabel.toLowerCase()}.
             </p>
 
             <div
