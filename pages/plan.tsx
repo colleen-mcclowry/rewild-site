@@ -9,7 +9,9 @@ type Plant = {
   name: string;
   latin?: string;
   benefit: string;
-  image: string;
+  image?: string;
+  imageSourceLabel?: string;
+  imageSourceUrl?: string;
   notes: string;
 };
 
@@ -550,19 +552,51 @@ export default function Plan() {
                 className="plant-card fade-up"
               >
                 <div style={{ position: "relative" }}>
-                  <Image
-                    src={plant.image}
-                    alt={plant.name}
-                    width={1200}
-                    height={680}
-                    style={{
-                      width: "100%",
-                      height: "220px",
-                      objectFit: "cover",
-                      display: "block",
-                      background: "#f3f3f3",
-                    }}
-                  />
+                  {plant.image ? (
+                    <Image
+                      src={plant.image}
+                      alt={plant.name}
+                      width={1200}
+                      height={680}
+                      style={{
+                        width: "100%",
+                        height: "220px",
+                        objectFit: "cover",
+                        display: "block",
+                        background: "#f3f3f3",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "220px",
+                        display: "flex",
+                        alignItems: "end",
+                        padding: "1rem",
+                        background:
+                          "linear-gradient(180deg, rgba(228,237,218,1) 0%, rgba(243,239,228,1) 100%)",
+                        color: "#345034",
+                      }}
+                    >
+                      <div>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "0.8rem",
+                            letterSpacing: "0.08em",
+                            textTransform: "uppercase",
+                            opacity: 0.7,
+                          }}
+                        >
+                          Curated photo coming soon
+                        </p>
+                        <p style={{ margin: "0.35rem 0 0", fontSize: "1.2rem", fontWeight: 700 }}>
+                          Botanical placeholder
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <div
                     style={{
                       position: "absolute",
@@ -617,6 +651,20 @@ export default function Plan() {
                   </p>
                   <p style={{ margin: 0, color: "#566453", lineHeight: 1.6 }}>
                     {plant.notes}
+                  </p>
+                  <p style={{ margin: "0.8rem 0 0", fontSize: "0.85rem", color: "#687565" }}>
+                    {plant.imageSourceUrl ? (
+                      <a
+                        href={plant.imageSourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ color: "#687565" }}
+                      >
+                        Photo source: {plant.imageSourceLabel}
+                      </a>
+                    ) : (
+                      "Photo source: curated placeholder while we verify a species match"
+                    )}
                   </p>
                 </div>
               </article>

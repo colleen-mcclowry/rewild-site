@@ -9,7 +9,9 @@ type Plant = {
   latin?: string;
   benefit: string;
   notes: string;
-  image: string;
+  image?: string;
+  imageSourceLabel?: string;
+  imageSourceUrl?: string;
 };
 
 type PlanDetails = {
@@ -29,6 +31,12 @@ type PlantsResponse = {
 };
 
 type PlantCatalog = Record<RegionKey, Record<SunPreference, Plant[]>>;
+
+type PlantImageMeta = {
+  image: string;
+  imageSourceLabel: string;
+  imageSourceUrl: string;
+};
 
 const sunLabels: Record<SunPreference, string> = {
   "full-sun": "Full sun",
@@ -519,6 +527,93 @@ const plantCatalog: PlantCatalog = {
   },
 };
 
+function commonsImage(filename: string): string {
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}`;
+}
+
+const curatedImageByPlantName: Partial<Record<string, PlantImageMeta>> = {
+  "Purple Coneflower": {
+    image: commonsImage("Purple coneflower (lat.echinacea purpurea) plant.jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Purple_coneflower_(lat.echinacea_purpurea)_plant.jpg",
+  },
+  "Wild Bergamot": {
+    image: commonsImage("Monarda fistulosa - Wild Bergamot.jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Monarda_fistulosa_-_Wild_Bergamot.jpg",
+  },
+  "Butterfly Milkweed": {
+    image: commonsImage("Asclepias tuberosa (butterfly milkweed) (54309755024).jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Asclepias_tuberosa_(butterfly_milkweed)_(54309755024).jpg",
+  },
+  "Little Bluestem": {
+    image: commonsImage("Little bluestem (11672134614).jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Little_bluestem_(11672134614).jpg",
+  },
+  "Black-Eyed Susan": {
+    image: commonsImage("Rudbeckia hirta - Black Eyed Susan.jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Rudbeckia_hirta_-_Black_Eyed_Susan.jpg",
+  },
+  "Bee Balm": {
+    image: commonsImage("Monarda didyma (39371530400).jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Monarda_didyma_(39371530400).jpg",
+  },
+  Columbine: {
+    image: commonsImage("Red Columbine acquilegia canadensis.jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Red_Columbine_acquilegia_canadensis.jpg",
+  },
+  "Wild Geranium": {
+    image: commonsImage("Geranium maculatum, Kane Woods Nature Area, 2025-05-12.jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Geranium_maculatum,_Kane_Woods_Nature_Area,_2025-05-12.jpg",
+  },
+  "Jacob's Ladder": {
+    image: commonsImage(
+      "Jacob's Ladder (Polemonium reptans), close-up of flowers, New Jersey, 051520, Becky Laboy.jpg"
+    ),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Jacob%27s_Ladder_(Polemonium_reptans),_close-up_of_flowers,_New_Jersey,_051520,_Becky_Laboy.jpg",
+  },
+  "Solomon's Seal": {
+    image: commonsImage("Smooth solomon's seal (Polygonatum biflorum) (47666983981).jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Smooth_solomon%27s_seal_(Polygonatum_biflorum)_(47666983981).jpg",
+  },
+  "Virginia Bluebells": {
+    image: commonsImage("Virginia Bluebells (Mertensia virginica).jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Virginia_Bluebells_(Mertensia_virginica).jpg",
+  },
+  Foamflower: {
+    image: commonsImage("Tiarella cordifolia - Foamflower (5760217966).jpg"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Tiarella_cordifolia_-_Foamflower_(5760217966).jpg",
+  },
+  "Wild Ginger": {
+    image: commonsImage("Wild Ginger (Asarum canadense) (1af1795b-155d-451f-6797-7cdfce9dfec9).JPG"),
+    imageSourceLabel: "Wikimedia Commons",
+    imageSourceUrl:
+      "https://commons.wikimedia.org/wiki/File:Wild_Ginger_(Asarum_canadense)_(1af1795b-155d-451f-6797-7cdfce9dfec9).JPG",
+  },
+};
+
 function getRegionFromQuery(region: string | undefined, zip: string | undefined): string {
   if (region) return region;
   if (zip === "60302") return "Oak Park, Illinois";
@@ -579,7 +674,11 @@ function getPlantsForPlan(
   const availablePlants = plantCatalog[regionKey][sun];
   const targetCount = spaceDetails[space].plantCount;
 
-  return availablePlants.slice(0, targetCount);
+  return availablePlants.slice(0, targetCount).map((plant) => {
+    const curated = curatedImageByPlantName[plant.name];
+
+    return curated ? { ...plant, ...curated } : plant;
+  });
 }
 
 function buildPlanDetails(
