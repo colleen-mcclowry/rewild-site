@@ -132,6 +132,8 @@ export default function Plan() {
   const regionLabel = region === "Your Region" ? "your area" : region;
   const planTitle =
     region === "Your Region" ? "Your starter rewilding plan" : `A starter plan for ${region}`;
+  const cardSurface = "rgba(255,255,255,0.78)";
+  const warmBorder = "1px solid rgba(104, 130, 90, 0.16)";
 
   if (!hasParams) {
     return (
@@ -172,11 +174,12 @@ export default function Plan() {
     <main
       style={{
         minHeight: "100vh",
-        fontFamily: "Georgia, Cambria, Times New Roman, Times, serif",
+        fontFamily:
+          '"Avenir Next", Avenir, Montserrat, "Segoe UI", "Helvetica Neue", sans-serif',
         padding: "2rem 1.25rem 4rem",
         margin: "0 auto",
         background:
-          "radial-gradient(circle at top left, rgba(224, 237, 214, 0.95), transparent 34%), radial-gradient(circle at top right, rgba(252, 239, 214, 0.9), transparent 28%), linear-gradient(180deg, #f5f1e8 0%, #fbfaf5 38%, #f7f8f2 100%)",
+          "radial-gradient(circle at top left, rgba(220, 234, 212, 0.98), transparent 33%), radial-gradient(circle at 90% 14%, rgba(246, 224, 188, 0.84), transparent 24%), linear-gradient(180deg, #f3efe4 0%, #fbfaf3 40%, #f2f5ec 100%)",
         color: "#1d2a1d",
       }}
     >
@@ -189,9 +192,10 @@ export default function Plan() {
             border: "none",
             padding: 0,
             cursor: "pointer",
-            color: "#50624a",
+            color: "#4e6249",
             fontSize: "0.95rem",
-            letterSpacing: "0.02em",
+            letterSpacing: "0.01em",
+            fontWeight: 600,
             marginBottom: "1.5rem",
           }}
         >
@@ -211,9 +215,9 @@ export default function Plan() {
               borderRadius: "30px",
               padding: "1.8rem",
               background:
-                "linear-gradient(145deg, rgba(35, 56, 34, 0.96), rgba(60, 91, 48, 0.9))",
+                "linear-gradient(145deg, rgba(28, 46, 33, 0.97), rgba(57, 85, 49, 0.92))",
               color: "#f6f5ee",
-              boxShadow: "0 20px 50px rgba(37, 58, 33, 0.2)",
+              boxShadow: "0 24px 56px rgba(37, 58, 33, 0.18)",
               position: "relative",
               overflow: "hidden",
             }}
@@ -225,7 +229,7 @@ export default function Plan() {
                 width: "220px",
                 height: "220px",
                 borderRadius: "999px",
-                background: "rgba(246, 212, 140, 0.14)",
+                background: "rgba(246, 212, 140, 0.12)",
               }}
             />
             <div
@@ -243,12 +247,13 @@ export default function Plan() {
                   borderRadius: "999px",
                   padding: "0.45rem 0.8rem",
                   background: "rgba(255,255,255,0.12)",
-                  fontSize: "0.85rem",
-                  letterSpacing: "0.04em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {locationSource}
+                fontSize: "0.85rem",
+                letterSpacing: "0.07em",
+                textTransform: "uppercase",
+                fontWeight: 700,
+              }}
+            >
+              {locationSource}
               </span>
               <span
                 style={{
@@ -256,20 +261,22 @@ export default function Plan() {
                   alignItems: "center",
                   borderRadius: "999px",
                   padding: "0.45rem 0.8rem",
-                  background: "rgba(255,255,255,0.12)",
-                  fontSize: "0.85rem",
-                }}
-              >
-                {ecosystem}
+                background: "rgba(255,255,255,0.12)",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+              }}
+            >
+              {ecosystem}
               </span>
             </div>
 
             <h1
               style={{
-                fontSize: "clamp(2.4rem, 6vw, 4.8rem)",
-                lineHeight: 0.95,
+                fontSize: "clamp(2.35rem, 6vw, 4.6rem)",
+                lineHeight: 0.96,
                 margin: "0 0 1rem",
-                letterSpacing: "-0.04em",
+                letterSpacing: "-0.06em",
+                fontWeight: 700,
               }}
             >
               {planTitle}
@@ -279,9 +286,10 @@ export default function Plan() {
               style={{
                 margin: 0,
                 maxWidth: "36rem",
-                fontSize: "1.08rem",
-                lineHeight: 1.6,
+                fontSize: "1.02rem",
+                lineHeight: 1.72,
                 color: "rgba(246, 245, 238, 0.82)",
+                letterSpacing: "-0.01em",
               }}
             >
               We turned {regionLabel} into a soft first step: three native plants that
@@ -300,9 +308,10 @@ export default function Plan() {
                 style={{
                   borderRadius: "18px",
                   padding: "0.95rem",
-                  background: "rgba(255,255,255,0.08)",
-                }}
-              >
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(4px)",
+              }}
+            >
                 <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Starter set</p>
                 <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>{plants.length || 3}</p>
               </div>
@@ -310,9 +319,10 @@ export default function Plan() {
                 style={{
                   borderRadius: "18px",
                   padding: "0.95rem",
-                  background: "rgba(255,255,255,0.08)",
-                }}
-              >
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(4px)",
+              }}
+            >
                 <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Patch size</p>
                 <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>3 x 6 ft</p>
               </div>
@@ -320,9 +330,10 @@ export default function Plan() {
                 style={{
                   borderRadius: "18px",
                   padding: "0.95rem",
-                  background: "rgba(255,255,255,0.08)",
-                }}
-              >
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(4px)",
+              }}
+            >
                 <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Best for</p>
                 <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>Pollinators</p>
               </div>
@@ -339,8 +350,8 @@ export default function Plan() {
             style={{
               borderRadius: "28px",
               padding: "1.4rem",
-              background: "rgba(255,255,255,0.7)",
-              border: "1px solid rgba(95, 126, 79, 0.16)",
+              background: cardSurface,
+              border: warmBorder,
               boxShadow: "0 18px 40px rgba(59, 82, 42, 0.08)",
               backdropFilter: "blur(14px)",
             }}
@@ -349,14 +360,22 @@ export default function Plan() {
               style={{
                 margin: "0 0 0.65rem",
                 fontSize: "0.8rem",
-                letterSpacing: "0.08em",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "#61725d",
+                fontWeight: 700,
               }}
             >
               What makes this plan work
             </p>
-            <h2 style={{ margin: "0 0 0.8rem", fontSize: "1.6rem", lineHeight: 1.1 }}>
+            <h2
+              style={{
+                margin: "0 0 0.8rem",
+                fontSize: "1.55rem",
+                lineHeight: 1.08,
+                letterSpacing: "-0.04em",
+              }}
+            >
               A beginner-friendly native patch
             </h2>
             <p style={{ margin: 0, color: "#4f5d4d", lineHeight: 1.65 }}>
@@ -381,7 +400,7 @@ export default function Plan() {
                   style={{
                     borderRadius: "18px",
                     padding: "0.9rem 1rem",
-                    background: "#f6f4ec",
+                    background: "rgba(244, 241, 231, 0.92)",
                     color: "#384536",
                     lineHeight: 1.5,
                   }}
@@ -414,14 +433,22 @@ export default function Plan() {
               style={{
                 margin: "0 0 0.45rem",
                 fontSize: "0.82rem",
-                letterSpacing: "0.08em",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "#667260",
+                fontWeight: 700,
               }}
             >
               Starter palette
             </p>
-            <h2 style={{ margin: 0, fontSize: "2rem", lineHeight: 1.05 }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "2rem",
+                lineHeight: 1.02,
+                letterSpacing: "-0.05em",
+              }}
+            >
               Native plants picked for {regionLabel}
             </h2>
           </div>
@@ -436,8 +463,8 @@ export default function Plan() {
             style={{
               borderRadius: "26px",
               background:
-                "linear-gradient(135deg, rgba(244,248,239,1) 0%, rgba(252,248,239,1) 100%)",
-              border: "1px solid #e8ecd9",
+                "linear-gradient(135deg, rgba(241,246,236,1) 0%, rgba(251,246,236,1) 100%)",
+              border: "1px solid #dde5d3",
               padding: "2rem",
               textAlign: "center",
               boxShadow: "0 12px 28px rgba(41, 63, 34, 0.06)",
@@ -467,10 +494,11 @@ export default function Plan() {
                 style={{
                   borderRadius: "24px",
                   overflow: "hidden",
-                  background: "rgba(255,255,255,0.88)",
-                  border: "1px solid rgba(95, 126, 79, 0.14)",
-                  boxShadow: "0 16px 40px rgba(42, 59, 32, 0.08)",
+                  background: "rgba(255,255,255,0.82)",
+                  border: warmBorder,
+                  boxShadow: "0 18px 44px rgba(42, 59, 32, 0.08)",
                 }}
+                className="plant-card fade-up"
               >
                 <div style={{ position: "relative" }}>
                   <Image
@@ -496,16 +524,25 @@ export default function Plan() {
                       borderRadius: "999px",
                       display: "grid",
                       placeItems: "center",
-                      background: "rgba(250, 247, 238, 0.88)",
+                      background: "rgba(250, 247, 238, 0.92)",
                       color: "#2f4328",
                       fontSize: "0.95rem",
+                      fontWeight: 700,
                     }}
                   >
                     0{index + 1}
                   </div>
                 </div>
                 <div style={{ padding: "1.15rem" }}>
-                  <h3 style={{ margin: 0, fontSize: "1.45rem", lineHeight: 1.05 }}>
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: "1.45rem",
+                      lineHeight: 1.02,
+                      letterSpacing: "-0.04em",
+                      fontWeight: 700,
+                    }}
+                  >
                     {plant.name}
                   </h3>
                   {plant.latin && (
@@ -549,22 +586,30 @@ export default function Plan() {
             style={{
               borderRadius: "26px",
               padding: "1.5rem",
-              background: "#f7f4ea",
-              border: "1px solid rgba(109, 135, 88, 0.14)",
+              background: "rgba(247, 244, 234, 0.92)",
+              border: warmBorder,
             }}
           >
             <p
               style={{
                 margin: "0 0 0.45rem",
                 fontSize: "0.82rem",
-                letterSpacing: "0.08em",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "#687565",
+                fontWeight: 700,
               }}
             >
               First weekend plan
             </p>
-            <h2 style={{ margin: "0 0 0.8rem", fontSize: "1.9rem", lineHeight: 1.08 }}>
+            <h2
+              style={{
+                margin: "0 0 0.8rem",
+                fontSize: "1.9rem",
+                lineHeight: 1.03,
+                letterSpacing: "-0.05em",
+              }}
+            >
               Start with one small patch, not the whole yard
             </h2>
             <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
@@ -597,8 +642,8 @@ export default function Plan() {
             style={{
               borderRadius: "26px",
               padding: "1.5rem",
-              background: "#fffdfa",
-              border: "1px solid rgba(109, 135, 88, 0.14)",
+              background: "rgba(255,253,250,0.88)",
+              border: warmBorder,
               boxShadow: "0 14px 34px rgba(51, 70, 40, 0.05)",
             }}
           >
@@ -606,14 +651,22 @@ export default function Plan() {
               style={{
                 margin: "0 0 0.45rem",
                 fontSize: "0.82rem",
-                letterSpacing: "0.08em",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "#687565",
+                fontWeight: 700,
               }}
             >
               Why this matters
             </p>
-            <h2 style={{ margin: "0 0 0.8rem", fontSize: "1.9rem", lineHeight: 1.08 }}>
+            <h2
+              style={{
+                margin: "0 0 0.8rem",
+                fontSize: "1.9rem",
+                lineHeight: 1.03,
+                letterSpacing: "-0.05em",
+              }}
+            >
               Tiny habitat is still habitat
             </h2>
             <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
@@ -635,6 +688,43 @@ export default function Plan() {
           </section>
         </section>
       </div>
+      <style jsx>{`
+        .fade-up {
+          animation: fadeUp 700ms ease-out both;
+        }
+
+        .plant-card {
+          transition:
+            transform 180ms ease,
+            box-shadow 180ms ease;
+        }
+
+        .plant-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 22px 48px rgba(42, 59, 32, 0.12);
+        }
+
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(16px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (max-width: 920px) {
+          section[style*="grid-template-columns: minmax(0, 1.4fr)"] {
+            grid-template-columns: 1fr !important;
+          }
+
+          section[style*="grid-template-columns: minmax(0, 1.05fr)"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
