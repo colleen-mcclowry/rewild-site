@@ -344,8 +344,9 @@ export default function Plan() {
               }}
             >
               We turned {regionLabel} into a {planDetails.sunLabel.toLowerCase()} starter
-              plan for a {planDetails.spaceLabel.toLowerCase()}. Expect three native plants
-              that support pollinators while staying manageable for the space you picked.
+              plan for a {planDetails.spaceLabel.toLowerCase()}. Expect a curated set of
+              native plants that support pollinators while staying manageable for the
+              space you picked.
             </p>
 
             <div
@@ -554,8 +555,8 @@ export default function Plan() {
                 }}
                 className="plant-card fade-up"
               >
-                <div style={{ position: "relative" }}>
-                  {plant.image ? (
+                {plant.image ? (
+                  <div style={{ position: "relative" }}>
                     <Image
                       src={plant.image}
                       alt={plant.name}
@@ -566,80 +567,22 @@ export default function Plan() {
                         height: "220px",
                         objectFit: "cover",
                         display: "block",
-                        background: "#f3f3f3",
-                      }}
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "220px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        padding: "1.25rem",
-                        background:
-                          "radial-gradient(circle at top left, rgba(221,233,210,0.95), transparent 34%), linear-gradient(180deg, rgba(231,239,222,1) 0%, rgba(243,239,228,1) 100%)",
-                        color: "#345034",
-                        textAlign: "center",
-                      }}
-                    >
-                      <div
-                        style={{
-                          maxWidth: "14rem",
-                          display: "grid",
-                          gap: "0.55rem",
-                          justifyItems: "center",
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: "3.8rem",
-                            height: "3.8rem",
-                            borderRadius: "999px",
-                            display: "grid",
-                            placeItems: "center",
-                            background: "rgba(255,255,255,0.52)",
-                            fontSize: "1.5rem",
-                          }}
-                        >
-                          +
-                        </div>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: "0.8rem",
-                            letterSpacing: "0.08em",
-                            textTransform: "uppercase",
-                            opacity: 0.66,
-                          }}
-                        >
-                          Curated image in progress
-                        </p>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: "1.12rem",
-                            fontWeight: 700,
-                            lineHeight: 1.25,
-                          }}
-                        >
-                          Trustworthy species photo coming soon
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                      background: "#f3f3f3",
+                    }}
+                  />
+                  </div>
+                ) : null}
+                <div style={{ padding: "1.15rem" }}>
                   <div
                     style={{
-                      position: "absolute",
-                      top: "0.9rem",
-                      left: "0.9rem",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       width: "2.3rem",
                       height: "2.3rem",
                       borderRadius: "999px",
-                      display: "grid",
-                      placeItems: "center",
-                      background: "rgba(250, 247, 238, 0.92)",
+                      marginBottom: "0.85rem",
+                      background: "rgba(237, 242, 231, 0.92)",
                       color: "#2f4328",
                       fontSize: "0.95rem",
                       fontWeight: 700,
@@ -647,8 +590,6 @@ export default function Plan() {
                   >
                     0{index + 1}
                   </div>
-                </div>
-                <div style={{ padding: "1.15rem" }}>
                   <h3
                     style={{
                       margin: 0,

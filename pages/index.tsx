@@ -40,12 +40,6 @@ const spaceOptions: Array<{ value: SpacePreference; label: string; notes: string
   },
 ];
 
-const recommendationCounts: Record<SpacePreference, string> = {
-  "small-patch": "3 plant picks",
-  "medium-yard": "5 plant picks",
-  "large-yard": "6 plant picks",
-};
-
 export default function Home() {
   const [zip, setZip] = useState("");
   const [showZip, setShowZip] = useState(false);
@@ -445,7 +439,8 @@ export default function Home() {
                 color: "rgba(248, 245, 236, 0.76)",
               }}
             >
-              {recommendationCounts[space]} tailored for {sunOptions.find((option) => option.value === sun)?.label.toLowerCase()}
+              Personalized native picks tailored for{" "}
+              {sunOptions.find((option) => option.value === sun)?.label.toLowerCase()}
             </p>
           </div>
         </section>

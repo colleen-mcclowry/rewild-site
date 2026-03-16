@@ -41,6 +41,8 @@ type PlantImageMeta = {
   imageSourceUrl: string;
 };
 
+type CuratedPlant = Plant & PlantImageMeta;
+
 const sunLabels: Record<SunPreference, string> = {
   "full-sun": "Full sun",
   "part-shade": "Part shade",
@@ -677,8 +679,19 @@ function getPlantsForPlan(
   const availablePlants = plantCatalog[regionKey][sun];
   const targetCount = spaceDetails[space].plantCount;
 
-  return availablePlants.slice(0, targetCount).map((plant, index) => {
-    const curated = curatedImageByPlantName[plant.name];
+  return availablePlants
+    .map((plant) => {
+      const curated = curatedImageByPlantName[plant.name];
+
+      if (!curated) {
+        return null;
+      }
+
+      return { ...plant, ...curated } satisfies CuratedPlant;
+    })
+    .filter((plant): plant is CuratedPlant => plant !== null)
+    .slice(0, targetCount)
+    .map((plant, index) => {
     const role =
       index === 0
         ? "Anchor plant"
@@ -697,18 +710,11 @@ function getPlantsForPlan(
     ];
     const placementNote = `${placementPrefix[space]} ${spaceDetails[space].strategy}`;
 
-    if (curated) {
-      return { ...plant, ...curated, role, fitReasons, placementNote };
-    }
-
     return {
       ...plant,
       role,
       fitReasons,
       placementNote,
-      image: undefined,
-      imageSourceLabel: undefined,
-      imageSourceUrl: undefined,
     };
   });
 }
