@@ -33,7 +33,7 @@ export default function Home() {
 
         console.log("Location success:", latitude, longitude);
 
-        router.push(`/plan?lat=${latitude}&lng=${longitude}`);
+        router.push(`/plan?lat=${latitude}&lon=${longitude}`);
       },
       (error) => {
         console.log("Location error:", error);

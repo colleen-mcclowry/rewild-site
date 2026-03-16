@@ -1,9 +1,11 @@
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 
 type Plant = {
   name: string;
   latin?: string;
+  benefit: string;
   image: string;
   notes: string;
 };
@@ -15,124 +17,30 @@ type GeoInfo = {
   displayName?: string;
 };
 
-function getEcosystemLabel(region: string): string {
-  if (
-    region.includes("Illinois") ||
-    region.includes("Oak Park") ||
-    region.includes("Chicago")
-  ) {
-    return "Prairie / Oak Savanna ecosystem";
-  }
-
-  if (region.includes("California")) {
-    return "California grassland / chaparral ecosystem";
-  }
-
-  if (region.includes("New York") || region.includes("Northeast")) {
-    return "Northeastern meadow / woodland ecosystem";
-  }
-
-  return "Local native plant ecosystem";
-}
-
-function getPlantsForRegion(region: string): Plant[] {
-  const midwest: Plant[] = [
-    {
-      name: "Purple Coneflower",
-      latin: "Echinacea purpurea",
-      image:
-        "https://images.unsplash.com/photo-1627923109045-01caba5a8b71?auto=format&fit=crop&w=1200&q=70",
-      notes: "Hardy, colorful, and excellent for pollinators.",
-    },
-    {
-      name: "Wild Bergamot",
-      latin: "Monarda fistulosa",
-      image:
-        "https://images.unsplash.com/photo-1621619858360-7f79b3f3b2a9?auto=format&fit=crop&w=1200&q=70",
-      notes: "Loved by bees and butterflies; fragrant and easygoing.",
-    },
-    {
-      name: "Prairie Dropseed",
-      latin: "Sporobolus heterolepis",
-      image:
-        "https://images.unsplash.com/photo-1625246333196-5b21f2bced1e?auto=format&fit=crop&w=1200&q=70",
-      notes: "A soft native grass with great texture and low maintenance needs.",
-    },
-  ];
-
-  const california: Plant[] = [
-    {
-      name: "California Poppy",
-      latin: "Eschscholzia californica",
-      image:
-        "https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=70",
-      notes: "Iconic blooms, drought tolerant, and easy to scatter into a sunny patch.",
-    },
-    {
-      name: "Yarrow",
-      latin: "Achillea millefolium",
-      image:
-        "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=70",
-      notes: "Tough, pollinator-friendly, and adaptable in many garden conditions.",
-    },
-    {
-      name: "Deer Grass",
-      latin: "Muhlenbergia rigens",
-      image:
-        "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=1200&q=70",
-      notes: "Architectural native grass that adds structure and handles dry summers.",
-    },
-  ];
-
-  const northeast: Plant[] = [
-    {
-      name: "Black-Eyed Susan",
-      latin: "Rudbeckia hirta",
-      image:
-        "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&w=1200&q=70",
-      notes: "Bright and cheerful, great for pollinators and beginner-friendly.",
-    },
-    {
-      name: "Bee Balm",
-      latin: "Monarda didyma",
-      image:
-        "https://images.unsplash.com/photo-1565019011521-b0575c2067b5?auto=format&fit=crop&w=1200&q=70",
-      notes: "Bold flowers that hummingbirds and bees absolutely love.",
-    },
-    {
-      name: "Little Bluestem",
-      latin: "Schizachyrium scoparium",
-      image:
-        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=70",
-      notes: "A native grass with gorgeous seasonal color and good habitat value.",
-    },
-  ];
-
-  if (region.includes("California")) return california;
-  if (region.includes("New York") || region.includes("Northeast")) return northeast;
-  return midwest;
-}
-
 export default function Plan() {
   const router = useRouter();
-  const { zip, lat, lng } = router.query;
+  const { zip, lat, lon, lng } = router.query;
+  const longitude = typeof lon === "string" ? lon : typeof lng === "string" ? lng : undefined;
 
   const [geoInfo, setGeoInfo] = useState<GeoInfo | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
+  const [plants, setPlants] = useState<Plant[]>([]);
+  const [plantsLoading, setPlantsLoading] = useState(false);
+  const [ecosystem, setEcosystem] = useState("Local native plant ecosystem");
 
   useEffect(() => {
     if (
       typeof lat === "string" &&
-      typeof lng === "string" &&
+      typeof longitude === "string" &&
       lat.length > 0 &&
-      lng.length > 0
+      longitude.length > 0
     ) {
       const run = async () => {
         try {
           setGeoLoading(true);
 
           const response = await fetch(
-            `/api/reverse-geocode?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`
+            `/api/reverse-geocode?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(longitude)}`
           );
           const data = await response.json();
 
@@ -153,7 +61,7 @@ export default function Plan() {
 
       run();
     }
-  }, [lat, lng]);
+  }, [lat, longitude]);
 
   const region = useMemo(() => {
     if (geoInfo?.city && geoInfo?.state) {
@@ -174,12 +82,56 @@ export default function Plan() {
     return "Your Region";
   }, [geoInfo, zip]);
 
-  const plants = useMemo(() => getPlantsForRegion(region), [region]);
-  const ecosystem = useMemo(() => getEcosystemLabel(region), [region]);
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const run = async () => {
+      try {
+        setPlantsLoading(true);
+
+        const params = new URLSearchParams();
+        params.set("region", region);
+
+        if (typeof zip === "string" && zip.length > 0) {
+          params.set("zip", zip);
+        }
+
+        const response = await fetch(`/api/plants?${params.toString()}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data?.error ?? "Unable to load plants");
+        }
+
+        setPlants(Array.isArray(data.plants) ? data.plants : []);
+        setEcosystem(
+          typeof data.ecosystem === "string"
+            ? data.ecosystem
+            : "Local native plant ecosystem"
+        );
+      } catch (error) {
+        console.error("plant plan failed", error);
+        setPlants([]);
+      } finally {
+        setPlantsLoading(false);
+      }
+    };
+
+    run();
+  }, [region, router.isReady, zip]);
 
   const hasParams =
     (typeof zip === "string" && zip.length > 0) ||
-    (typeof lat === "string" && typeof lng === "string");
+    (typeof lat === "string" && typeof longitude === "string");
+  const locationSource =
+    typeof lat === "string" && typeof longitude === "string"
+      ? "Current location"
+      : typeof zip === "string"
+        ? `ZIP ${zip}`
+        : "Location";
+  const regionLabel = region === "Your Region" ? "your area" : region;
+  const planTitle =
+    region === "Your Region" ? "Your starter rewilding plan" : `A starter plan for ${region}`;
 
   if (!hasParams) {
     return (
@@ -220,145 +172,469 @@ export default function Plan() {
     <main
       style={{
         minHeight: "100vh",
-        fontFamily: "system-ui",
-        padding: "2rem",
-        maxWidth: "960px",
+        fontFamily: "Georgia, Cambria, Times New Roman, Times, serif",
+        padding: "2rem 1.25rem 4rem",
         margin: "0 auto",
+        background:
+          "radial-gradient(circle at top left, rgba(224, 237, 214, 0.95), transparent 34%), radial-gradient(circle at top right, rgba(252, 239, 214, 0.9), transparent 28%), linear-gradient(180deg, #f5f1e8 0%, #fbfaf5 38%, #f7f8f2 100%)",
+        color: "#1d2a1d",
       }}
     >
-      <button
-        type="button"
-        onClick={() => router.push("/")}
-        style={{
-          background: "transparent",
-          border: "none",
-          padding: 0,
-          cursor: "pointer",
-          textDecoration: "underline",
-          opacity: 0.7,
-          marginBottom: "1.5rem",
-        }}
-      >
-        ← Back
-      </button>
-
-      <header style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "2.25rem", marginBottom: "0.5rem" }}>
-          Your Rewild Plan
-        </h1>
-
-        <p style={{ margin: 0, opacity: 0.75 }}>
-          Region: <strong>{region}</strong>
-        </p>
-
-        <p style={{ marginTop: "0.5rem", opacity: 0.65, fontSize: "0.98rem" }}>
-          Ecosystem: <strong>{ecosystem}</strong>
-        </p>
-
-        {geoLoading && (
-          <p style={{ marginTop: "0.5rem", opacity: 0.55 }}>
-            Refining your location…
-          </p>
-        )}
-
-        {typeof lat === "string" && typeof lng === "string" && !geoLoading && (
-          <p style={{ marginTop: "0.5rem", opacity: 0.55, fontSize: "0.95rem" }}>
-            Using your current location
-          </p>
-        )}
-
-        {typeof zip === "string" && (
-          <p style={{ marginTop: "0.5rem", opacity: 0.55, fontSize: "0.95rem" }}>
-            Using ZIP: {zip}
-          </p>
-        )}
-      </header>
-
-      <section
-        style={{
-          marginBottom: "1.5rem",
-          textAlign: "center",
-          maxWidth: "760px",
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        <h2 style={{ fontSize: "1.4rem", marginBottom: "0.5rem" }}>
-          Starter plants for your area
-        </h2>
-        <p style={{ margin: 0, opacity: 0.75 }}>
-          A simple, location-aware starter set to help you begin with confidence.
-        </p>
-      </section>
-
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "1rem",
-        }}
-      >
-        {plants.map((plant) => (
-          <article
-            key={plant.name}
+      <div style={{ maxWidth: "1120px", margin: "0 auto" }}>
+        <button
+          type="button"
+          onClick={() => router.push("/")}
+          style={{
+            background: "transparent",
+            border: "none",
+            padding: 0,
+            cursor: "pointer",
+            color: "#50624a",
+            fontSize: "0.95rem",
+            letterSpacing: "0.02em",
+            marginBottom: "1.5rem",
+          }}
+        >
+          ← Back home
+        </button>
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1.4fr) minmax(280px, 0.9fr)",
+            gap: "1.25rem",
+            alignItems: "stretch",
+            marginBottom: "1.75rem",
+          }}
+        >
+          <header
             style={{
-              border: "1px solid #eee",
-              borderRadius: "14px",
+              borderRadius: "30px",
+              padding: "1.8rem",
+              background:
+                "linear-gradient(145deg, rgba(35, 56, 34, 0.96), rgba(60, 91, 48, 0.9))",
+              color: "#f6f5ee",
+              boxShadow: "0 20px 50px rgba(37, 58, 33, 0.2)",
+              position: "relative",
               overflow: "hidden",
-              background: "white",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.04)",
             }}
           >
-            <img
-              src={plant.image}
-              alt={plant.name}
+            <div
               style={{
-                width: "100%",
-                height: "170px",
-                objectFit: "cover",
-                display: "block",
-                background: "#f3f3f3",
+                position: "absolute",
+                inset: "auto -70px -80px auto",
+                width: "220px",
+                height: "220px",
+                borderRadius: "999px",
+                background: "rgba(246, 212, 140, 0.14)",
               }}
             />
-            <div style={{ padding: "1rem" }}>
-              <h3 style={{ margin: 0 }}>{plant.name}</h3>
-              {plant.latin && (
-                <p
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "0.65rem",
+                marginBottom: "1rem",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  borderRadius: "999px",
+                  padding: "0.45rem 0.8rem",
+                  background: "rgba(255,255,255,0.12)",
+                  fontSize: "0.85rem",
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {locationSource}
+              </span>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  borderRadius: "999px",
+                  padding: "0.45rem 0.8rem",
+                  background: "rgba(255,255,255,0.12)",
+                  fontSize: "0.85rem",
+                }}
+              >
+                {ecosystem}
+              </span>
+            </div>
+
+            <h1
+              style={{
+                fontSize: "clamp(2.4rem, 6vw, 4.8rem)",
+                lineHeight: 0.95,
+                margin: "0 0 1rem",
+                letterSpacing: "-0.04em",
+              }}
+            >
+              {planTitle}
+            </h1>
+
+            <p
+              style={{
+                margin: 0,
+                maxWidth: "36rem",
+                fontSize: "1.08rem",
+                lineHeight: 1.6,
+                color: "rgba(246, 245, 238, 0.82)",
+              }}
+            >
+              We turned {regionLabel} into a soft first step: three native plants that
+              bring pollinators in, create habitat, and still feel easy to begin with.
+            </p>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                gap: "0.8rem",
+                marginTop: "1.4rem",
+              }}
+            >
+              <div
+                style={{
+                  borderRadius: "18px",
+                  padding: "0.95rem",
+                  background: "rgba(255,255,255,0.08)",
+                }}
+              >
+                <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Starter set</p>
+                <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>{plants.length || 3}</p>
+              </div>
+              <div
+                style={{
+                  borderRadius: "18px",
+                  padding: "0.95rem",
+                  background: "rgba(255,255,255,0.08)",
+                }}
+              >
+                <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Patch size</p>
+                <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>3 x 6 ft</p>
+              </div>
+              <div
+                style={{
+                  borderRadius: "18px",
+                  padding: "0.95rem",
+                  background: "rgba(255,255,255,0.08)",
+                }}
+              >
+                <p style={{ margin: 0, fontSize: "0.82rem", opacity: 0.72 }}>Best for</p>
+                <p style={{ margin: "0.3rem 0 0", fontSize: "1.5rem" }}>Pollinators</p>
+              </div>
+            </div>
+
+            {geoLoading && (
+              <p style={{ margin: "1rem 0 0", fontSize: "0.95rem", opacity: 0.72 }}>
+                Refining your location...
+              </p>
+            )}
+          </header>
+
+          <aside
+            style={{
+              borderRadius: "28px",
+              padding: "1.4rem",
+              background: "rgba(255,255,255,0.7)",
+              border: "1px solid rgba(95, 126, 79, 0.16)",
+              boxShadow: "0 18px 40px rgba(59, 82, 42, 0.08)",
+              backdropFilter: "blur(14px)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.65rem",
+                fontSize: "0.8rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#61725d",
+              }}
+            >
+              What makes this plan work
+            </p>
+            <h2 style={{ margin: "0 0 0.8rem", fontSize: "1.6rem", lineHeight: 1.1 }}>
+              A beginner-friendly native patch
+            </h2>
+            <p style={{ margin: 0, color: "#4f5d4d", lineHeight: 1.65 }}>
+              This mix balances bloom, structure, and habitat so the space feels alive
+              quickly instead of looking sparse for months.
+            </p>
+
+            <div
+              style={{
+                marginTop: "1.2rem",
+                display: "grid",
+                gap: "0.8rem",
+              }}
+            >
+              {[
+                "One flowering anchor plant for easy color",
+                "One pollinator magnet to increase wildlife visits",
+                "One native grass for movement and shelter",
+              ].map((item) => (
+                <div
+                  key={item}
                   style={{
-                    margin: "0.3rem 0 0.6rem",
-                    opacity: 0.65,
-                    fontStyle: "italic",
+                    borderRadius: "18px",
+                    padding: "0.9rem 1rem",
+                    background: "#f6f4ec",
+                    color: "#384536",
+                    lineHeight: 1.5,
                   }}
                 >
-                  {plant.latin}
-                </p>
-              )}
-              <p style={{ margin: 0, opacity: 0.75, lineHeight: 1.4 }}>
-                {plant.notes}
-              </p>
+                  {item}
+                </div>
+              ))}
             </div>
-          </article>
-        ))}
-      </section>
 
-      <section
-        style={{
-          marginTop: "2rem",
-          padding: "1.25rem",
-          borderRadius: "14px",
-          background: "#fafafa",
-          border: "1px solid #eee",
-          textAlign: "center",
-        }}
-      >
-        <h2 style={{ marginTop: 0, marginBottom: "0.5rem", fontSize: "1.2rem" }}>
-          A simple first step
-        </h2>
-        <p style={{ margin: 0, opacity: 0.75 }}>
-          Start with one small patch — even a 3×6 ft area is enough to create habitat and
-          learn what works in your yard.
-        </p>
-      </section>
+            <p style={{ margin: "1rem 0 0", fontSize: "0.92rem", color: "#6f7c69" }}>
+              {typeof zip === "string"
+                ? `Using ZIP ${zip} as your planning signal.`
+                : "Using your current location as your planning signal."}
+            </p>
+          </aside>
+        </section>
+
+        <section
+          style={{
+            marginBottom: "1.25rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "end",
+            gap: "1rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.82rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#667260",
+              }}
+            >
+              Starter palette
+            </p>
+            <h2 style={{ margin: 0, fontSize: "2rem", lineHeight: 1.05 }}>
+              Native plants picked for {regionLabel}
+            </h2>
+          </div>
+          <p style={{ margin: 0, maxWidth: "28rem", color: "#5f6d58", lineHeight: 1.6 }}>
+            A small, location-aware set to help you start with confidence instead of
+            decision fatigue.
+          </p>
+        </section>
+
+        {plantsLoading ? (
+          <section
+            style={{
+              borderRadius: "26px",
+              background:
+                "linear-gradient(135deg, rgba(244,248,239,1) 0%, rgba(252,248,239,1) 100%)",
+              border: "1px solid #e8ecd9",
+              padding: "2rem",
+              textAlign: "center",
+              boxShadow: "0 12px 28px rgba(41, 63, 34, 0.06)",
+              marginBottom: "1.75rem",
+            }}
+          >
+            <p style={{ margin: 0, fontSize: "1.2rem" }}>
+              Building your starter habitat plan...
+            </p>
+            <p style={{ margin: "0.75rem auto 0", maxWidth: "32rem", opacity: 0.7 }}>
+              Matching your area with a few native plants that are beautiful,
+              beginner-friendly, and useful for wildlife.
+            </p>
+          </section>
+        ) : (
+          <section
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "1.15rem",
+              marginBottom: "1.9rem",
+            }}
+          >
+            {plants.map((plant, index) => (
+              <article
+                key={plant.name}
+                style={{
+                  borderRadius: "24px",
+                  overflow: "hidden",
+                  background: "rgba(255,255,255,0.88)",
+                  border: "1px solid rgba(95, 126, 79, 0.14)",
+                  boxShadow: "0 16px 40px rgba(42, 59, 32, 0.08)",
+                }}
+              >
+                <div style={{ position: "relative" }}>
+                  <Image
+                    src={plant.image}
+                    alt={plant.name}
+                    width={1200}
+                    height={680}
+                    style={{
+                      width: "100%",
+                      height: "220px",
+                      objectFit: "cover",
+                      display: "block",
+                      background: "#f3f3f3",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "0.9rem",
+                      left: "0.9rem",
+                      width: "2.3rem",
+                      height: "2.3rem",
+                      borderRadius: "999px",
+                      display: "grid",
+                      placeItems: "center",
+                      background: "rgba(250, 247, 238, 0.88)",
+                      color: "#2f4328",
+                      fontSize: "0.95rem",
+                    }}
+                  >
+                    0{index + 1}
+                  </div>
+                </div>
+                <div style={{ padding: "1.15rem" }}>
+                  <h3 style={{ margin: 0, fontSize: "1.45rem", lineHeight: 1.05 }}>
+                    {plant.name}
+                  </h3>
+                  {plant.latin && (
+                    <p
+                      style={{
+                        margin: "0.35rem 0 0.75rem",
+                        color: "#73806e",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      {plant.latin}
+                    </p>
+                  )}
+                  <p
+                    style={{
+                      margin: "0 0 0.65rem",
+                      fontWeight: 600,
+                      color: "#35552d",
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    {plant.benefit}
+                  </p>
+                  <p style={{ margin: 0, color: "#566453", lineHeight: 1.6 }}>
+                    {plant.notes}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </section>
+        )}
+
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1.05fr) minmax(260px, 0.95fr)",
+            gap: "1rem",
+          }}
+        >
+          <section
+            style={{
+              borderRadius: "26px",
+              padding: "1.5rem",
+              background: "#f7f4ea",
+              border: "1px solid rgba(109, 135, 88, 0.14)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.82rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#687565",
+              }}
+            >
+              First weekend plan
+            </p>
+            <h2 style={{ margin: "0 0 0.8rem", fontSize: "1.9rem", lineHeight: 1.08 }}>
+              Start with one small patch, not the whole yard
+            </h2>
+            <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
+              Even a 3 x 6 foot area can begin creating habitat. The goal is momentum,
+              not perfection.
+            </p>
+            <div style={{ display: "grid", gap: "0.7rem" }}>
+              {[
+                "Pick the sunniest small area you can actually maintain.",
+                "Plant in loose clusters so the bed feels intentional quickly.",
+                "Leave room for the native grass to soften the edge and hold structure.",
+              ].map((step) => (
+                <div
+                  key={step}
+                  style={{
+                    borderRadius: "16px",
+                    background: "rgba(255,255,255,0.68)",
+                    padding: "0.95rem 1rem",
+                    color: "#41503f",
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {step}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section
+            style={{
+              borderRadius: "26px",
+              padding: "1.5rem",
+              background: "#fffdfa",
+              border: "1px solid rgba(109, 135, 88, 0.14)",
+              boxShadow: "0 14px 34px rgba(51, 70, 40, 0.05)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.82rem",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#687565",
+              }}
+            >
+              Why this matters
+            </p>
+            <h2 style={{ margin: "0 0 0.8rem", fontSize: "1.9rem", lineHeight: 1.08 }}>
+              Tiny habitat is still habitat
+            </h2>
+            <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
+              Native plants feed insects, insects feed birds, and suddenly your space is
+              participating in something bigger than a garden bed.
+            </p>
+            <div
+              style={{
+                borderRadius: "18px",
+                background: "linear-gradient(180deg, #eef3e6 0%, #f8f5ec 100%)",
+                padding: "1rem",
+                color: "#3f5139",
+                lineHeight: 1.6,
+              }}
+            >
+              Rewild works best when it feels joyful and repeatable. Start small, notice
+              what shows up, and let curiosity pull you into the next patch.
+            </div>
+          </section>
+        </section>
+      </div>
     </main>
   );
 }
