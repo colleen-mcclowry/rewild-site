@@ -677,7 +677,16 @@ function getPlantsForPlan(
   return availablePlants.slice(0, targetCount).map((plant) => {
     const curated = curatedImageByPlantName[plant.name];
 
-    return curated ? { ...plant, ...curated } : plant;
+    if (curated) {
+      return { ...plant, ...curated };
+    }
+
+    return {
+      ...plant,
+      image: undefined,
+      imageSourceLabel: undefined,
+      imageSourceUrl: undefined,
+    };
   });
 }
 
