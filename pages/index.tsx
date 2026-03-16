@@ -108,7 +108,7 @@ export default function Home() {
       <div
         style={{
           position: "relative",
-          maxWidth: "960px",
+          maxWidth: "980px",
           margin: "0 auto",
           padding: "2.5rem 1.25rem 4rem",
         }}
@@ -146,12 +146,12 @@ export default function Home() {
           className="fade-up"
           style={{
             position: "relative",
-            borderRadius: "34px",
+            borderRadius: "38px",
             padding: "2rem",
             background:
-              "linear-gradient(145deg, rgba(29, 47, 34, 0.97), rgba(53, 79, 48, 0.92))",
+              "linear-gradient(155deg, rgba(25, 43, 31, 0.98), rgba(49, 79, 50, 0.94))",
             color: "#f8f5ec",
-            boxShadow: "0 28px 70px rgba(30, 46, 33, 0.16)",
+            boxShadow: "0 32px 78px rgba(30, 46, 33, 0.18)",
             overflow: "hidden",
           }}
         >
@@ -166,6 +166,80 @@ export default function Home() {
               background: "rgba(246, 210, 146, 0.1)",
             }}
           />
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: "1.2rem",
+              right: "1.2rem",
+              width: "19rem",
+              height: "13rem",
+              opacity: 0.95,
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: "0 auto auto 0",
+                width: "10rem",
+                height: "6.5rem",
+                borderRadius: "70% 30% 65% 35% / 55% 35% 65% 45%",
+                background: "rgba(164, 194, 124, 0.28)",
+                transform: "rotate(-10deg)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: "1.8rem",
+                left: "4rem",
+                width: "11rem",
+                height: "6rem",
+                borderRadius: "43% 57% 34% 66% / 49% 36% 64% 51%",
+                background: "rgba(230, 189, 116, 0.26)",
+                transform: "rotate(9deg)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                right: "0.6rem",
+                bottom: "0.5rem",
+                width: "11rem",
+                height: "5rem",
+                borderRadius: "63% 37% 55% 45% / 52% 52% 48% 48%",
+                background: "rgba(117, 154, 94, 0.24)",
+              }}
+            />
+            <svg
+              viewBox="0 0 300 180"
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <path
+                d="M14 112 C56 88, 84 132, 126 108 S198 72, 286 110"
+                fill="none"
+                stroke="rgba(248,245,236,0.34)"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              <path
+                d="M42 134 C86 106, 112 150, 152 129 S226 95, 280 128"
+                fill="none"
+                stroke="rgba(248,245,236,0.2)"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <circle cx="78" cy="94" r="6" fill="rgba(248,245,236,0.84)" />
+              <circle cx="164" cy="80" r="5" fill="rgba(248,245,236,0.7)" />
+              <circle cx="226" cy="114" r="7" fill="rgba(248,245,236,0.75)" />
+            </svg>
+          </div>
 
           <div
             style={{
@@ -173,9 +247,9 @@ export default function Home() {
               alignItems: "center",
               borderRadius: "999px",
               padding: "0.5rem 0.9rem",
-              background: "rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.12)",
               fontSize: "0.8rem",
-              letterSpacing: "0.08em",
+              letterSpacing: "0.12em",
               textTransform: "uppercase",
               fontWeight: 700,
             }}
@@ -185,12 +259,13 @@ export default function Home() {
 
           <h1
             style={{
-              fontSize: "clamp(3rem, 8vw, 5.4rem)",
-              lineHeight: 0.92,
-              letterSpacing: "-0.08em",
-              margin: "1rem 0 0.85rem",
+              fontSize: "clamp(3.1rem, 8vw, 5.9rem)",
+              lineHeight: 0.9,
+              letterSpacing: "-0.095em",
+              margin: "1.1rem 0 0.8rem",
               fontWeight: 700,
-              maxWidth: "10ch",
+              maxWidth: "9ch",
+              textWrap: "balance",
             }}
           >
             Rewild your yard one patch at a time.
@@ -198,10 +273,10 @@ export default function Home() {
 
           <p
             style={{
-              maxWidth: "34rem",
+              maxWidth: "35rem",
               margin: 0,
-              fontSize: "1.02rem",
-              lineHeight: 1.7,
+              fontSize: "1.05rem",
+              lineHeight: 1.74,
               color: "rgba(248, 245, 236, 0.82)",
             }}
           >
@@ -212,9 +287,10 @@ export default function Home() {
 
           <div
             style={{
+              position: "relative",
               display: "grid",
               gap: "1rem",
-              marginTop: "1.35rem",
+              marginTop: "1.5rem",
             }}
           >
             <div>
@@ -251,11 +327,12 @@ export default function Home() {
                           ? "1px solid rgba(243, 221, 175, 0.9)"
                           : "1px solid rgba(255,255,255,0.14)",
                         background: isActive
-                          ? "rgba(243, 221, 175, 0.14)"
+                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
                           : "rgba(255,255,255,0.06)",
                         color: "#f8f5ec",
                         padding: "0.85rem",
                         cursor: "pointer",
+                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
                       }}
                     >
                       <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
@@ -296,11 +373,12 @@ export default function Home() {
                           ? "1px solid rgba(243, 221, 175, 0.9)"
                           : "1px solid rgba(255,255,255,0.14)",
                         background: isActive
-                          ? "rgba(243, 221, 175, 0.14)"
+                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
                           : "rgba(255,255,255,0.06)",
                         color: "#f8f5ec",
                         padding: "0.9rem 1rem",
                         cursor: "pointer",
+                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
                       }}
                     >
                       <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
@@ -337,11 +415,11 @@ export default function Home() {
                 backgroundColor: "#f3ddaf",
                 color: "#213426",
                 cursor: "pointer",
-                boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
-              }}
-            >
-              Use my location
-            </button>
+              boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
+            }}
+          >
+            Use my location
+          </button>
 
             <button
               type="button"
@@ -364,7 +442,7 @@ export default function Home() {
               style={{
                 margin: 0,
                 fontSize: "0.92rem",
-                color: "rgba(248, 245, 236, 0.7)",
+                color: "rgba(248, 245, 236, 0.76)",
               }}
             >
               {recommendationCounts[space]} tailored for {sunOptions.find((option) => option.value === sun)?.label.toLowerCase()}
@@ -449,6 +527,7 @@ export default function Home() {
           className="fade-up delay-3"
           style={{
             display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
             gap: "0.9rem",
             marginTop: "1rem",
           }}
@@ -460,8 +539,22 @@ export default function Home() {
               background: "rgba(255,255,255,0.7)",
               border: "1px solid rgba(98, 126, 86, 0.15)",
               boxShadow: "0 16px 30px rgba(59, 79, 44, 0.06)",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                right: "-1.2rem",
+                bottom: "-1.8rem",
+                width: "7rem",
+                height: "7rem",
+                borderRadius: "999px",
+                background: "rgba(199, 221, 181, 0.34)",
+              }}
+            />
             <p
               style={{
                 margin: "0 0 0.45rem",
@@ -487,8 +580,22 @@ export default function Home() {
               background: "rgba(247, 244, 234, 0.9)",
               border: "1px solid rgba(125, 146, 108, 0.16)",
               boxShadow: "0 14px 28px rgba(59, 79, 44, 0.05)",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                left: "-1.4rem",
+                top: "-1.2rem",
+                width: "6rem",
+                height: "6rem",
+                borderRadius: "999px",
+                background: "rgba(234, 214, 168, 0.28)",
+              }}
+            />
             <p
               style={{
                 margin: "0 0 0.45rem",
@@ -568,6 +675,10 @@ export default function Home() {
         @media (max-width: 720px) {
           main {
             overflow-x: clip;
+          }
+
+          section[style*="grid-template-columns: repeat(2"] {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
