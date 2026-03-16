@@ -572,27 +572,56 @@ export default function Plan() {
                         width: "100%",
                         height: "220px",
                         display: "flex",
-                        alignItems: "end",
-                        padding: "1rem",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: "1.25rem",
                         background:
-                          "linear-gradient(180deg, rgba(228,237,218,1) 0%, rgba(243,239,228,1) 100%)",
+                          "radial-gradient(circle at top left, rgba(221,233,210,0.95), transparent 34%), linear-gradient(180deg, rgba(231,239,222,1) 0%, rgba(243,239,228,1) 100%)",
                         color: "#345034",
+                        textAlign: "center",
                       }}
                     >
-                      <div>
+                      <div
+                        style={{
+                          maxWidth: "14rem",
+                          display: "grid",
+                          gap: "0.55rem",
+                          justifyItems: "center",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "3.8rem",
+                            height: "3.8rem",
+                            borderRadius: "999px",
+                            display: "grid",
+                            placeItems: "center",
+                            background: "rgba(255,255,255,0.52)",
+                            fontSize: "1.5rem",
+                          }}
+                        >
+                          +
+                        </div>
                         <p
                           style={{
                             margin: 0,
                             fontSize: "0.8rem",
                             letterSpacing: "0.08em",
                             textTransform: "uppercase",
-                            opacity: 0.7,
+                            opacity: 0.66,
                           }}
                         >
-                          Curated photo coming soon
+                          Curated image in progress
                         </p>
-                        <p style={{ margin: "0.35rem 0 0", fontSize: "1.2rem", fontWeight: 700 }}>
-                          Botanical placeholder
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "1.12rem",
+                            fontWeight: 700,
+                            lineHeight: 1.25,
+                          }}
+                        >
+                          Trustworthy species photo coming soon
                         </p>
                       </div>
                     </div>
@@ -652,8 +681,8 @@ export default function Plan() {
                   <p style={{ margin: 0, color: "#566453", lineHeight: 1.6 }}>
                     {plant.notes}
                   </p>
-                  <p style={{ margin: "0.8rem 0 0", fontSize: "0.85rem", color: "#687565" }}>
-                    {plant.imageSourceUrl ? (
+                  {plant.imageSourceUrl && (
+                    <p style={{ margin: "0.8rem 0 0", fontSize: "0.85rem", color: "#687565" }}>
                       <a
                         href={plant.imageSourceUrl}
                         target="_blank"
@@ -662,10 +691,8 @@ export default function Plan() {
                       >
                         Photo source: {plant.imageSourceLabel}
                       </a>
-                    ) : (
-                      "Photo source: curated placeholder while we verify a species match"
-                    )}
-                  </p>
+                    </p>
+                  )}
                 </div>
               </article>
             ))}
