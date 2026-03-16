@@ -114,6 +114,9 @@ export default function Home() {
     );
   };
 
+  const selectedSun = sunOptions.find((option) => option.value === sun);
+  const selectedGoal = goalOptions.find((option) => option.value === goal);
+
   return (
     <main
       style={{
@@ -121,14 +124,14 @@ export default function Home() {
         fontFamily:
           '"Avenir Next", Avenir, Montserrat, "Segoe UI", "Helvetica Neue", sans-serif',
         background:
-          "radial-gradient(circle at top left, rgba(219, 233, 209, 0.98), transparent 30%), radial-gradient(circle at 84% 14%, rgba(246, 225, 188, 0.72), transparent 22%), linear-gradient(180deg, #f3efe4 0%, #fbf8f2 50%, #f4f6ee 100%)",
+          "radial-gradient(circle at top left, rgba(219, 233, 209, 0.98), transparent 28%), radial-gradient(circle at 84% 14%, rgba(246, 225, 188, 0.68), transparent 22%), linear-gradient(180deg, #f3efe4 0%, #fbf8f2 48%, #f4f6ee 100%)",
         color: "#1c2d22",
       }}
     >
       <div
         style={{
           position: "relative",
-          maxWidth: "980px",
+          maxWidth: "1040px",
           margin: "0 auto",
           padding: "2.5rem 1.25rem 4rem",
         }}
@@ -138,7 +141,7 @@ export default function Home() {
           className="float-slow"
           style={{
             position: "absolute",
-            top: "3.5rem",
+            top: "3rem",
             left: "-2rem",
             width: "11rem",
             height: "11rem",
@@ -153,7 +156,7 @@ export default function Home() {
           style={{
             position: "absolute",
             right: "-1rem",
-            top: "8rem",
+            top: "7rem",
             width: "12rem",
             height: "12rem",
             borderRadius: "999px",
@@ -165,9 +168,54 @@ export default function Home() {
         <section
           className="fade-up"
           style={{
+            textAlign: "center",
+            marginBottom: "1.2rem",
+          }}
+        >
+          <p
+            style={{
+              margin: "0 0 0.6rem",
+              fontSize: "0.82rem",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "#607159",
+              fontWeight: 700,
+            }}
+          >
+            Rewild
+          </p>
+          <h1
+            style={{
+              margin: 0,
+              fontSize: "clamp(3.3rem, 9vw, 6rem)",
+              lineHeight: 0.9,
+              letterSpacing: "-0.09em",
+              color: "#203127",
+              textWrap: "balance",
+            }}
+          >
+            Your backyard can be part of nature&apos;s best hope.
+          </h1>
+          <p
+            style={{
+              maxWidth: "42rem",
+              margin: "0.9rem auto 0",
+              fontSize: "1.08rem",
+              lineHeight: 1.72,
+              color: "#52624d",
+            }}
+          >
+            Tell us about your yard, then we&apos;ll turn your location into a native
+            planting plan that feels doable, personal, and climate-friendly.
+          </p>
+        </section>
+
+        <section
+          className="fade-up delay-2"
+          style={{
             position: "relative",
             borderRadius: "38px",
-            padding: "2rem",
+            padding: "1.4rem",
             background:
               "linear-gradient(155deg, rgba(25, 43, 31, 0.98), rgba(49, 79, 50, 0.94))",
             color: "#f8f5ec",
@@ -179,151 +227,107 @@ export default function Home() {
             aria-hidden="true"
             style={{
               position: "absolute",
-              inset: "auto -5rem -5rem auto",
-              width: "15rem",
-              height: "15rem",
-              borderRadius: "999px",
-              background: "rgba(246, 210, 146, 0.1)",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: "1.2rem",
-              right: "1.2rem",
-              width: "19rem",
-              height: "13rem",
-              opacity: 0.95,
+              top: "1rem",
+              right: "1rem",
+              width: "16rem",
+              height: "11rem",
+              opacity: 0.9,
               pointerEvents: "none",
             }}
           >
             <div
               style={{
                 position: "absolute",
-                inset: "0 auto auto 0",
-                width: "10rem",
-                height: "6.5rem",
+                width: "9rem",
+                height: "5.5rem",
                 borderRadius: "70% 30% 65% 35% / 55% 35% 65% 45%",
-                background: "rgba(164, 194, 124, 0.28)",
+                background: "rgba(164, 194, 124, 0.24)",
                 transform: "rotate(-10deg)",
               }}
             />
             <div
               style={{
                 position: "absolute",
-                top: "1.8rem",
-                left: "4rem",
-                width: "11rem",
-                height: "6rem",
+                top: "1.6rem",
+                left: "3rem",
+                width: "9.5rem",
+                height: "5rem",
                 borderRadius: "43% 57% 34% 66% / 49% 36% 64% 51%",
-                background: "rgba(230, 189, 116, 0.26)",
+                background: "rgba(230, 189, 116, 0.22)",
                 transform: "rotate(9deg)",
               }}
             />
-            <div
-              style={{
-                position: "absolute",
-                right: "0.6rem",
-                bottom: "0.5rem",
-                width: "11rem",
-                height: "5rem",
-                borderRadius: "63% 37% 55% 45% / 52% 52% 48% 48%",
-                background: "rgba(117, 154, 94, 0.24)",
-              }}
-            />
-            <svg
-              viewBox="0 0 300 180"
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <path
-                d="M14 112 C56 88, 84 132, 126 108 S198 72, 286 110"
-                fill="none"
-                stroke="rgba(248,245,236,0.34)"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <path
-                d="M42 134 C86 106, 112 150, 152 129 S226 95, 280 128"
-                fill="none"
-                stroke="rgba(248,245,236,0.2)"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <circle cx="78" cy="94" r="6" fill="rgba(248,245,236,0.84)" />
-              <circle cx="164" cy="80" r="5" fill="rgba(248,245,236,0.7)" />
-              <circle cx="226" cy="114" r="7" fill="rgba(248,245,236,0.75)" />
-            </svg>
           </div>
 
           <div
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
-              borderRadius: "999px",
-              padding: "0.5rem 0.9rem",
-              background: "rgba(255,255,255,0.12)",
-              fontSize: "0.8rem",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-            }}
-          >
-            Native planting, made simple
-          </div>
-
-          <h1
-            style={{
-              fontSize: "clamp(3.1rem, 8vw, 5.9rem)",
-              lineHeight: 0.9,
-              letterSpacing: "-0.095em",
-              margin: "1.1rem 0 0.8rem",
-              fontWeight: 700,
-              maxWidth: "9ch",
-              textWrap: "balance",
-            }}
-          >
-            Rewild your yard one patch at a time.
-          </h1>
-
-          <p
-            style={{
-              maxWidth: "35rem",
-              margin: 0,
-              fontSize: "1.05rem",
-              lineHeight: 1.74,
-              color: "rgba(248, 245, 236, 0.82)",
-            }}
-          >
-            Your backyard can be part of nature&apos;s best hope. Pick your light and yard
-            size, then we&apos;ll turn your location into a native planting plan that feels
-            doable, personal, and wildlife-friendly.
-          </p>
-
-          <div
-            style={{
-              position: "relative",
-              display: "grid",
+              justifyContent: "space-between",
               gap: "1rem",
-              marginTop: "1.5rem",
+              flexWrap: "wrap",
+              marginBottom: "1rem",
             }}
           >
             <div>
               <p
                 style={{
-                  margin: "0 0 0.5rem",
+                  margin: "0 0 0.35rem",
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                  color: "rgba(248,245,236,0.72)",
+                }}
+              >
+                Build your starter plan
+              </p>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "1.9rem",
+                  lineHeight: 1,
+                  letterSpacing: "-0.05em",
+                }}
+              >
+                Three quick decisions, then we plan your patch
+              </h2>
+            </div>
+            <p
+              style={{
+                margin: 0,
+                color: "rgba(248,245,236,0.76)",
+                fontSize: "0.95rem",
+              }}
+            >
+              {selectedSun?.label.toLowerCase()} • {selectedGoal?.label.toLowerCase()} focus
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gap: "0.9rem",
+            }}
+          >
+            <section
+              style={{
+                borderRadius: "28px",
+                padding: "1rem",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 0.55rem",
                   fontSize: "0.78rem",
-                  letterSpacing: "0.09em",
+                  letterSpacing: "0.1em",
                   textTransform: "uppercase",
                   opacity: 0.76,
                 }}
               >
-                Light
+                1. Light
               </p>
               <div
                 style={{
@@ -363,19 +367,26 @@ export default function Home() {
                   );
                 })}
               </div>
-            </div>
+            </section>
 
-            <div>
+            <section
+              style={{
+                borderRadius: "28px",
+                padding: "1rem",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
               <p
                 style={{
-                  margin: "0 0 0.5rem",
+                  margin: "0 0 0.55rem",
                   fontSize: "0.78rem",
-                  letterSpacing: "0.09em",
+                  letterSpacing: "0.1em",
                   textTransform: "uppercase",
                   opacity: 0.76,
                 }}
               >
-                Space
+                2. Space
               </p>
               <div style={{ display: "grid", gap: "0.7rem" }}>
                 {spaceOptions.map((option) => {
@@ -409,19 +420,26 @@ export default function Home() {
                   );
                 })}
               </div>
-            </div>
+            </section>
 
-            <div>
+            <section
+              style={{
+                borderRadius: "28px",
+                padding: "1rem",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
               <p
                 style={{
-                  margin: "0 0 0.5rem",
+                  margin: "0 0 0.55rem",
                   fontSize: "0.78rem",
-                  letterSpacing: "0.09em",
+                  letterSpacing: "0.1em",
                   textTransform: "uppercase",
                   opacity: 0.76,
                 }}
               >
-                What matters most
+                3. What matters most
               </p>
               <div
                 style={{
@@ -461,7 +479,7 @@ export default function Home() {
                   );
                 })}
               </div>
-            </div>
+            </section>
           </div>
 
           <div
@@ -470,7 +488,7 @@ export default function Home() {
               flexWrap: "wrap",
               gap: "0.85rem",
               alignItems: "center",
-              marginTop: "1.5rem",
+              marginTop: "1.2rem",
             }}
           >
             <button
@@ -487,11 +505,11 @@ export default function Home() {
                 backgroundColor: "#f3ddaf",
                 color: "#213426",
                 cursor: "pointer",
-              boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
-            }}
-          >
-            Use my location
-          </button>
+                boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
+              }}
+            >
+              Use my location
+            </button>
 
             <button
               type="button"
@@ -517,21 +535,19 @@ export default function Home() {
                 color: "rgba(248, 245, 236, 0.76)",
               }}
             >
-              Personalized native picks tailored for{" "}
-              {sunOptions.find((option) => option.value === sun)?.label.toLowerCase()} with a{" "}
-              {goalOptions.find((option) => option.value === goal)?.label.toLowerCase()} focus
+              Personalized native picks with a {selectedGoal?.label.toLowerCase()} focus
             </p>
           </div>
         </section>
 
         {showZip && (
           <section
-            className="fade-up delay-2"
+            className="fade-up delay-3"
             style={{
               marginTop: "1rem",
               borderRadius: "28px",
               padding: "1.35rem",
-              background: "rgba(255,255,255,0.72)",
+              background: "rgba(255,255,255,0.74)",
               border: "1px solid rgba(109, 137, 97, 0.16)",
               boxShadow: "0 18px 34px rgba(58, 77, 43, 0.08)",
             }}
@@ -598,95 +614,130 @@ export default function Home() {
         )}
 
         <section
-          className="fade-up delay-3"
+          className="fade-up delay-4"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: "0.9rem",
+            gridTemplateColumns: "minmax(0, 1.05fr) minmax(0, 0.95fr)",
+            gap: "0.95rem",
             marginTop: "1rem",
           }}
         >
-          <div
+          <article
             style={{
-              borderRadius: "26px",
-              padding: "1.25rem 1.35rem",
-              background: "rgba(255,255,255,0.7)",
+              borderRadius: "30px",
+              padding: "1.45rem",
+              background: "rgba(255,255,255,0.74)",
               border: "1px solid rgba(98, 126, 86, 0.15)",
-              boxShadow: "0 16px 30px rgba(59, 79, 44, 0.06)",
-              position: "relative",
-              overflow: "hidden",
+              boxShadow: "0 18px 34px rgba(59, 79, 44, 0.06)",
             }}
           >
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                right: "-1.2rem",
-                bottom: "-1.8rem",
-                width: "7rem",
-                height: "7rem",
-                borderRadius: "999px",
-                background: "rgba(199, 221, 181, 0.34)",
-              }}
-            />
             <p
               style={{
-                margin: "0 0 0.45rem",
-                fontSize: "0.8rem",
+                margin: "0 0 0.55rem",
+                fontSize: "0.82rem",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "#667561",
                 fontWeight: 700,
               }}
             >
-              What you get
+              What is rewilding?
             </p>
-            <p style={{ margin: 0, color: "#475544", lineHeight: 1.65 }}>
-              A region-aware native plant set, example dimensions for your yard size, and a
-              first weekend plan that feels manageable.
+            <h2
+              style={{
+                margin: "0 0 0.75rem",
+                fontSize: "1.75rem",
+                lineHeight: 1.02,
+                letterSpacing: "-0.05em",
+                color: "#243427",
+              }}
+            >
+              Returning ecosystems to a healthier natural rhythm
+            </h2>
+            <p style={{ margin: "0 0 0.85rem", color: "#4f5f4a", lineHeight: 1.7 }}>
+              Rewilding is the process of helping ecosystems recover by restoring habitat,
+              supporting native species, and making more room for nature to function the way
+              it&apos;s meant to.
             </p>
-          </div>
+            <p style={{ margin: 0, color: "#4f5f4a", lineHeight: 1.7 }}>
+              In a backyard context, that can be as simple as replacing a small patch of lawn
+              with native plants that feed insects, support birds, and strengthen the local
+              web of life.
+            </p>
+          </article>
 
-          <div
+          <article
             style={{
-              borderRadius: "26px",
-              padding: "1.25rem 1.35rem",
-              background: "rgba(247, 244, 234, 0.9)",
+              borderRadius: "30px",
+              padding: "1.45rem",
+              background: "rgba(247, 244, 234, 0.92)",
               border: "1px solid rgba(125, 146, 108, 0.16)",
-              boxShadow: "0 14px 28px rgba(59, 79, 44, 0.05)",
-              position: "relative",
-              overflow: "hidden",
+              boxShadow: "0 16px 30px rgba(59, 79, 44, 0.05)",
             }}
           >
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                left: "-1.4rem",
-                top: "-1.2rem",
-                width: "6rem",
-                height: "6rem",
-                borderRadius: "999px",
-                background: "rgba(234, 214, 168, 0.28)",
-              }}
-            />
             <p
               style={{
-                margin: "0 0 0.45rem",
-                fontSize: "0.8rem",
+                margin: "0 0 0.55rem",
+                fontSize: "0.82rem",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 color: "#677564",
                 fontWeight: 700,
               }}
             >
-              Why it feels lighter
+              Why it matters
             </p>
-            <p style={{ margin: 0, color: "#475544", lineHeight: 1.65 }}>
-              Rewild is designed to help you start with one good patch, not master your whole
-              yard at once.
+            <h2
+              style={{
+                margin: "0 0 0.75rem",
+                fontSize: "1.75rem",
+                lineHeight: 1.02,
+                letterSpacing: "-0.05em",
+                color: "#243427",
+              }}
+            >
+              Biodiversity helps stabilize the climate
+            </h2>
+            <p style={{ margin: "0 0 0.85rem", color: "#4f5f4a", lineHeight: 1.7 }}>
+              Biodiversity supports healthy soil, cleaner water, pollination, food chains,
+              and climate resilience. When species disappear, those systems become weaker.
             </p>
-          </div>
+            <p style={{ margin: 0, color: "#4f5f4a", lineHeight: 1.7 }}>
+              Rewilding matters because restoring native habitat helps rebuild those
+              relationships. It&apos;s one of the clearest ways we can respond to biodiversity
+              loss and create landscapes that are more resilient over time.
+            </p>
+          </article>
+        </section>
+
+        <section
+          className="fade-up delay-5"
+          style={{
+            marginTop: "0.95rem",
+            borderRadius: "28px",
+            padding: "1.3rem 1.4rem",
+            background: "linear-gradient(180deg, rgba(238, 243, 230, 0.98), rgba(247, 243, 233, 0.98))",
+            border: "1px solid rgba(125, 146, 108, 0.16)",
+            boxShadow: "0 14px 26px rgba(59, 79, 44, 0.05)",
+          }}
+        >
+          <p
+            style={{
+              margin: "0 0 0.4rem",
+              fontSize: "0.82rem",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "#677564",
+              fontWeight: 700,
+            }}
+          >
+            The big idea
+          </p>
+          <p style={{ margin: 0, color: "#445240", lineHeight: 1.7 }}>
+            The loss of biodiversity is a crisis of our own making. Rewilding is one of the
+            clearest ways to restore what has been lost by reviving habitat, supporting the
+            species that belong there, and letting nature do more of the work again.
+          </p>
         </section>
       </div>
 
@@ -701,6 +752,14 @@ export default function Home() {
 
         .delay-3 {
           animation-delay: 180ms;
+        }
+
+        .delay-4 {
+          animation-delay: 240ms;
+        }
+
+        .delay-5 {
+          animation-delay: 300ms;
         }
 
         .float-slow {
@@ -751,7 +810,15 @@ export default function Home() {
             overflow-x: clip;
           }
 
+          section[style*="grid-template-columns: repeat(3"] {
+            grid-template-columns: 1fr !important;
+          }
+
           section[style*="grid-template-columns: repeat(2"] {
+            grid-template-columns: 1fr !important;
+          }
+
+          section[style*="grid-template-columns: minmax(0, 1.05fr)"] {
             grid-template-columns: 1fr !important;
           }
         }
