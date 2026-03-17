@@ -605,23 +605,25 @@ export default function Home() {
             >
               The big idea
             </p>
-            <p
+            <h3
               style={{
                 margin: 0,
-                fontSize: "1.6rem",
-                lineHeight: 1.12,
-                letterSpacing: "-0.05em",
-                color: "#213224",
-                fontWeight: 700,
+                fontSize: "clamp(2rem, 4.6vw, 3.6rem)",
+                lineHeight: 0.95,
+                letterSpacing: "-0.06em",
+                color: "#203126",
+                textWrap: "balance",
               }}
             >
               A backyard does not have to be large to become habitat.
-            </p>
+            </h3>
             <p
               style={{
                 margin: "0.95rem 0 0",
-                color: "#576653",
-                lineHeight: 1.65,
+                maxWidth: "34rem",
+                color: "#556451",
+                lineHeight: 1.72,
+                fontSize: "1.02rem",
               }}
             >
               Rewilding is not about perfection. It is about making room for life to
