@@ -205,8 +205,8 @@ export default function Home() {
               color: "#52624d",
             }}
           >
-            Tell us about your yard, then we&apos;ll turn your location into a native
-            planting plan that feels doable, personal, and climate-friendly.
+            Tell us about your space. We&apos;ll turn it into a conservation plan that
+            feels doable, personal, and regenerative.
           </p>
         </section>
 
