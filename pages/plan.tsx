@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
+import { getGardenPlans, saveGardenPlan } from "../lib/my-garden";
 
 type SunPreference = "full-sun" | "part-shade" | "mostly-shade";
 type SpacePreference = "small-patch" | "medium-yard" | "large-yard";
@@ -48,6 +49,8 @@ export default function Plan() {
   const [plants, setPlants] = useState<Plant[]>([]);
   const [plantsLoading, setPlantsLoading] = useState(false);
   const [ecosystem, setEcosystem] = useState("Local native plant ecosystem");
+  const [gardenMessage, setGardenMessage] = useState("");
+  const [isSavedToGarden, setIsSavedToGarden] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [planDetails, setPlanDetails] = useState<PlanDetails>({
     sun: "full-sun",
@@ -175,6 +178,25 @@ export default function Plan() {
     return () => window.clearTimeout(timeout);
   }, [shareMessage]);
 
+  useEffect(() => {
+    if (!gardenMessage) return;
+
+    const timeout = window.setTimeout(() => {
+      setGardenMessage("");
+    }, 2600);
+
+    return () => window.clearTimeout(timeout);
+  }, [gardenMessage]);
+
+  useEffect(() => {
+    if (!router.isReady || typeof window === "undefined") return;
+
+    const currentPlanUrl = `${window.location.pathname}${window.location.search}`;
+    const isSaved = getGardenPlans().some((plan) => plan.planUrl === currentPlanUrl);
+
+    setIsSavedToGarden(isSaved);
+  }, [router.asPath, router.isReady]);
+
   const hasParams =
     (typeof zip === "string" && zip.length > 0) ||
     (typeof lat === "string" && typeof longitude === "string");
@@ -193,6 +215,42 @@ export default function Plan() {
   const shareText = `A ${planDetails.sunLabel.toLowerCase()} native planting plan for a ${planDetails.spaceLabel.toLowerCase()} with a ${planDetails.goalLabel.toLowerCase()} focus.`;
   const cardSurface = "rgba(255,255,255,0.78)";
   const warmBorder = "1px solid rgba(104, 130, 90, 0.16)";
+
+  const savePlanToGarden = () => {
+    if (typeof window === "undefined" || plants.length === 0) return;
+
+    try {
+      const currentPlanUrl = `${window.location.pathname}${window.location.search}`;
+      const result = saveGardenPlan({
+        title: planTitle,
+        region: regionLabel,
+        locationSource,
+        ecosystem,
+        planUrl: currentPlanUrl,
+        sunLabel: planDetails.sunLabel,
+        spaceLabel: planDetails.spaceLabel,
+        goalLabel: planDetails.goalLabel,
+        sizeRange: planDetails.sizeRange,
+        plantCount: plants.length,
+        plants: plants.map((plant) => ({
+          name: plant.name,
+          latin: plant.latin,
+          benefit: plant.benefit,
+          image: plant.image,
+        })),
+      });
+
+      setIsSavedToGarden(true);
+      setGardenMessage(
+        result.mode === "created"
+          ? "Saved to My Garden as an idea"
+          : "Updated in My Garden"
+      );
+    } catch (error) {
+      console.error("save to my garden failed", error);
+      setGardenMessage("Couldn’t save this plan");
+    }
+  };
 
   const copyPlanLink = async () => {
     if (typeof window === "undefined") return;
@@ -297,23 +355,49 @@ export default function Plan() {
       }}
     >
       <div style={{ maxWidth: "1120px", margin: "0 auto" }}>
-        <button
-          type="button"
-          onClick={() => router.push("/")}
+        <div
           style={{
-            background: "transparent",
-            border: "none",
-            padding: 0,
-            cursor: "pointer",
-            color: "#4e6249",
-            fontSize: "0.95rem",
-            letterSpacing: "0.01em",
-            fontWeight: 600,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "1rem",
+            flexWrap: "wrap",
             marginBottom: "1.5rem",
           }}
         >
-          ← Back home
-        </button>
+          <button
+            type="button"
+            onClick={() => router.push("/")}
+            style={{
+              background: "transparent",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              color: "#4e6249",
+              fontSize: "0.95rem",
+              letterSpacing: "0.01em",
+              fontWeight: 600,
+            }}
+          >
+            ← Back home
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/garden")}
+            style={{
+              borderRadius: "999px",
+              border: "1px solid rgba(104, 130, 90, 0.16)",
+              background: "rgba(255,255,255,0.66)",
+              color: "#31442e",
+              fontSize: "0.92rem",
+              fontWeight: 600,
+              padding: "0.7rem 1rem",
+              cursor: "pointer",
+            }}
+          >
+            My Garden
+          </button>
+        </div>
         <section
           style={{
             display: "grid",
@@ -590,7 +674,88 @@ export default function Plan() {
                   fontWeight: 700,
                 }}
               >
-                Save or share
+                My Garden
+              </p>
+              <p style={{ margin: "0 0 0.85rem", color: "#4f5d4d", lineHeight: 1.6 }}>
+                Turn this starter plan into a conservation project you can revisit and grow.
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "0.7rem",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={savePlanToGarden}
+                  style={{
+                    borderRadius: "999px",
+                    border: "none",
+                    background:
+                      plantsLoading || plants.length === 0 ? "rgba(48, 77, 46, 0.38)" : "#304d2e",
+                    color: "#f8f5ec",
+                    fontWeight: 600,
+                    fontSize: "0.95rem",
+                    padding: "0.78rem 1rem",
+                    cursor:
+                      plantsLoading || plants.length === 0 ? "not-allowed" : "pointer",
+                  }}
+                  disabled={plantsLoading || plants.length === 0}
+                >
+                  {isSavedToGarden ? "Update saved plan" : "Save to My Garden"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/garden")}
+                  style={{
+                    borderRadius: "999px",
+                    border: "1px solid rgba(76, 100, 67, 0.18)",
+                    background: "rgba(255,255,255,0.94)",
+                    color: "#30412c",
+                    fontWeight: 600,
+                    fontSize: "0.95rem",
+                    padding: "0.78rem 1rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  Open My Garden
+                </button>
+              </div>
+              <p
+                aria-live="polite"
+                style={{
+                  minHeight: "1.25rem",
+                  margin: "0.75rem 0 0",
+                  fontSize: "0.88rem",
+                  color: "#6a7766",
+                }}
+              >
+                {gardenMessage ||
+                  (isSavedToGarden
+                    ? "This plan already lives in My Garden."
+                    : "Save this plan to come back to it later.")}
+              </p>
+            </div>
+
+            <div
+              style={{
+                marginTop: "1.2rem",
+                paddingTop: "1.15rem",
+                borderTop: "1px solid rgba(104, 130, 90, 0.12)",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 0.45rem",
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#61725d",
+                  fontWeight: 700,
+                }}
+              >
+                Share
               </p>
               <p style={{ margin: "0 0 0.85rem", color: "#4f5d4d", lineHeight: 1.6 }}>
                 Keep this version handy or send it to someone you want to rewild with.
