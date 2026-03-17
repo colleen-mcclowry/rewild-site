@@ -347,7 +347,7 @@ export default function Home() {
                   letterSpacing: "-0.05em",
                 }}
               >
-                Three quick decisions, then we plan your patch
+                Three quick choices, then your plan
               </h2>
             </div>
             <p
