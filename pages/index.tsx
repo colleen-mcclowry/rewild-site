@@ -205,8 +205,8 @@ export default function Home() {
               color: "#52624d",
             }}
           >
-            Tell us about your space. We&apos;ll turn it into a conservation plan that
-            feels doable, personal, and regenerative.
+            Tell us about your space. We&apos;ll turn it into a simple, personalized
+            conservation plan.
           </p>
         </section>
 
