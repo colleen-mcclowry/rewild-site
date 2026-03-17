@@ -13,7 +13,7 @@ const sunOptions: Array<{ value: SunPreference; label: string; notes: string }> 
   },
   {
     value: "part-shade",
-    label: "Part shade",
+    label: "Partial shade",
     notes: "Morning sun or dappled light",
   },
   {
@@ -63,6 +63,63 @@ const goalOptions: Array<{ value: GoalPreference; label: string; notes: string }
     notes: "A brighter, more visibly blooming mix",
   },
 ];
+
+function LightIcon({ type }: { type: SunPreference }) {
+  const iconStroke = "#f3ddaf";
+  const iconFill = "rgba(243, 221, 175, 0.14)";
+
+  if (type === "full-sun") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2" fill={iconFill} stroke={iconStroke} strokeWidth="1.6" />
+        <path
+          d="M12 2.8v3.1M12 18.1v3.1M21.2 12h-3.1M5.9 12H2.8M18.5 5.5l-2.2 2.2M7.7 16.3l-2.2 2.2M18.5 18.5l-2.2-2.2M7.7 7.7 5.5 5.5"
+          stroke={iconStroke}
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (type === "part-shade") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M12 4.2a7.8 7.8 0 1 0 0 15.6V4.2Z"
+          fill={iconFill}
+          stroke={iconStroke}
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M12 4.2a7.8 7.8 0 0 1 0 15.6"
+          stroke={iconStroke}
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M18.6 6.2c-4.5.5-8.5 4-9.1 8.5-.2 1.2-.1 2.2.2 3.1.9.3 2 .4 3.1.2 4.5-.6 8-4.6 8.5-9.1.1-.9.1-1.8-.1-2.6-.8-.2-1.7-.2-2.6-.1Z"
+        fill={iconFill}
+        stroke={iconStroke}
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.1 15.9c1.7-1.4 3.3-3 4.7-4.7"
+        stroke={iconStroke}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 
 export default function Home() {
   const [zip, setZip] = useState("");
@@ -327,7 +384,7 @@ export default function Home() {
                   opacity: 0.76,
                 }}
               >
-                1. Light
+                Light
               </p>
               <div
                 style={{
@@ -359,6 +416,22 @@ export default function Home() {
                         boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
                       }}
                     >
+                      <div
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "2.5rem",
+                          height: "2.5rem",
+                          borderRadius: "999px",
+                          marginBottom: "0.65rem",
+                          background: isActive
+                            ? "rgba(243, 221, 175, 0.18)"
+                            : "rgba(255,255,255,0.08)",
+                        }}
+                      >
+                        <LightIcon type={option.value} />
+                      </div>
                       <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
                       <div style={{ fontSize: "0.88rem", opacity: 0.78, lineHeight: 1.45 }}>
                         {option.notes}
@@ -386,7 +459,7 @@ export default function Home() {
                   opacity: 0.76,
                 }}
               >
-                2. Space
+                Space
               </p>
               <div style={{ display: "grid", gap: "0.7rem" }}>
                 {spaceOptions.map((option) => {
@@ -439,7 +512,7 @@ export default function Home() {
                   opacity: 0.76,
                 }}
               >
-                3. What matters most
+                What matters most
               </p>
               <div
                 style={{

@@ -48,7 +48,7 @@ type CuratedPlant = Plant & PlantImageMeta;
 
 const sunLabels: Record<SunPreference, string> = {
   "full-sun": "Full sun",
-  "part-shade": "Part shade",
+  "part-shade": "Partial shade",
   "mostly-shade": "Mostly shade",
 };
 
