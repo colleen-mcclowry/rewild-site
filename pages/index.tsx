@@ -127,6 +127,7 @@ export default function Home() {
   const [sun, setSun] = useState<SunPreference>("full-sun");
   const [space, setSpace] = useState<SpacePreference>("small-patch");
   const [goal, setGoal] = useState<GoalPreference>("pollinators");
+  const [activeStep, setActiveStep] = useState(0);
   const router = useRouter();
 
   const buildPlanUrl = (params: Record<string, string>) => {
@@ -172,7 +173,9 @@ export default function Home() {
   };
 
   const selectedSun = sunOptions.find((option) => option.value === sun);
+  const selectedSpace = spaceOptions.find((option) => option.value === space);
   const selectedGoal = goalOptions.find((option) => option.value === goal);
+  const onboardingSteps = ["Light", "Space", "What matters most"] as const;
 
   return (
     <main
@@ -270,425 +273,6 @@ export default function Home() {
         <section
           className="fade-up delay-2"
           style={{
-            position: "relative",
-            borderRadius: "38px",
-            padding: "1.4rem",
-            background:
-              "linear-gradient(155deg, rgba(25, 43, 31, 0.98), rgba(49, 79, 50, 0.94))",
-            color: "#f8f5ec",
-            boxShadow: "0 32px 78px rgba(30, 46, 33, 0.18)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: "1rem",
-              right: "1rem",
-              width: "16rem",
-              height: "11rem",
-              opacity: 0.9,
-              pointerEvents: "none",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                width: "9rem",
-                height: "5.5rem",
-                borderRadius: "70% 30% 65% 35% / 55% 35% 65% 45%",
-                background: "rgba(164, 194, 124, 0.24)",
-                transform: "rotate(-10deg)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: "1.6rem",
-                left: "3rem",
-                width: "9.5rem",
-                height: "5rem",
-                borderRadius: "43% 57% 34% 66% / 49% 36% 64% 51%",
-                background: "rgba(230, 189, 116, 0.22)",
-                transform: "rotate(9deg)",
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "1rem",
-              flexWrap: "wrap",
-              marginBottom: "1rem",
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  margin: "0 0 0.35rem",
-                  fontSize: "0.8rem",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  fontWeight: 700,
-                  color: "rgba(248,245,236,0.72)",
-                }}
-              >
-                Build your starter plan
-              </p>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: "1.9rem",
-                  lineHeight: 1,
-                  letterSpacing: "-0.05em",
-                }}
-              >
-                Three quick choices, then your plan
-              </h2>
-            </div>
-            <p
-              style={{
-                margin: 0,
-                color: "rgba(248,245,236,0.76)",
-                fontSize: "0.95rem",
-              }}
-            >
-              {selectedSun?.label.toLowerCase()} • {selectedGoal?.label.toLowerCase()} focus
-            </p>
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gap: "0.9rem",
-            }}
-          >
-            <section
-              style={{
-                borderRadius: "28px",
-                padding: "1rem",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <p
-                style={{
-                  margin: "0 0 0.55rem",
-                  fontSize: "0.78rem",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  opacity: 0.76,
-                }}
-              >
-                Light
-              </p>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                  gap: "0.7rem",
-                }}
-              >
-                {sunOptions.map((option) => {
-                  const isActive = option.value === sun;
-
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setSun(option.value)}
-                      style={{
-                        textAlign: "left",
-                        borderRadius: "18px",
-                        border: isActive
-                          ? "1px solid rgba(243, 221, 175, 0.9)"
-                          : "1px solid rgba(255,255,255,0.14)",
-                        background: isActive
-                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
-                          : "rgba(255,255,255,0.06)",
-                        color: "#f8f5ec",
-                        padding: "0.85rem",
-                        cursor: "pointer",
-                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "2.5rem",
-                          height: "2.5rem",
-                          borderRadius: "999px",
-                          marginBottom: "0.65rem",
-                          background: isActive
-                            ? "rgba(243, 221, 175, 0.18)"
-                            : "rgba(255,255,255,0.08)",
-                        }}
-                      >
-                        <LightIcon type={option.value} />
-                      </div>
-                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
-                      <div style={{ fontSize: "0.88rem", opacity: 0.78, lineHeight: 1.45 }}>
-                        {option.notes}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section
-              style={{
-                borderRadius: "28px",
-                padding: "1rem",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <p
-                style={{
-                  margin: "0 0 0.55rem",
-                  fontSize: "0.78rem",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  opacity: 0.76,
-                }}
-              >
-                Space
-              </p>
-              <div style={{ display: "grid", gap: "0.7rem" }}>
-                {spaceOptions.map((option) => {
-                  const isActive = option.value === space;
-
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setSpace(option.value)}
-                      style={{
-                        textAlign: "left",
-                        borderRadius: "20px",
-                        border: isActive
-                          ? "1px solid rgba(243, 221, 175, 0.9)"
-                          : "1px solid rgba(255,255,255,0.14)",
-                        background: isActive
-                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
-                          : "rgba(255,255,255,0.06)",
-                        color: "#f8f5ec",
-                        padding: "0.9rem 1rem",
-                        cursor: "pointer",
-                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
-                      }}
-                    >
-                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
-                      <div style={{ fontSize: "0.9rem", opacity: 0.8, lineHeight: 1.5 }}>
-                        {option.notes}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section
-              style={{
-                borderRadius: "28px",
-                padding: "1rem",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <p
-                style={{
-                  margin: "0 0 0.55rem",
-                  fontSize: "0.78rem",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  opacity: 0.76,
-                }}
-              >
-                What matters most
-              </p>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                  gap: "0.7rem",
-                }}
-              >
-                {goalOptions.map((option) => {
-                  const isActive = option.value === goal;
-
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => setGoal(option.value)}
-                      style={{
-                        textAlign: "left",
-                        borderRadius: "18px",
-                        border: isActive
-                          ? "1px solid rgba(243, 221, 175, 0.9)"
-                          : "1px solid rgba(255,255,255,0.14)",
-                        background: isActive
-                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
-                          : "rgba(255,255,255,0.06)",
-                        color: "#f8f5ec",
-                        padding: "0.9rem 1rem",
-                        cursor: "pointer",
-                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
-                      }}
-                    >
-                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
-                      <div style={{ fontSize: "0.88rem", opacity: 0.8, lineHeight: 1.45 }}>
-                        {option.notes}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "0.85rem",
-              alignItems: "center",
-              marginTop: "1.2rem",
-            }}
-          >
-            <button
-              type="button"
-              onClick={handleLocation}
-              className="cta-pop"
-              style={{
-                padding: "0.95rem 1.55rem",
-                fontSize: "1rem",
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                borderRadius: "999px",
-                border: "none",
-                backgroundColor: "#f3ddaf",
-                color: "#213426",
-                cursor: "pointer",
-                boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
-              }}
-            >
-              Use my location
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowZip(true)}
-              style={{
-                padding: "0.95rem 1.35rem",
-                fontSize: "1rem",
-                fontWeight: 600,
-                borderRadius: "999px",
-                border: "1px solid rgba(255,255,255,0.18)",
-                background: "rgba(255,255,255,0.08)",
-                color: "#f8f5ec",
-                cursor: "pointer",
-              }}
-            >
-              Enter ZIP instead
-            </button>
-
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.92rem",
-                color: "rgba(248, 245, 236, 0.76)",
-              }}
-            >
-              Personalized native picks with a {selectedGoal?.label.toLowerCase()} focus
-            </p>
-          </div>
-        </section>
-
-        {showZip && (
-          <section
-            className="fade-up delay-3"
-            style={{
-              marginTop: "1rem",
-              borderRadius: "28px",
-              padding: "1.35rem",
-              background: "rgba(255,255,255,0.74)",
-              border: "1px solid rgba(109, 137, 97, 0.16)",
-              boxShadow: "0 18px 34px rgba(58, 77, 43, 0.08)",
-            }}
-          >
-            <p
-              style={{
-                margin: "0 0 0.45rem",
-                fontSize: "0.8rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#667561",
-                fontWeight: 700,
-              }}
-            >
-              ZIP fallback
-            </p>
-            <h2
-              style={{
-                margin: "0 0 0.8rem",
-                fontSize: "1.35rem",
-                lineHeight: 1.06,
-                letterSpacing: "-0.04em",
-              }}
-            >
-              Use your ZIP to start your plan
-            </h2>
-            <div
-              style={{
-                display: "flex",
-                gap: "0.8rem",
-                flexWrap: "wrap",
-                alignItems: "center",
-              }}
-            >
-              <input
-                placeholder="60302"
-                value={zip}
-                inputMode="numeric"
-                autoComplete="postal-code"
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-                  setZip(value);
-
-                  if (value.length === 5) {
-                    goWithZip(value);
-                  }
-                }}
-                style={{
-                  padding: "0.9rem 1rem",
-                  fontSize: "1rem",
-                  borderRadius: "16px",
-                  border: "1px solid #d6ddd0",
-                  width: "220px",
-                  background: "rgba(255,255,255,0.88)",
-                  color: "#213224",
-                  outline: "none",
-                }}
-              />
-              <p style={{ margin: 0, color: "#596756", lineHeight: 1.55 }}>
-                Perfect if you want to browse with a location instead of enabling geolocation.
-              </p>
-            </div>
-          </section>
-        )}
-
-        <section
-          className="fade-up delay-4"
-          style={{
             display: "grid",
             gridTemplateColumns: "minmax(0, 1.05fr) minmax(0, 0.95fr)",
             gap: "0.95rem",
@@ -784,7 +368,7 @@ export default function Home() {
         </section>
 
         <section
-          className="fade-up delay-5"
+          className="fade-up delay-3"
           style={{
             marginTop: "0.95rem",
             borderRadius: "28px",
@@ -812,6 +396,490 @@ export default function Home() {
             species that belong there, and letting nature do more of the work again.
           </p>
         </section>
+
+        <section
+          className="fade-up delay-4"
+          style={{
+            marginTop: "1rem",
+            position: "relative",
+            borderRadius: "38px",
+            padding: "1.4rem",
+            background:
+              "linear-gradient(155deg, rgba(25, 43, 31, 0.98), rgba(49, 79, 50, 0.94))",
+            color: "#f8f5ec",
+            boxShadow: "0 32px 78px rgba(30, 46, 33, 0.18)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: "1rem",
+              right: "1rem",
+              width: "16rem",
+              height: "11rem",
+              opacity: 0.9,
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                width: "9rem",
+                height: "5.5rem",
+                borderRadius: "70% 30% 65% 35% / 55% 35% 65% 45%",
+                background: "rgba(164, 194, 124, 0.24)",
+                transform: "rotate(-10deg)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: "1.6rem",
+                left: "3rem",
+                width: "9.5rem",
+                height: "5rem",
+                borderRadius: "43% 57% 34% 66% / 49% 36% 64% 51%",
+                background: "rgba(230, 189, 116, 0.22)",
+                transform: "rotate(9deg)",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+              flexWrap: "wrap",
+              marginBottom: "1rem",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.35rem",
+                  fontSize: "0.8rem",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                  color: "rgba(248,245,236,0.72)",
+                }}
+              >
+                Build your starter plan
+              </p>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "1.9rem",
+                  lineHeight: 1,
+                  letterSpacing: "-0.05em",
+                }}
+              >
+                Three quick choices, then your plan
+              </h2>
+            </div>
+            <p
+              style={{
+                margin: 0,
+                color: "rgba(248,245,236,0.76)",
+                fontSize: "0.95rem",
+              }}
+            >
+              {selectedSun?.label.toLowerCase()} • {selectedSpace?.label.toLowerCase()} •{" "}
+              {selectedGoal?.label.toLowerCase()}
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "0.55rem",
+              flexWrap: "wrap",
+              marginBottom: "1rem",
+            }}
+          >
+            {onboardingSteps.map((step, index) => {
+              const isActive = index === activeStep;
+
+              return (
+                <button
+                  key={step}
+                  type="button"
+                  onClick={() => setActiveStep(index)}
+                  style={{
+                    borderRadius: "999px",
+                    border: isActive
+                      ? "1px solid rgba(243, 221, 175, 0.9)"
+                      : "1px solid rgba(255,255,255,0.14)",
+                    background: isActive
+                      ? "rgba(243, 221, 175, 0.18)"
+                      : "rgba(255,255,255,0.08)",
+                    color: "#f8f5ec",
+                    padding: "0.58rem 0.9rem",
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  {step}
+                </button>
+              );
+            })}
+          </div>
+
+          <section
+            style={{
+              borderRadius: "28px",
+              padding: "1rem",
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.3rem",
+                fontSize: "0.78rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                opacity: 0.76,
+              }}
+            >
+              {onboardingSteps[activeStep]}
+            </p>
+            <p
+              style={{
+                margin: "0 0 0.9rem",
+                color: "rgba(248,245,236,0.74)",
+                lineHeight: 1.55,
+              }}
+            >
+              {activeStep === 0
+                ? "Choose the kind of light your planting area gets most often."
+                : activeStep === 1
+                  ? "Pick the scale that feels closest to the patch you want to start with."
+                  : "Tell Rewild what you want this first planting to do best."}
+            </p>
+
+            {activeStep === 0 && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                  gap: "0.7rem",
+                }}
+              >
+                {sunOptions.map((option) => {
+                  const isActive = option.value === sun;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setSun(option.value)}
+                      style={{
+                        textAlign: "left",
+                        borderRadius: "18px",
+                        border: isActive
+                          ? "1px solid rgba(243, 221, 175, 0.9)"
+                          : "1px solid rgba(255,255,255,0.14)",
+                        background: isActive
+                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
+                          : "rgba(255,255,255,0.06)",
+                        color: "#f8f5ec",
+                        padding: "0.85rem",
+                        cursor: "pointer",
+                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "2.5rem",
+                          height: "2.5rem",
+                          borderRadius: "999px",
+                          marginBottom: "0.65rem",
+                          background: isActive
+                            ? "rgba(243, 221, 175, 0.18)"
+                            : "rgba(255,255,255,0.08)",
+                        }}
+                      >
+                        <LightIcon type={option.value} />
+                      </div>
+                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
+                      <div style={{ fontSize: "0.88rem", opacity: 0.78, lineHeight: 1.45 }}>
+                        {option.notes}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {activeStep === 1 && (
+              <div style={{ display: "grid", gap: "0.7rem" }}>
+                {spaceOptions.map((option) => {
+                  const isActive = option.value === space;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setSpace(option.value)}
+                      style={{
+                        textAlign: "left",
+                        borderRadius: "20px",
+                        border: isActive
+                          ? "1px solid rgba(243, 221, 175, 0.9)"
+                          : "1px solid rgba(255,255,255,0.14)",
+                        background: isActive
+                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
+                          : "rgba(255,255,255,0.06)",
+                        color: "#f8f5ec",
+                        padding: "0.9rem 1rem",
+                        cursor: "pointer",
+                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
+                      <div style={{ fontSize: "0.9rem", opacity: 0.8, lineHeight: 1.5 }}>
+                        {option.notes}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {activeStep === 2 && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gap: "0.7rem",
+                }}
+              >
+                {goalOptions.map((option) => {
+                  const isActive = option.value === goal;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setGoal(option.value)}
+                      style={{
+                        textAlign: "left",
+                        borderRadius: "18px",
+                        border: isActive
+                          ? "1px solid rgba(243, 221, 175, 0.9)"
+                          : "1px solid rgba(255,255,255,0.14)",
+                        background: isActive
+                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
+                          : "rgba(255,255,255,0.06)",
+                        color: "#f8f5ec",
+                        padding: "0.9rem 1rem",
+                        cursor: "pointer",
+                        boxShadow: isActive ? "0 12px 26px rgba(19, 29, 21, 0.16)" : "none",
+                      }}
+                    >
+                      <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{option.label}</div>
+                      <div style={{ fontSize: "0.88rem", opacity: 0.8, lineHeight: 1.45 }}>
+                        {option.notes}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.8rem",
+                flexWrap: "wrap",
+                marginTop: "1rem",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setActiveStep((step) => Math.max(0, step - 1))}
+                disabled={activeStep === 0}
+                style={{
+                  padding: "0.82rem 1rem",
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  borderRadius: "999px",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  background: activeStep === 0 ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.08)",
+                  color: activeStep === 0 ? "rgba(248,245,236,0.38)" : "#f8f5ec",
+                  cursor: activeStep === 0 ? "default" : "pointer",
+                }}
+              >
+                Back
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveStep((step) => Math.min(onboardingSteps.length - 1, step + 1))}
+                disabled={activeStep === onboardingSteps.length - 1}
+                style={{
+                  padding: "0.82rem 1rem",
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  borderRadius: "999px",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  background:
+                    activeStep === onboardingSteps.length - 1
+                      ? "rgba(255,255,255,0.04)"
+                      : "rgba(255,255,255,0.08)",
+                  color:
+                    activeStep === onboardingSteps.length - 1
+                      ? "rgba(248,245,236,0.38)"
+                      : "#f8f5ec",
+                  cursor: activeStep === onboardingSteps.length - 1 ? "default" : "pointer",
+                  marginLeft: "auto",
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </section>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "0.85rem",
+              alignItems: "center",
+              marginTop: "1.2rem",
+            }}
+          >
+            <button
+              type="button"
+              onClick={handleLocation}
+              className="cta-pop"
+              style={{
+                padding: "0.95rem 1.55rem",
+                fontSize: "1rem",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: "#f3ddaf",
+                color: "#213426",
+                cursor: "pointer",
+                boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
+              }}
+            >
+              Use my location
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowZip(true)}
+              style={{
+                padding: "0.95rem 1.35rem",
+                fontSize: "1rem",
+                fontWeight: 600,
+                borderRadius: "999px",
+                border: "1px solid rgba(255,255,255,0.18)",
+                background: "rgba(255,255,255,0.08)",
+                color: "#f8f5ec",
+                cursor: "pointer",
+              }}
+            >
+              Enter ZIP instead
+            </button>
+
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.92rem",
+                color: "rgba(248, 245, 236, 0.76)",
+              }}
+            >
+              Personalized native picks with a {selectedGoal?.label.toLowerCase()} focus
+            </p>
+          </div>
+        </section>
+
+        {showZip && (
+          <section
+            className="fade-up delay-5"
+            style={{
+              marginTop: "1rem",
+              borderRadius: "28px",
+              padding: "1.35rem",
+              background: "rgba(255,255,255,0.74)",
+              border: "1px solid rgba(109, 137, 97, 0.16)",
+              boxShadow: "0 18px 34px rgba(58, 77, 43, 0.08)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.8rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#667561",
+                fontWeight: 700,
+              }}
+            >
+              ZIP fallback
+            </p>
+            <h2
+              style={{
+                margin: "0 0 0.8rem",
+                fontSize: "1.35rem",
+                lineHeight: 1.06,
+                letterSpacing: "-0.04em",
+              }}
+            >
+              Use your ZIP to start your plan
+            </h2>
+            <div
+              style={{
+                display: "flex",
+                gap: "0.8rem",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <input
+                placeholder="60302"
+                value={zip}
+                inputMode="numeric"
+                autoComplete="postal-code"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+                  setZip(value);
+
+                  if (value.length === 5) {
+                    goWithZip(value);
+                  }
+                }}
+                style={{
+                  padding: "0.9rem 1rem",
+                  fontSize: "1rem",
+                  borderRadius: "16px",
+                  border: "1px solid #d6ddd0",
+                  width: "220px",
+                  background: "rgba(255,255,255,0.88)",
+                  color: "#213224",
+                  outline: "none",
+                }}
+              />
+              <p style={{ margin: 0, color: "#596756", lineHeight: 1.55 }}>
+                Perfect if you want to browse with a location instead of enabling geolocation.
+              </p>
+            </div>
+          </section>
+        )}
       </div>
 
       <style jsx>{`
