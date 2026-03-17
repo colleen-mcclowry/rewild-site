@@ -121,6 +121,73 @@ function LightIcon({ type }: { type: SunPreference }) {
   );
 }
 
+function StoryGlyph({ kind }: { kind: "leaf" | "bee" | "bird" | "globe" }) {
+  const stroke = "#38533b";
+
+  if (kind === "leaf") {
+    return (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M18.4 5.8c-5 .5-9.3 4.4-10 9.5-.2 1.3-.1 2.4.2 3.4 1 .3 2.1.4 3.4.2 5.1-.7 9-5 9.5-10 .1-.9.1-2-.1-3.1-.8-.2-1.9-.2-3-.1Z"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M9 15c2.3-2 4.3-4.2 6-6.6"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "bee") {
+    return (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M8.5 9.6c-1.1-1.8-.8-4 .8-5.1 1.6-1 3.9-.5 5.1 1.1"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+        <path
+          d="M15.5 9.6c1.1-1.8.8-4-.8-5.1-1.6-1-3.9-.5-5.1 1.1"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+        <rect x="7" y="9" width="10" height="8" rx="4" stroke={stroke} strokeWidth="1.7" />
+        <path d="M10 9v8M14 9v8" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
+        <path d="M12 17v2.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  if (kind === "bird") {
+    return (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M6.5 15.8c1.5-4.7 5-8 10-8.6-.5 1.5-.6 3-.5 4.4 1.3.3 2.5.8 3.5 1.6-1.4 1.6-3.1 2.7-5.2 3.3-2.7.8-5.5.5-7.8-.7Z"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinejoin="round"
+        />
+        <path d="M10 12.3c1.5.1 2.8.5 4 1.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.4" stroke={stroke} strokeWidth="1.7" />
+      <path d="M3.9 12h16.2M12 3.8c2 2.1 3.1 5 3.1 8.2S14 18.1 12 20.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M12 3.8c-2 2.1-3.1 5-3.1 8.2s1.1 6.1 3.1 8.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function Home() {
   const [zip, setZip] = useState("");
   const [showZip, setShowZip] = useState(false);
@@ -270,128 +337,297 @@ export default function Home() {
         <section
           className="fade-up delay-2"
           style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1.05fr) minmax(0, 0.95fr)",
-            gap: "0.95rem",
             marginTop: "1rem",
+            borderRadius: "40px",
+            padding: "2rem 1.5rem",
+            background:
+              "linear-gradient(180deg, rgba(248, 246, 239, 0.9), rgba(241, 245, 234, 0.88))",
+            border: "1px solid rgba(125, 146, 108, 0.14)",
+            boxShadow: "0 24px 44px rgba(59, 79, 44, 0.06)",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <article
+          <div
+            aria-hidden="true"
             style={{
-              borderRadius: "30px",
-              padding: "1.45rem",
-              background: "rgba(255,255,255,0.74)",
-              border: "1px solid rgba(98, 126, 86, 0.15)",
-              boxShadow: "0 18px 34px rgba(59, 79, 44, 0.06)",
+              position: "absolute",
+              inset: "0 auto auto 50%",
+              width: "46rem",
+              height: "22rem",
+              transform: "translateX(-50%)",
+              borderRadius: "999px",
+              background:
+                "radial-gradient(circle, rgba(172, 198, 156, 0.18) 0%, rgba(172, 198, 156, 0.06) 36%, transparent 72%)",
             }}
-          >
-            <p
-              style={{
-                margin: "0 0 0.55rem",
-                fontSize: "0.82rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#667561",
-                fontWeight: 700,
-              }}
-            >
-              What is rewilding?
-            </p>
-            <h2
-              style={{
-                margin: "0 0 0.75rem",
-                fontSize: "1.75rem",
-                lineHeight: 1.02,
-                letterSpacing: "-0.05em",
-                color: "#243427",
-              }}
-            >
-              Returning ecosystems to a healthier natural rhythm
-            </h2>
-            <p style={{ margin: "0 0 0.85rem", color: "#4f5f4a", lineHeight: 1.7 }}>
-              Rewilding is the process of helping ecosystems recover by restoring habitat,
-              supporting native species, and making more room for nature to function the way
-              it&apos;s meant to.
-            </p>
-            <p style={{ margin: 0, color: "#4f5f4a", lineHeight: 1.7 }}>
-              In a backyard context, that can be as simple as replacing a small patch of lawn
-              with native plants that feed insects, support birds, and strengthen the local
-              web of life.
-            </p>
-          </article>
+          />
 
-          <article
-            style={{
-              borderRadius: "30px",
-              padding: "1.45rem",
-              background: "rgba(247, 244, 234, 0.92)",
-              border: "1px solid rgba(125, 146, 108, 0.16)",
-              boxShadow: "0 16px 30px rgba(59, 79, 44, 0.05)",
-            }}
-          >
-            <p
+          <div style={{ position: "relative" }}>
+            <div
               style={{
-                margin: "0 0 0.55rem",
-                fontSize: "0.82rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#677564",
-                fontWeight: 700,
+                textAlign: "center",
+                maxWidth: "42rem",
+                margin: "0 auto",
               }}
             >
-              Why it matters
-            </p>
-            <h2
+              <p
+                style={{
+                  margin: "0 0 0.6rem",
+                  fontSize: "0.82rem",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "#697867",
+                  fontWeight: 700,
+                }}
+              >
+                What is rewilding?
+              </p>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "clamp(2.35rem, 6vw, 4.7rem)",
+                  lineHeight: 0.93,
+                  letterSpacing: "-0.07em",
+                  color: "#203126",
+                  textWrap: "balance",
+                }}
+              >
+                Nature knows how to heal.
+              </h2>
+              <p
+                style={{
+                  margin: "1rem auto 0",
+                  maxWidth: "34rem",
+                  fontSize: "1.05rem",
+                  lineHeight: 1.72,
+                  color: "#556451",
+                }}
+              >
+                Rewilding gives it the space. Replace a little lawn with native life,
+                and the ecosystem starts rebuilding itself.
+              </p>
+            </div>
+
+            <div
               style={{
-                margin: "0 0 0.75rem",
-                fontSize: "1.75rem",
-                lineHeight: 1.02,
-                letterSpacing: "-0.05em",
-                color: "#243427",
+                marginTop: "1.8rem",
+                borderRadius: "32px",
+                padding: "1.25rem",
+                background: "rgba(255,255,255,0.72)",
+                border: "1px solid rgba(214, 221, 208, 0.9)",
+                boxShadow: "0 12px 36px rgba(32, 49, 38, 0.05)",
               }}
             >
-              Biodiversity helps stabilize the climate
-            </h2>
-            <p style={{ margin: "0 0 0.85rem", color: "#4f5f4a", lineHeight: 1.7 }}>
-              Biodiversity supports healthy soil, cleaner water, pollination, food chains,
-              and climate resilience. When species disappear, those systems become weaker.
-            </p>
-            <p style={{ margin: 0, color: "#4f5f4a", lineHeight: 1.7 }}>
-              Rewilding matters because restoring native habitat helps rebuild those
-              relationships. It&apos;s one of the clearest ways we can respond to biodiversity
-              loss and create landscapes that are more resilient over time.
-            </p>
-          </article>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "stretch",
+                  justifyContent: "center",
+                  gap: "0.9rem",
+                }}
+              >
+                {[
+                  {
+                    kind: "leaf" as const,
+                    title: "Replace lawn with life",
+                    copy: "Native plants create habitat where it was missing.",
+                  },
+                  {
+                    kind: "bee" as const,
+                    title: "Pollinators return",
+                    copy: "Bees and butterflies find food again.",
+                  },
+                  {
+                    kind: "bird" as const,
+                    title: "The web of life grows",
+                    copy: "Insects support birds, shelter, and seasonal cycles.",
+                  },
+                  {
+                    kind: "globe" as const,
+                    title: "Ecosystems get stronger",
+                    copy: "Healthier soil, water, and resilience build over time.",
+                  },
+                ].map((item, index, items) => (
+                  <div
+                    key={item.title}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.9rem",
+                      flex: "1 1 210px",
+                      minWidth: "210px",
+                      maxWidth: "250px",
+                    }}
+                  >
+                    <article
+                      style={{
+                        flex: 1,
+                        minHeight: "100%",
+                        borderRadius: "26px",
+                        padding: "1rem",
+                        background:
+                          "linear-gradient(180deg, rgba(248, 250, 244, 0.96), rgba(243, 238, 226, 0.94))",
+                        border: "1px solid rgba(207, 216, 199, 0.9)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "3rem",
+                          height: "3rem",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "999px",
+                          background: "rgba(221, 232, 214, 0.92)",
+                          marginBottom: "0.8rem",
+                        }}
+                      >
+                        <StoryGlyph kind={item.kind} />
+                      </div>
+                      <h3
+                        style={{
+                          margin: "0 0 0.45rem",
+                          fontSize: "1.18rem",
+                          lineHeight: 1.05,
+                          letterSpacing: "-0.04em",
+                          color: "#223425",
+                        }}
+                      >
+                        {item.title}
+                      </h3>
+                      <p style={{ margin: 0, color: "#5a6856", lineHeight: 1.55 }}>
+                        {item.copy}
+                      </p>
+                    </article>
+
+                    {index < items.length - 1 ? (
+                      <div
+                        aria-hidden="true"
+                        style={{
+                          width: "2.4rem",
+                          height: "2.4rem",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "999px",
+                          background: "rgba(233, 238, 226, 0.9)",
+                          color: "#7b8d74",
+                          fontSize: "1.25rem",
+                          flexShrink: 0,
+                        }}
+                      >
+                        →
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
 
         <section
           className="fade-up delay-3"
           style={{
             marginTop: "0.95rem",
-            borderRadius: "28px",
-            padding: "1.3rem 1.4rem",
-            background: "linear-gradient(180deg, rgba(238, 243, 230, 0.98), rgba(247, 243, 233, 0.98))",
-            border: "1px solid rgba(125, 146, 108, 0.16)",
-            boxShadow: "0 14px 26px rgba(59, 79, 44, 0.05)",
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1.15fr) minmax(280px, 0.85fr)",
+            gap: "0.95rem",
           }}
         >
-          <p
+          <article
             style={{
-              margin: "0 0 0.4rem",
-              fontSize: "0.82rem",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "#677564",
-              fontWeight: 700,
+              borderRadius: "30px",
+              padding: "1.6rem",
+              background: "rgba(255,255,255,0.76)",
+              border: "1px solid rgba(125, 146, 108, 0.14)",
+              boxShadow: "0 16px 34px rgba(59, 79, 44, 0.05)",
             }}
           >
-            The big idea
-          </p>
-          <p style={{ margin: 0, color: "#445240", lineHeight: 1.7 }}>
-            The loss of biodiversity is a crisis of our own making. Rewilding is one of the
-            clearest ways to restore what has been lost by reviving habitat, supporting the
-            species that belong there, and letting nature do more of the work again.
-          </p>
+            <p
+              style={{
+                margin: "0 0 0.5rem",
+                fontSize: "0.82rem",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#697867",
+                fontWeight: 700,
+              }}
+            >
+              Why it matters
+            </p>
+            <h3
+              style={{
+                margin: 0,
+                fontSize: "clamp(2rem, 4.6vw, 3.6rem)",
+                lineHeight: 0.95,
+                letterSpacing: "-0.06em",
+                color: "#203126",
+                textWrap: "balance",
+              }}
+            >
+              Biodiversity starts in small places.
+            </h3>
+            <p
+              style={{
+                margin: "1rem 0 0",
+                maxWidth: "34rem",
+                color: "#556451",
+                lineHeight: 1.72,
+                fontSize: "1.02rem",
+              }}
+            >
+              Even a modest patch of native planting can feed insects, support birds,
+              and help restore the relationships that keep ecosystems stable.
+            </p>
+          </article>
+
+          <article
+            style={{
+              borderRadius: "30px",
+              padding: "1.6rem",
+              background:
+                "linear-gradient(180deg, rgba(231, 238, 224, 0.98), rgba(246, 241, 229, 0.98))",
+              border: "1px solid rgba(125, 146, 108, 0.16)",
+              boxShadow: "0 14px 28px rgba(59, 79, 44, 0.05)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.5rem",
+                fontSize: "0.82rem",
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "#677564",
+                fontWeight: 700,
+              }}
+            >
+              The big idea
+            </p>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "1.6rem",
+                lineHeight: 1.12,
+                letterSpacing: "-0.05em",
+                color: "#213224",
+                fontWeight: 700,
+              }}
+            >
+              A backyard does not have to be large to become habitat.
+            </p>
+            <p
+              style={{
+                margin: "0.95rem 0 0",
+                color: "#576653",
+                lineHeight: 1.65,
+              }}
+            >
+              Rewilding is not about perfection. It is about making room for life to
+              return, one patch at a time.
+            </p>
+          </article>
         </section>
 
         <section
@@ -938,6 +1174,10 @@ export default function Home() {
           }
 
           section[style*="grid-template-columns: minmax(0, 1.05fr)"] {
+            grid-template-columns: 1fr !important;
+          }
+
+          section[style*="grid-template-columns: minmax(0, 1.15fr)"] {
             grid-template-columns: 1fr !important;
           }
         }
