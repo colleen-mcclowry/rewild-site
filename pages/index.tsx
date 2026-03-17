@@ -175,7 +175,7 @@ export default function Home() {
           <p
             style={{
               margin: "0 0 0.6rem",
-              fontSize: "0.82rem",
+              fontSize: "1.18rem",
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               color: "#607159",
@@ -187,20 +187,20 @@ export default function Home() {
           <h1
             style={{
               margin: 0,
-              fontSize: "clamp(3.3rem, 9vw, 6rem)",
+              fontSize: "clamp(2.55rem, 6.8vw, 4.6rem)",
               lineHeight: 0.9,
               letterSpacing: "-0.09em",
               color: "#203127",
               textWrap: "balance",
             }}
           >
-            Your backyard can be part of nature&apos;s best hope.
+            Your land. Nature&apos;s best hope.
           </h1>
           <p
             style={{
               maxWidth: "42rem",
               margin: "0.9rem auto 0",
-              fontSize: "1.08rem",
+              fontSize: "0.98rem",
               lineHeight: 1.72,
               color: "#52624d",
             }}
