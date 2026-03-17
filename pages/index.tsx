@@ -172,9 +172,6 @@ export default function Home() {
     );
   };
 
-  const selectedSun = sunOptions.find((option) => option.value === sun);
-  const selectedSpace = spaceOptions.find((option) => option.value === space);
-  const selectedGoal = goalOptions.find((option) => option.value === goal);
   const onboardingSteps = ["Light", "Space", "What matters most"] as const;
 
   return (
@@ -528,17 +525,6 @@ export default function Home() {
             </div>
           </div>
 
-          <p
-            style={{
-              margin: "0 0 1rem",
-              color: "rgba(248,245,236,0.76)",
-              fontSize: "0.95rem",
-            }}
-          >
-            {selectedSun?.label.toLowerCase()} • {selectedSpace?.label.toLowerCase()} •{" "}
-            {selectedGoal?.label.toLowerCase()}
-          </p>
-
           {showZip && (
             <section
               style={{
@@ -870,15 +856,6 @@ export default function Home() {
             </div>
           </section>
 
-          <p
-            style={{
-              margin: "1rem 0 0",
-              fontSize: "0.92rem",
-              color: "rgba(248, 245, 236, 0.76)",
-            }}
-          >
-            Personalized native picks with a {selectedGoal?.label.toLowerCase()} focus
-          </p>
         </section>
 
       </div>
