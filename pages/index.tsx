@@ -397,8 +397,83 @@ export default function Home() {
           </p>
         </section>
 
+        {showZip && (
+          <section
+            className="fade-up delay-4"
+            style={{
+              marginTop: "1rem",
+              borderRadius: "28px",
+              padding: "1.35rem",
+              background:
+                "linear-gradient(135deg, rgba(249, 238, 209, 0.96), rgba(244, 226, 185, 0.92))",
+              border: "1px solid rgba(192, 160, 101, 0.22)",
+              boxShadow: "0 18px 34px rgba(126, 97, 44, 0.12)",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.8rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#7a6332",
+                fontWeight: 700,
+              }}
+            >
+              ZIP fallback
+            </p>
+            <h2
+              style={{
+                margin: "0 0 0.8rem",
+                fontSize: "1.35rem",
+                lineHeight: 1.06,
+                letterSpacing: "-0.04em",
+                color: "#2c2b21",
+              }}
+            >
+              Use your ZIP to start your plan
+            </h2>
+            <div
+              style={{
+                display: "flex",
+                gap: "0.8rem",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <input
+                placeholder="60302"
+                value={zip}
+                inputMode="numeric"
+                autoComplete="postal-code"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+                  setZip(value);
+
+                  if (value.length === 5) {
+                    goWithZip(value);
+                  }
+                }}
+                style={{
+                  padding: "0.9rem 1rem",
+                  fontSize: "1rem",
+                  borderRadius: "16px",
+                  border: "1px solid #d6ddd0",
+                  width: "220px",
+                  background: "rgba(255,255,255,0.88)",
+                  color: "#213224",
+                  outline: "none",
+                }}
+              />
+              <p style={{ margin: 0, color: "#62573a", lineHeight: 1.55 }}>
+                Perfect if you want to browse with a location instead of enabling geolocation.
+              </p>
+            </div>
+          </section>
+        )}
+
         <section
-          className="fade-up delay-4"
+          className="fade-up delay-5"
           style={{
             marginTop: "1rem",
             position: "relative",
@@ -808,78 +883,6 @@ export default function Home() {
           </div>
         </section>
 
-        {showZip && (
-          <section
-            className="fade-up delay-5"
-            style={{
-              marginTop: "1rem",
-              borderRadius: "28px",
-              padding: "1.35rem",
-              background: "rgba(255,255,255,0.74)",
-              border: "1px solid rgba(109, 137, 97, 0.16)",
-              boxShadow: "0 18px 34px rgba(58, 77, 43, 0.08)",
-            }}
-          >
-            <p
-              style={{
-                margin: "0 0 0.45rem",
-                fontSize: "0.8rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#667561",
-                fontWeight: 700,
-              }}
-            >
-              ZIP fallback
-            </p>
-            <h2
-              style={{
-                margin: "0 0 0.8rem",
-                fontSize: "1.35rem",
-                lineHeight: 1.06,
-                letterSpacing: "-0.04em",
-              }}
-            >
-              Use your ZIP to start your plan
-            </h2>
-            <div
-              style={{
-                display: "flex",
-                gap: "0.8rem",
-                flexWrap: "wrap",
-                alignItems: "center",
-              }}
-            >
-              <input
-                placeholder="60302"
-                value={zip}
-                inputMode="numeric"
-                autoComplete="postal-code"
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-                  setZip(value);
-
-                  if (value.length === 5) {
-                    goWithZip(value);
-                  }
-                }}
-                style={{
-                  padding: "0.9rem 1rem",
-                  fontSize: "1rem",
-                  borderRadius: "16px",
-                  border: "1px solid #d6ddd0",
-                  width: "220px",
-                  background: "rgba(255,255,255,0.88)",
-                  color: "#213224",
-                  outline: "none",
-                }}
-              />
-              <p style={{ margin: 0, color: "#596756", lineHeight: 1.55 }}>
-                Perfect if you want to browse with a location instead of enabling geolocation.
-              </p>
-            </div>
-          </section>
-        )}
       </div>
 
       <style jsx>{`
