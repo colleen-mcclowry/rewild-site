@@ -397,83 +397,8 @@ export default function Home() {
           </p>
         </section>
 
-        {showZip && (
-          <section
-            className="fade-up delay-4"
-            style={{
-              marginTop: "1rem",
-              borderRadius: "28px",
-              padding: "1.35rem",
-              background:
-                "linear-gradient(135deg, rgba(249, 238, 209, 0.96), rgba(244, 226, 185, 0.92))",
-              border: "1px solid rgba(192, 160, 101, 0.22)",
-              boxShadow: "0 18px 34px rgba(126, 97, 44, 0.12)",
-            }}
-          >
-            <p
-              style={{
-                margin: "0 0 0.45rem",
-                fontSize: "0.8rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#7a6332",
-                fontWeight: 700,
-              }}
-            >
-              ZIP fallback
-            </p>
-            <h2
-              style={{
-                margin: "0 0 0.8rem",
-                fontSize: "1.35rem",
-                lineHeight: 1.06,
-                letterSpacing: "-0.04em",
-                color: "#2c2b21",
-              }}
-            >
-              Use your ZIP to start your plan
-            </h2>
-            <div
-              style={{
-                display: "flex",
-                gap: "0.8rem",
-                flexWrap: "wrap",
-                alignItems: "center",
-              }}
-            >
-              <input
-                placeholder="60302"
-                value={zip}
-                inputMode="numeric"
-                autoComplete="postal-code"
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-                  setZip(value);
-
-                  if (value.length === 5) {
-                    goWithZip(value);
-                  }
-                }}
-                style={{
-                  padding: "0.9rem 1rem",
-                  fontSize: "1rem",
-                  borderRadius: "16px",
-                  border: "1px solid #d6ddd0",
-                  width: "220px",
-                  background: "rgba(255,255,255,0.88)",
-                  color: "#213224",
-                  outline: "none",
-                }}
-              />
-              <p style={{ margin: 0, color: "#62573a", lineHeight: 1.55 }}>
-                Perfect if you want to browse with a location instead of enabling geolocation.
-              </p>
-            </div>
-          </section>
-        )}
-
         <section
-          className="fade-up delay-5"
+          className="fade-up delay-4"
           style={{
             marginTop: "1rem",
             position: "relative",
@@ -525,7 +450,7 @@ export default function Home() {
           <div
             style={{
               display: "flex",
-              alignItems: "center",
+              alignItems: "start",
               justifyContent: "space-between",
               gap: "1rem",
               flexWrap: "wrap",
@@ -556,17 +481,137 @@ export default function Home() {
                 Three quick choices, then your plan
               </h2>
             </div>
-            <p
+            <div
               style={{
-                margin: 0,
-                color: "rgba(248,245,236,0.76)",
-                fontSize: "0.95rem",
+                display: "flex",
+                gap: "0.7rem",
+                flexWrap: "wrap",
+                alignItems: "center",
               }}
             >
-              {selectedSun?.label.toLowerCase()} • {selectedSpace?.label.toLowerCase()} •{" "}
-              {selectedGoal?.label.toLowerCase()}
-            </p>
+              <button
+                type="button"
+                onClick={handleLocation}
+                className="cta-pop"
+                style={{
+                  padding: "0.9rem 1.3rem",
+                  fontSize: "0.98rem",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  borderRadius: "999px",
+                  border: "none",
+                  backgroundColor: "#f3ddaf",
+                  color: "#213426",
+                  cursor: "pointer",
+                  boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
+                }}
+              >
+                Use my location
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowZip((current) => !current)}
+                style={{
+                  padding: "0.9rem 1.2rem",
+                  fontSize: "0.96rem",
+                  fontWeight: 600,
+                  borderRadius: "999px",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  background: "rgba(255,255,255,0.08)",
+                  color: "#f8f5ec",
+                  cursor: "pointer",
+                }}
+              >
+                {showZip ? "Hide ZIP" : "Enter ZIP instead"}
+              </button>
+            </div>
           </div>
+
+          <p
+            style={{
+              margin: "0 0 1rem",
+              color: "rgba(248,245,236,0.76)",
+              fontSize: "0.95rem",
+            }}
+          >
+            {selectedSun?.label.toLowerCase()} • {selectedSpace?.label.toLowerCase()} •{" "}
+            {selectedGoal?.label.toLowerCase()}
+          </p>
+
+          {showZip && (
+            <section
+              style={{
+                marginBottom: "1rem",
+                borderRadius: "24px",
+                padding: "1.1rem",
+                background:
+                  "linear-gradient(135deg, rgba(249, 238, 209, 0.96), rgba(244, 226, 185, 0.92))",
+                border: "1px solid rgba(192, 160, 101, 0.22)",
+                boxShadow: "0 18px 34px rgba(126, 97, 44, 0.12)",
+                color: "#2c2b21",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 0.4rem",
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#7a6332",
+                  fontWeight: 700,
+                }}
+              >
+                ZIP fallback
+              </p>
+              <p
+                style={{
+                  margin: "0 0 0.8rem",
+                  color: "#62573a",
+                  lineHeight: 1.55,
+                }}
+              >
+                Prefer typing your location? Start with your ZIP and we&apos;ll build the same
+                personalized plan from there.
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.8rem",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  placeholder="60302"
+                  value={zip}
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+                    setZip(value);
+
+                    if (value.length === 5) {
+                      goWithZip(value);
+                    }
+                  }}
+                  style={{
+                    padding: "0.9rem 1rem",
+                    fontSize: "1rem",
+                    borderRadius: "16px",
+                    border: "1px solid rgba(192, 160, 101, 0.3)",
+                    width: "220px",
+                    background: "rgba(255,255,255,0.9)",
+                    color: "#213224",
+                    outline: "none",
+                  }}
+                />
+                <p style={{ margin: 0, color: "#62573a", lineHeight: 1.55 }}>
+                  Great if you want to browse without enabling geolocation.
+                </p>
+              </div>
+            </section>
+          )}
 
           <div
             style={{
@@ -825,62 +870,15 @@ export default function Home() {
             </div>
           </section>
 
-          <div
+          <p
             style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "0.85rem",
-              alignItems: "center",
-              marginTop: "1.2rem",
+              margin: "1rem 0 0",
+              fontSize: "0.92rem",
+              color: "rgba(248, 245, 236, 0.76)",
             }}
           >
-            <button
-              type="button"
-              onClick={handleLocation}
-              className="cta-pop"
-              style={{
-                padding: "0.95rem 1.55rem",
-                fontSize: "1rem",
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                borderRadius: "999px",
-                border: "none",
-                backgroundColor: "#f3ddaf",
-                color: "#213426",
-                cursor: "pointer",
-                boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
-              }}
-            >
-              Use my location
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowZip(true)}
-              style={{
-                padding: "0.95rem 1.35rem",
-                fontSize: "1rem",
-                fontWeight: 600,
-                borderRadius: "999px",
-                border: "1px solid rgba(255,255,255,0.18)",
-                background: "rgba(255,255,255,0.08)",
-                color: "#f8f5ec",
-                cursor: "pointer",
-              }}
-            >
-              Enter ZIP instead
-            </button>
-
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.92rem",
-                color: "rgba(248, 245, 236, 0.76)",
-              }}
-            >
-              Personalized native picks with a {selectedGoal?.label.toLowerCase()} focus
-            </p>
-          </div>
+            Personalized native picks with a {selectedGoal?.label.toLowerCase()} focus
+          </p>
         </section>
 
       </div>
