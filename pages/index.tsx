@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -63,6 +64,28 @@ const goalOptions: Array<{ value: GoalPreference; label: string; notes: string }
     notes: "A brighter, more visibly blooming mix",
   },
 ];
+
+const heroScenes = [
+  {
+    title: "A starter patch can look good fast.",
+    copy: "Color, movement, and habitat in one corner of the yard.",
+    image:
+      "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&w=1400&q=70",
+    tags: ["First-season color", "Pollinator food"],
+  },
+  {
+    title: "Pollinator food",
+    copy: "Native bloom gives bees and butterflies a reason to stop by.",
+    image:
+      "https://images.unsplash.com/photo-1621619858360-7f79b3f3b2a9?auto=format&fit=crop&w=1200&q=70",
+  },
+  {
+    title: "Roots + structure",
+    copy: "Grasses and seedheads keep the patch useful after peak bloom.",
+    image:
+      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=70",
+  },
+] as const;
 
 function LightIcon({ type }: { type: SunPreference }) {
   const iconStroke = "#f3ddaf";
@@ -184,70 +207,6 @@ function StoryGlyph({ kind }: { kind: "leaf" | "bee" | "bird" | "globe" }) {
       <circle cx="12" cy="12" r="8.4" stroke={stroke} strokeWidth="1.7" />
       <path d="M3.9 12h16.2M12 3.8c2 2.1 3.1 5 3.1 8.2S14 18.1 12 20.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
       <path d="M12 3.8c-2 2.1-3.1 5-3.1 8.2s1.1 6.1 3.1 8.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SparkGlyph({ kind }: { kind: "bloom" | "buzz" | "song" | "roots" }) {
-  const stroke = "#30412c";
-
-  if (kind === "bloom") {
-    return (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="12" r="2.1" stroke={stroke} strokeWidth="1.7" />
-        <path
-          d="M12 3.5c1.8 0 3 1.3 3 3.1S13.7 10 12 10 9 8.7 9 6.6s1.2-3.1 3-3.1ZM20.2 9.4c0 1.8-1.3 3-3.1 3S13.7 11.2 13.7 9.4s1.3-3 3.4-3 3.1 1.2 3.1 3ZM15.2 17.5c0 1.8-1.3 3-3.1 3S9 19.3 9 17.5s1.3-3 3.1-3 3.1 1.2 3.1 3ZM10.3 9.4c0 1.8-1.3 3-3.1 3S4 11.2 4 9.4s1.3-3 3.2-3 3.1 1.2 3.1 3Z"
-          stroke={stroke}
-          strokeWidth="1.4"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
-  if (kind === "buzz") {
-    return (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <rect x="7" y="9" width="10" height="7" rx="3.5" stroke={stroke} strokeWidth="1.7" />
-        <path
-          d="M9 9c-.8-1.5-.5-3.2.9-4.1M15 9c.8-1.5.5-3.2-.9-4.1M10.5 9v7M13.5 9v7M4.5 12h1.9M17.6 12h1.9"
-          stroke={stroke}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (kind === "roots") {
-    return (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M12 4.5v6.4M12 10.4c-1.8 0-3.2-1.4-3.2-3.2M12 10.4c1.8 0 3.2-1.4 3.2-3.2"
-          stroke={stroke}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-        />
-        <path
-          d="M12 10.9c0 2.3-.6 3.8-1.7 5.1M12 10.9c0 2.2.6 3.8 1.8 5.1M10.1 15.3c-.9.3-1.6.9-2.3 1.7M13.9 15.3c.9.3 1.6.9 2.3 1.7"
-          stroke={stroke}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    );
-  }
-
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M5.6 15.6c1.7-4.4 5.2-7.2 10.5-7.8-.4 1.3-.5 2.6-.3 3.8 1.3.2 2.4.6 3.2 1.3-1.2 1.5-2.9 2.4-5.1 3-2.7.7-5.4.5-8.3-.3Z"
-        stroke={stroke}
-        strokeWidth="1.7"
-        strokeLinejoin="round"
-      />
-      <path d="M10.2 12.4c1.6 0 3 .3 4.3.9" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   );
 }
@@ -439,7 +398,7 @@ export default function Home() {
             }}
           >
             <div
-              className="hero-preview-grid"
+              className="hero-gallery-grid"
               style={{
                 display: "grid",
                 gridTemplateColumns: "minmax(0, 1.1fr) minmax(280px, 0.9fr)",
@@ -448,188 +407,173 @@ export default function Home() {
               }}
             >
               <article
+                className="hero-scene hero-scene-main"
                 style={{
                   borderRadius: "24px",
-                  padding: "1.05rem",
-                  background:
-                    "linear-gradient(145deg, rgba(26, 44, 32, 0.98), rgba(54, 83, 49, 0.92))",
+                  minHeight: "420px",
                   color: "#f6f5ee",
                   textAlign: "left",
                   position: "relative",
                   overflow: "hidden",
                 }}
               >
+                <Image
+                  src={heroScenes[0].image}
+                  alt={heroScenes[0].title}
+                  fill
+                  priority
+                  sizes="(max-width: 720px) 100vw, 58vw"
+                  style={{ objectFit: "cover" }}
+                />
                 <div
                   aria-hidden="true"
                   style={{
                     position: "absolute",
-                    inset: "auto -45px -70px auto",
-                    width: "180px",
-                    height: "180px",
-                    borderRadius: "999px",
-                    background: "rgba(243, 221, 175, 0.12)",
+                    inset: 0,
+                    background:
+                      "linear-gradient(180deg, rgba(15, 24, 18, 0.08) 0%, rgba(15, 24, 18, 0.34) 48%, rgba(15, 24, 18, 0.82) 100%)",
                   }}
                 />
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "0.74rem",
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: "rgba(246,245,238,0.72)",
-                    fontWeight: 700,
-                  }}
-                >
-                  Preview
-                </p>
-                <h3
-                  style={{
-                    margin: "0.45rem 0 0",
-                    fontSize: "1.55rem",
-                    lineHeight: 1,
-                    letterSpacing: "-0.05em",
-                  }}
-                >
-                  Your first patch, already sketched out.
-                </h3>
                 <div
                   style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "0.5rem",
-                    marginTop: "0.9rem",
+                    position: "absolute",
+                    inset: "auto 1rem 1rem 1rem",
                   }}
                 >
-                  {["Oak Park", "Full sun", "Pollinators"].map((item) => (
-                    <span
-                      key={item}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        borderRadius: "999px",
-                        padding: "0.42rem 0.68rem",
-                        background: "rgba(255,255,255,0.12)",
-                        fontSize: "0.83rem",
-                      }}
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                    gap: "0.6rem",
-                    marginTop: "1rem",
-                  }}
-                >
-                  {[
-                    { label: "Coneflower", tint: "rgba(232, 208, 236, 0.44)" },
-                    { label: "Milkweed", tint: "rgba(243, 205, 146, 0.4)" },
-                    { label: "Bluestem", tint: "rgba(197, 214, 175, 0.36)" },
-                  ].map((item, index) => (
-                    <div
-                      key={item.label}
-                      style={{
-                        borderRadius: "18px",
-                        padding: "0.78rem",
-                        background: "rgba(255,255,255,0.08)",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        textAlign: "left",
-                      }}
-                    >
-                      <div
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.74rem",
+                      letterSpacing: "0.14em",
+                      textTransform: "uppercase",
+                      color: "rgba(246,245,238,0.76)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Picture the patch
+                  </p>
+                  <h3
+                    style={{
+                      margin: "0.45rem 0 0",
+                      maxWidth: "22rem",
+                      fontSize: "clamp(1.8rem, 4vw, 2.45rem)",
+                      lineHeight: 0.98,
+                      letterSpacing: "-0.05em",
+                    }}
+                  >
+                    {heroScenes[0].title}
+                  </h3>
+                  <p
+                    style={{
+                      margin: "0.6rem 0 0",
+                      maxWidth: "24rem",
+                      color: "rgba(246,245,238,0.82)",
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {heroScenes[0].copy}
+                  </p>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "0.5rem",
+                      marginTop: "0.9rem",
+                    }}
+                  >
+                    {heroScenes[0].tags.map((item) => (
+                      <span
+                        key={item}
                         style={{
-                          width: "100%",
-                          aspectRatio: "1 / 1",
-                          borderRadius: "16px",
-                          background: `radial-gradient(circle at 35% 30%, ${item.tint}, rgba(255,255,255,0.08) 60%)`,
-                          display: "flex",
-                          alignItems: "start",
-                          justifyContent: "end",
-                          padding: "0.45rem",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          borderRadius: "999px",
+                          padding: "0.42rem 0.68rem",
+                          background: "rgba(255,255,255,0.14)",
+                          backdropFilter: "blur(6px)",
+                          fontSize: "0.83rem",
                         }}
                       >
-                        <span
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: "1.55rem",
-                            height: "1.55rem",
-                            borderRadius: "999px",
-                            background: "rgba(255,255,255,0.14)",
-                            fontSize: "0.8rem",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {index + 1}
-                        </span>
-                      </div>
-                      <p style={{ margin: "0.55rem 0 0", fontSize: "0.84rem", opacity: 0.84 }}>
-                        {item.label}
-                      </p>
-                    </div>
-                  ))}
+                        {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </article>
 
               <div
+                className="hero-scene-stack"
                 style={{
                   display: "grid",
+                  gridTemplateRows: "minmax(0, 1fr) minmax(0, 1fr) auto",
                   gap: "0.8rem",
                 }}
               >
+                {heroScenes.slice(1).map((scene) => (
+                  <article
+                    key={scene.title}
+                    className="hero-scene"
+                    style={{
+                      borderRadius: "24px",
+                      minHeight: "190px",
+                      position: "relative",
+                      overflow: "hidden",
+                      textAlign: "left",
+                      color: "#f6f5ee",
+                    }}
+                  >
+                    <Image
+                      src={scene.image}
+                      alt={scene.title}
+                      fill
+                      sizes="(max-width: 720px) 100vw, 32vw"
+                      style={{ objectFit: "cover" }}
+                    />
+                    <div
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(180deg, rgba(20, 29, 20, 0.06) 0%, rgba(20, 29, 20, 0.28) 48%, rgba(20, 29, 20, 0.78) 100%)",
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: "auto 0.9rem 0.9rem 0.9rem",
+                      }}
+                    >
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontSize: "1.15rem",
+                          lineHeight: 1.02,
+                          letterSpacing: "-0.04em",
+                        }}
+                      >
+                        {scene.title}
+                      </h3>
+                      <p
+                        style={{
+                          margin: "0.38rem 0 0",
+                          color: "rgba(246,245,238,0.82)",
+                          lineHeight: 1.45,
+                          fontSize: "0.94rem",
+                        }}
+                      >
+                        {scene.copy}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+
                 <article
                   style={{
                     borderRadius: "24px",
                     padding: "1rem",
                     background:
                       "linear-gradient(180deg, rgba(248, 250, 244, 0.96), rgba(243, 238, 226, 0.94))",
-                    border: "1px solid rgba(207, 216, 199, 0.9)",
-                    textAlign: "left",
-                  }}
-                >
-                  <p
-                    style={{
-                      margin: "0 0 0.35rem",
-                      fontSize: "0.75rem",
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      color: "#697867",
-                      fontWeight: 700,
-                    }}
-                  >
-                    What you get
-                  </p>
-                  <div style={{ display: "grid", gap: "0.55rem" }}>
-                    {[
-                      "A plant list",
-                      "A simple layout",
-                      "A first-weekend plan",
-                    ].map((item) => (
-                      <div
-                        key={item}
-                        style={{
-                          borderRadius: "16px",
-                          padding: "0.72rem 0.82rem",
-                          background: "rgba(255,255,255,0.7)",
-                          color: "#31422d",
-                          fontWeight: 600,
-                        }}
-                      >
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </article>
-
-                <article
-                  style={{
-                    borderRadius: "24px",
-                    padding: "1rem",
-                    background: "rgba(255,255,255,0.72)",
                     border: "1px solid rgba(207, 216, 199, 0.9)",
                     textAlign: "left",
                   }}
@@ -644,21 +588,33 @@ export default function Home() {
                       fontWeight: 700,
                     }}
                   >
-                    What shifts
+                    The shift
                   </p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem" }}>
-                    {[
-                      { label: "Bloom", kind: "bloom" as const },
-                      { label: "Buzz", kind: "buzz" as const },
-                      { label: "Song", kind: "song" as const },
-                      { label: "Roots", kind: "roots" as const },
-                    ].map((item) => (
-                      <div
-                        key={item.label}
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: "1.5rem",
+                      lineHeight: 1.02,
+                      letterSpacing: "-0.05em",
+                      color: "#243424",
+                    }}
+                  >
+                    Not a perfect meadow. Just a living patch.
+                  </h3>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "0.55rem",
+                      marginTop: "0.9rem",
+                    }}
+                  >
+                    {["Less mowing", "More bloom", "More shelter"].map((item) => (
+                      <span
+                        key={item}
                         style={{
                           display: "inline-flex",
                           alignItems: "center",
-                          gap: "0.45rem",
                           borderRadius: "999px",
                           padding: "0.46rem 0.68rem",
                           background: "rgba(236, 242, 230, 0.92)",
@@ -666,13 +622,12 @@ export default function Home() {
                           fontWeight: 600,
                         }}
                       >
-                        <SparkGlyph kind={item.kind} />
-                        {item.label}
-                      </div>
+                        {item}
+                      </span>
                     ))}
                   </div>
-                  <p style={{ margin: "0.65rem 0 0", color: "#5b6a57", lineHeight: 1.55 }}>
-                    Less mowing. More rooted cover. More life above ground.
+                  <p style={{ margin: "0.7rem 0 0", color: "#5b6a57", lineHeight: 1.55 }}>
+                    The planner below is the tool. This is the feeling you&apos;re aiming for.
                   </p>
                 </article>
               </div>
@@ -1564,8 +1519,20 @@ export default function Home() {
             padding: 1.15rem !important;
           }
 
-          .hero-preview-grid {
+          .hero-gallery-grid {
             grid-template-columns: 1fr !important;
+          }
+
+          .hero-scene-main {
+            min-height: 340px !important;
+          }
+
+          .hero-scene-stack {
+            grid-template-rows: none !important;
+          }
+
+          .hero-scene {
+            min-height: 210px !important;
           }
 
           .impact-flow {
