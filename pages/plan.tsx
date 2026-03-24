@@ -405,7 +405,7 @@ export default function Plan() {
   const warmBorder = "1px solid rgba(104, 130, 90, 0.16)";
   const selectionMessage = plantsLoading
     ? "Refreshing your starter palette..."
-    : "Tap a choice to update the plan without losing your location.";
+    : "Tap a choice to refresh the mix.";
   const isRefineDisabled = plantsLoading || !router.isReady;
   const layoutZones = useMemo<LayoutZone[]>(() => {
     const zones: LayoutZone[] = [
@@ -899,10 +899,9 @@ export default function Plan() {
                 letterSpacing: "-0.01em",
               }}
             >
-              We turned {regionLabel} into a {planDetails.sunLabel.toLowerCase()} starter
-              plan for a {planDetails.spaceLabel.toLowerCase()} with a {planDetails.goalLabel.toLowerCase()} focus. Expect a curated set of
-              native plants that support pollinators while staying manageable for the
-              space you picked.
+              A native starter patch for {regionLabel}, matched to {planDetails.sunLabel.toLowerCase()}, sized for a{" "}
+              {planDetails.spaceLabel.toLowerCase()}, and tilted toward{" "}
+              {planDetails.goalLabel.toLowerCase()}.
             </p>
 
             <div
@@ -992,7 +991,7 @@ export default function Plan() {
                 fontWeight: 700,
               }}
             >
-              What makes this plan work
+              Why this mix works
             </p>
             <h2
               style={{
@@ -1002,12 +1001,11 @@ export default function Plan() {
                 letterSpacing: "-0.04em",
               }}
             >
-              A beginner-friendly native patch
+              Built to look good fast
             </h2>
             <p style={{ margin: 0, color: "#4f5d4d", lineHeight: 1.65 }}>
-              This mix balances bloom, structure, and habitat so the space feels alive
-              quickly without outgrowing your {planDetails.spaceLabel.toLowerCase()}, while
-              leaning toward {planDetails.goalLabel.toLowerCase()}.
+              Enough bloom, enough structure, and enough habitat to make one patch feel
+              alive quickly.
             </p>
 
             <div
@@ -1063,7 +1061,7 @@ export default function Plan() {
                 My Garden
               </p>
               <p style={{ margin: "0 0 0.85rem", color: "#4f5d4d", lineHeight: 1.6 }}>
-                Turn this starter plan into a conservation project you can revisit and grow.
+                Save it now. Revisit it later.
               </p>
               <div
                 className="plan-action-group"
@@ -1145,7 +1143,7 @@ export default function Plan() {
                 Share
               </p>
               <p style={{ margin: "0 0 0.85rem", color: "#4f5d4d", lineHeight: 1.6 }}>
-                Keep this version handy or send it to someone you want to rewild with.
+                Send this version to yourself or someone else.
               </p>
               <div
                 className="plan-action-group"
@@ -1246,7 +1244,7 @@ export default function Plan() {
                   color: "#243323",
                 }}
               >
-                Adjust the habitat recipe without starting over
+                Tune the mix without starting over
               </h2>
             </div>
             <p
@@ -1330,8 +1328,7 @@ export default function Plan() {
             </h2>
           </div>
           <p style={{ margin: 0, maxWidth: "28rem", color: "#5f6d58", lineHeight: 1.6 }}>
-            A location-aware plant set shaped by your light and space choices, so it
-            feels like a plan instead of a generic list.
+            A short, local plant list shaped by your choices.
           </p>
         </section>
 
@@ -1352,8 +1349,7 @@ export default function Plan() {
               Building your starter habitat plan...
             </p>
             <p style={{ margin: "0.75rem auto 0", maxWidth: "32rem", opacity: 0.7 }}>
-              Matching your area with a few native plants that are beautiful,
-              beginner-friendly, and useful for wildlife.
+              Matching your area with a small, useful native mix.
             </p>
           </section>
         ) : plants.length === 0 ? (
@@ -1389,7 +1385,7 @@ export default function Plan() {
                 color: "#233224",
               }}
             >
-              Try a different light, size, or priority mix.
+              Try a different mix.
             </h3>
             <p
               style={{
@@ -1399,9 +1395,8 @@ export default function Plan() {
                 lineHeight: 1.65,
               }}
             >
-              We couldn&apos;t build a strong starter palette for this exact combination
-              yet, but the controls above will refresh the plan without losing your
-              location.
+              We don&apos;t have a strong starter set for this exact combination yet, but
+              the controls above will refresh the plan without losing your location.
             </p>
           </section>
         ) : (
@@ -1619,11 +1614,10 @@ export default function Plan() {
                   letterSpacing: "-0.05em",
                 }}
               >
-                A starter bed you can actually picture
+                A layout you can picture
               </h2>
               <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
-                Use the numbered plants from the cards above and group them by zone instead
-                of spacing everything evenly like a checklist.
+                Group the numbered plants by zone instead of spacing everything evenly.
               </p>
               <div style={{ display: "grid", gap: "0.8rem" }}>
                 {layoutZones.map((zone) => (
@@ -1730,7 +1724,7 @@ export default function Plan() {
                   letterSpacing: "-0.05em",
                 }}
               >
-                What this patch is doing through the year
+                What the patch is doing through the year
               </h2>
               <div style={{ display: "grid", gap: "0.8rem" }}>
                 {seasonalMoments.map((moment) => (
@@ -1807,9 +1801,9 @@ export default function Plan() {
                 color: "#687565",
                 fontWeight: 700,
               }}
-            >
-              First weekend plan
-            </p>
+              >
+                First weekend plan
+              </p>
             <h2
               style={{
                 margin: "0 0 0.8rem",
@@ -1817,11 +1811,11 @@ export default function Plan() {
                 lineHeight: 1.03,
                 letterSpacing: "-0.05em",
               }}
-            >
-              Start with one small patch, not the whole yard
-            </h2>
+              >
+                Start with one bed
+              </h2>
             <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
-              {planDetails.sizeRange}. The goal is momentum, not perfection.
+              {planDetails.sizeRange}. Go for momentum, not perfection.
             </p>
             <div style={{ display: "grid", gap: "0.7rem" }}>
               {[
@@ -1863,9 +1857,9 @@ export default function Plan() {
                 color: "#687565",
                 fontWeight: 700,
               }}
-            >
-              Why this matters
-            </p>
+              >
+                Why this matters
+              </p>
             <h2
               style={{
                 margin: "0 0 0.8rem",
@@ -1877,8 +1871,8 @@ export default function Plan() {
               Tiny habitat is still habitat
             </h2>
             <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
-              Native plants feed insects, insects feed birds, and suddenly your space is
-              participating in something bigger than a garden bed.
+              Native plants feed insects. Insects feed birds. Your yard starts acting
+              like habitat.
             </p>
             <div
               style={{
@@ -1889,8 +1883,8 @@ export default function Plan() {
                 lineHeight: 1.6,
               }}
             >
-              Rewild works best when it feels joyful and repeatable. Start small, notice
-              what shows up, and let curiosity pull you into the next patch.
+              Start small, notice what shows up, and let the next patch happen from
+              there.
             </div>
           </section>
         </section>

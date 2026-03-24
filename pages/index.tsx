@@ -330,9 +330,37 @@ export default function Home() {
               color: "#52624d",
             }}
           >
-            Tell us about your space. We&apos;ll turn it into a simple, personalized
-            conservation plan.
+            Three choices. One starter patch. A native habitat plan shaped to your yard.
           </p>
+          <div
+            className="hero-chip-row"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "0.6rem",
+              flexWrap: "wrap",
+              marginTop: "1rem",
+            }}
+          >
+            {["Pick light", "Choose size", "Get your plan"].map((item) => (
+              <span
+                key={item}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  borderRadius: "999px",
+                  padding: "0.48rem 0.82rem",
+                  background: "rgba(255,255,255,0.68)",
+                  border: "1px solid rgba(125, 146, 108, 0.14)",
+                  color: "#4d5d49",
+                  fontSize: "0.88rem",
+                  fontWeight: 600,
+                }}
+              >
+                {item}
+              </span>
+            ))}
+          </div>
         </section>
 
         <section
@@ -381,7 +409,7 @@ export default function Home() {
                   fontWeight: 700,
                 }}
               >
-                What is rewilding?
+                What rewilding does
               </p>
               <h2
                 style={{
@@ -393,7 +421,7 @@ export default function Home() {
                   textWrap: "balance",
                 }}
               >
-                Nature knows how to heal.
+                A little yard can wake up fast.
               </h2>
               <p
                 style={{
@@ -404,8 +432,8 @@ export default function Home() {
                   color: "#556451",
                 }}
               >
-                Rewilding gives it the space. Replace a little lawn with native life,
-                and the ecosystem starts rebuilding itself.
+                Swap some lawn for native plants and you start bringing back food,
+                shelter, and seasonal life.
               </p>
             </div>
 
@@ -433,23 +461,23 @@ export default function Home() {
                 {[
                   {
                     kind: "leaf" as const,
-                    title: "Replace lawn with life",
-                    copy: "Native plants create habitat where it was missing.",
+                    title: "More bloom",
+                    copy: "Native plants replace blank space with life.",
                   },
                   {
                     kind: "bee" as const,
-                    title: "Pollinators return",
+                    title: "More buzz",
                     copy: "Bees and butterflies find food again.",
                   },
                   {
                     kind: "bird" as const,
-                    title: "The web of life grows",
-                    copy: "Insects support birds, shelter, and seasonal cycles.",
+                    title: "More song",
+                    copy: "Insects bring birds, movement, and shelter with them.",
                   },
                   {
                     kind: "globe" as const,
-                    title: "Ecosystems get stronger",
-                    copy: "Healthier soil, water, and resilience build over time.",
+                    title: "More resilience",
+                    copy: "Healthier soil and stronger seasonal cycles build over time.",
                   },
                 ].map((item, index, items) => (
                   <div
@@ -533,108 +561,137 @@ export default function Home() {
         </section>
 
         <section
-          className="belief-grid fade-up delay-3"
+          className="return-strip fade-up delay-3"
           style={{
             marginTop: "0.95rem",
-            display: "grid",
-            gridTemplateColumns: "minmax(0, 1.15fr) minmax(280px, 0.85fr)",
-            gap: "0.95rem",
+            borderRadius: "32px",
+            padding: "1.35rem",
+            background: "rgba(255,255,255,0.76)",
+            border: "1px solid rgba(125, 146, 108, 0.14)",
+            boxShadow: "0 16px 34px rgba(59, 79, 44, 0.05)",
           }}
         >
-          <article
+          <div
             style={{
-              borderRadius: "30px",
-              padding: "1.6rem",
-              background: "rgba(255,255,255,0.76)",
-              border: "1px solid rgba(125, 146, 108, 0.14)",
-              boxShadow: "0 16px 34px rgba(59, 79, 44, 0.05)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "end",
+              gap: "1rem",
+              flexWrap: "wrap",
             }}
           >
-            <p
-              style={{
-                margin: "0 0 0.5rem",
-                fontSize: "0.82rem",
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "#697867",
-                fontWeight: 700,
-              }}
-            >
-              Why it matters
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.45rem",
+                  fontSize: "0.82rem",
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#697867",
+                  fontWeight: 700,
+                }}
+              >
+                What comes back
+              </p>
+              <h3
+                style={{
+                  margin: 0,
+                  fontSize: "clamp(2rem, 4.8vw, 3.4rem)",
+                  lineHeight: 0.96,
+                  letterSpacing: "-0.06em",
+                  color: "#203126",
+                }}
+              >
+                Bloom. Buzz. Birds. Shelter.
+              </h3>
+            </div>
+            <p style={{ margin: 0, maxWidth: "26rem", color: "#556451", lineHeight: 1.65 }}>
+              One patch can feed insects, support birds, and make the yard feel alive.
             </p>
-            <h3
-              style={{
-                margin: 0,
-                fontSize: "clamp(2rem, 4.6vw, 3.6rem)",
-                lineHeight: 0.95,
-                letterSpacing: "-0.06em",
-                color: "#203126",
-                textWrap: "balance",
-              }}
-            >
-              Biodiversity starts in small places.
-            </h3>
-            <p
-              style={{
-                margin: "1rem 0 0",
-                maxWidth: "34rem",
-                color: "#556451",
-                lineHeight: 1.72,
-                fontSize: "1.02rem",
-              }}
-            >
-              Even a modest patch of native planting can feed insects, support birds,
-              and help restore the relationships that keep ecosystems stable.
-            </p>
-          </article>
+          </div>
 
-          <article
+          <div
+            className="return-grid"
             style={{
-              borderRadius: "30px",
-              padding: "1.6rem",
-              background:
-                "linear-gradient(180deg, rgba(231, 238, 224, 0.98), rgba(246, 241, 229, 0.98))",
-              border: "1px solid rgba(125, 146, 108, 0.16)",
-              boxShadow: "0 14px 28px rgba(59, 79, 44, 0.05)",
+              display: "grid",
+              gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+              gap: "0.8rem",
+              marginTop: "1rem",
             }}
           >
-            <p
-              style={{
-                margin: "0 0 0.5rem",
-                fontSize: "0.82rem",
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "#677564",
-                fontWeight: 700,
-              }}
-            >
-              The big idea
-            </p>
-            <h3
-              style={{
-                margin: 0,
-                fontSize: "clamp(2rem, 4.6vw, 3.6rem)",
-                lineHeight: 0.95,
-                letterSpacing: "-0.06em",
-                color: "#203126",
-                textWrap: "balance",
-              }}
-            >
-              A backyard does not have to be large to become habitat.
-            </h3>
-            <p
-              style={{
-                margin: "0.95rem 0 0",
-                maxWidth: "34rem",
-                color: "#556451",
-                lineHeight: 1.72,
-                fontSize: "1.02rem",
-              }}
-            >
-              Rewilding is not about perfection. It is about making room for life to
-              return, one patch at a time.
-            </p>
-          </article>
+            {[
+              {
+                kind: "leaf" as const,
+                label: "Food",
+                value: "Bloom + nectar",
+              },
+              {
+                kind: "bee" as const,
+                label: "Pollinators",
+                value: "Bees + butterflies",
+              },
+              {
+                kind: "bird" as const,
+                label: "Wildlife",
+                value: "Song + shelter",
+              },
+              {
+                kind: "globe" as const,
+                label: "Soil",
+                value: "Roots + resilience",
+              },
+            ].map((item) => (
+              <article
+                key={item.label}
+                style={{
+                  borderRadius: "24px",
+                  padding: "1rem",
+                  background:
+                    "linear-gradient(180deg, rgba(248, 250, 244, 0.96), rgba(243, 238, 226, 0.94))",
+                  border: "1px solid rgba(207, 216, 199, 0.9)",
+                }}
+              >
+                <div
+                  style={{
+                    width: "2.9rem",
+                    height: "2.9rem",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "999px",
+                    background: "rgba(221, 232, 214, 0.92)",
+                    marginBottom: "0.75rem",
+                  }}
+                >
+                  <StoryGlyph kind={item.kind} />
+                </div>
+                <p
+                  style={{
+                    margin: "0 0 0.25rem",
+                    fontSize: "0.78rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "#6b7967",
+                    fontWeight: 700,
+                  }}
+                >
+                  {item.label}
+                </p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "1.15rem",
+                    lineHeight: 1.15,
+                    letterSpacing: "-0.03em",
+                    color: "#223425",
+                    fontWeight: 700,
+                  }}
+                >
+                  {item.value}
+                </p>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section
@@ -719,8 +776,11 @@ export default function Home() {
                   letterSpacing: "-0.05em",
                 }}
               >
-                Three quick choices, then your plan
+                Three quick choices. One patch to start.
               </h2>
+              <p style={{ margin: "0.55rem 0 0", color: "rgba(248,245,236,0.72)", lineHeight: 1.55 }}>
+                Pick light, size, and what you want back most.
+              </p>
             </div>
             <div
               className="planner-header-actions"
@@ -803,8 +863,7 @@ export default function Home() {
                   lineHeight: 1.55,
                 }}
               >
-                Prefer typing your location? Start with your ZIP and we&apos;ll build the same
-                personalized plan from there.
+                Use a ZIP if you&apos;d rather skip geolocation.
               </p>
               <div
                 className="zip-row"
@@ -839,9 +898,7 @@ export default function Home() {
                     outline: "none",
                   }}
                 />
-                <p style={{ margin: 0, color: "#62573a", lineHeight: 1.55 }}>
-                  Great if you want to browse without enabling geolocation.
-                </p>
+                <p style={{ margin: 0, color: "#62573a", lineHeight: 1.55 }}>Same plan, just typed in.</p>
               </div>
             </section>
           )}
@@ -892,9 +949,9 @@ export default function Home() {
               border: "1px solid rgba(255,255,255,0.1)",
             }}
           >
-            <p
-              style={{
-                margin: "0 0 0.3rem",
+              <p
+                style={{
+                  margin: "0 0 0.3rem",
                 fontSize: "0.78rem",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
@@ -909,12 +966,12 @@ export default function Home() {
                 color: "rgba(248,245,236,0.74)",
                 lineHeight: 1.55,
               }}
-            >
+              >
               {activeStep === 0
-                ? "Choose the kind of light your planting area gets most often."
+                ? "Choose the light your patch gets most often."
                 : activeStep === 1
-                  ? "Pick the scale that feels closest to the patch you want to start with."
-                  : "Tell Rewild what you want this first planting to do best."}
+                  ? "Pick the scale that feels right for your first patch."
+                  : "Choose what you want this planting to do best."}
             </p>
 
             {activeStep === 0 && (
@@ -1252,16 +1309,8 @@ export default function Home() {
             grid-template-columns: 1fr !important;
           }
 
-          .belief-grid {
+          .return-grid {
             grid-template-columns: 1fr !important;
-          }
-
-          .belief-grid article {
-            padding: 1.2rem !important;
-          }
-
-          .belief-grid h3 {
-            font-size: 1.72rem !important;
           }
 
           .planner-nav {
