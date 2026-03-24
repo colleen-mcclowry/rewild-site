@@ -188,6 +188,50 @@ function StoryGlyph({ kind }: { kind: "leaf" | "bee" | "bird" | "globe" }) {
   );
 }
 
+function SparkGlyph({ kind }: { kind: "bloom" | "buzz" | "song" }) {
+  const stroke = "#30412c";
+
+  if (kind === "bloom") {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="2.1" stroke={stroke} strokeWidth="1.7" />
+        <path
+          d="M12 3.5c1.8 0 3 1.3 3 3.1S13.7 10 12 10 9 8.7 9 6.6s1.2-3.1 3-3.1ZM20.2 9.4c0 1.8-1.3 3-3.1 3S13.7 11.2 13.7 9.4s1.3-3 3.4-3 3.1 1.2 3.1 3ZM15.2 17.5c0 1.8-1.3 3-3.1 3S9 19.3 9 17.5s1.3-3 3.1-3 3.1 1.2 3.1 3ZM10.3 9.4c0 1.8-1.3 3-3.1 3S4 11.2 4 9.4s1.3-3 3.2-3 3.1 1.2 3.1 3Z"
+          stroke={stroke}
+          strokeWidth="1.4"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "buzz") {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <rect x="7" y="9" width="10" height="7" rx="3.5" stroke={stroke} strokeWidth="1.7" />
+        <path
+          d="M9 9c-.8-1.5-.5-3.2.9-4.1M15 9c.8-1.5.5-3.2-.9-4.1M10.5 9v7M13.5 9v7M4.5 12h1.9M17.6 12h1.9"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M5.6 15.6c1.7-4.4 5.2-7.2 10.5-7.8-.4 1.3-.5 2.6-.3 3.8 1.3.2 2.4.6 3.2 1.3-1.2 1.5-2.9 2.4-5.1 3-2.7.7-5.4.5-8.3-.3Z"
+        stroke={stroke}
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+      <path d="M10.2 12.4c1.6 0 3 .3 4.3.9" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function Home() {
   const [zip, setZip] = useState("");
   const [showZip, setShowZip] = useState(false);
@@ -361,6 +405,255 @@ export default function Home() {
               </span>
             ))}
           </div>
+
+          <section
+            className="hero-preview"
+            style={{
+              marginTop: "1.15rem",
+              borderRadius: "30px",
+              padding: "1.15rem",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.82), rgba(244, 247, 238, 0.78))",
+              border: "1px solid rgba(125, 146, 108, 0.14)",
+              boxShadow: "0 18px 42px rgba(59, 79, 44, 0.06)",
+            }}
+          >
+            <div
+              className="hero-preview-grid"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(0, 1.1fr) minmax(280px, 0.9fr)",
+                gap: "0.9rem",
+                alignItems: "stretch",
+              }}
+            >
+              <article
+                style={{
+                  borderRadius: "24px",
+                  padding: "1.05rem",
+                  background:
+                    "linear-gradient(145deg, rgba(26, 44, 32, 0.98), rgba(54, 83, 49, 0.92))",
+                  color: "#f6f5ee",
+                  textAlign: "left",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    inset: "auto -45px -70px auto",
+                    width: "180px",
+                    height: "180px",
+                    borderRadius: "999px",
+                    background: "rgba(243, 221, 175, 0.12)",
+                  }}
+                />
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.74rem",
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "rgba(246,245,238,0.72)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Preview
+                </p>
+                <h3
+                  style={{
+                    margin: "0.45rem 0 0",
+                    fontSize: "1.55rem",
+                    lineHeight: 1,
+                    letterSpacing: "-0.05em",
+                  }}
+                >
+                  Your first patch, already sketched out.
+                </h3>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "0.5rem",
+                    marginTop: "0.9rem",
+                  }}
+                >
+                  {["Oak Park", "Full sun", "Pollinators"].map((item) => (
+                    <span
+                      key={item}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        borderRadius: "999px",
+                        padding: "0.42rem 0.68rem",
+                        background: "rgba(255,255,255,0.12)",
+                        fontSize: "0.83rem",
+                      }}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                    gap: "0.6rem",
+                    marginTop: "1rem",
+                  }}
+                >
+                  {[
+                    { label: "Coneflower", tint: "rgba(232, 208, 236, 0.44)" },
+                    { label: "Milkweed", tint: "rgba(243, 205, 146, 0.4)" },
+                    { label: "Bluestem", tint: "rgba(197, 214, 175, 0.36)" },
+                  ].map((item, index) => (
+                    <div
+                      key={item.label}
+                      style={{
+                        borderRadius: "18px",
+                        padding: "0.78rem",
+                        background: "rgba(255,255,255,0.08)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        textAlign: "left",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "100%",
+                          aspectRatio: "1 / 1",
+                          borderRadius: "16px",
+                          background: `radial-gradient(circle at 35% 30%, ${item.tint}, rgba(255,255,255,0.08) 60%)`,
+                          display: "flex",
+                          alignItems: "start",
+                          justifyContent: "end",
+                          padding: "0.45rem",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "1.55rem",
+                            height: "1.55rem",
+                            borderRadius: "999px",
+                            background: "rgba(255,255,255,0.14)",
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {index + 1}
+                        </span>
+                      </div>
+                      <p style={{ margin: "0.55rem 0 0", fontSize: "0.84rem", opacity: 0.84 }}>
+                        {item.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: "0.8rem",
+                }}
+              >
+                <article
+                  style={{
+                    borderRadius: "24px",
+                    padding: "1rem",
+                    background:
+                      "linear-gradient(180deg, rgba(248, 250, 244, 0.96), rgba(243, 238, 226, 0.94))",
+                    border: "1px solid rgba(207, 216, 199, 0.9)",
+                    textAlign: "left",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: "0 0 0.35rem",
+                      fontSize: "0.75rem",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "#697867",
+                      fontWeight: 700,
+                    }}
+                  >
+                    What you get
+                  </p>
+                  <div style={{ display: "grid", gap: "0.55rem" }}>
+                    {[
+                      "A plant list",
+                      "A simple layout",
+                      "A first-weekend plan",
+                    ].map((item) => (
+                      <div
+                        key={item}
+                        style={{
+                          borderRadius: "16px",
+                          padding: "0.72rem 0.82rem",
+                          background: "rgba(255,255,255,0.7)",
+                          color: "#31422d",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </article>
+
+                <article
+                  style={{
+                    borderRadius: "24px",
+                    padding: "1rem",
+                    background: "rgba(255,255,255,0.72)",
+                    border: "1px solid rgba(207, 216, 199, 0.9)",
+                    textAlign: "left",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: "0 0 0.5rem",
+                      fontSize: "0.75rem",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "#697867",
+                      fontWeight: 700,
+                    }}
+                  >
+                    What comes back
+                  </p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem" }}>
+                    {[
+                      { label: "Bloom", kind: "bloom" as const },
+                      { label: "Buzz", kind: "buzz" as const },
+                      { label: "Song", kind: "song" as const },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.45rem",
+                          borderRadius: "999px",
+                          padding: "0.46rem 0.68rem",
+                          background: "rgba(236, 242, 230, 0.92)",
+                          color: "#32442f",
+                          fontWeight: 600,
+                        }}
+                      >
+                        <SparkGlyph kind={item.kind} />
+                        {item.label}
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
         </section>
 
         <section
@@ -1245,6 +1538,10 @@ export default function Home() {
           .planner-section {
             border-radius: 28px !important;
             padding: 1.15rem !important;
+          }
+
+          .hero-preview-grid {
+            grid-template-columns: 1fr !important;
           }
 
           .impact-flow {

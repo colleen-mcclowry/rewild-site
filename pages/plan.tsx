@@ -153,6 +153,19 @@ const planDetailsDefaults: PlanDetails = {
   title: "Starter plan",
 };
 
+const layoutZoneLabels: Record<LayoutZone["key"], string> = {
+  front: "Front edge",
+  center: "Center drift",
+  back: "Backbone",
+};
+
+const seasonalMomentLabels: Record<SeasonalMoment["key"], string> = {
+  spring: "Spring",
+  summer: "Summer",
+  fall: "Late season",
+  structure: "Year-round",
+};
+
 function includesAny(value: string, keywords: string[]) {
   return keywords.some((keyword) => value.includes(keyword));
 }
@@ -224,6 +237,16 @@ function getSeasonalMomentKey(plant: Plant): SeasonalMoment["key"] {
   }
 
   return "summer";
+}
+
+function getPlantPreviewTags(plant: Plant) {
+  const tags = [
+    layoutZoneLabels[getLayoutZoneKey(plant)],
+    seasonalMomentLabels[getSeasonalMomentKey(plant)],
+    ...(plant.fitReasons ?? []).slice(0, 2),
+  ];
+
+  return [...new Set(tags)];
 }
 
 export default function Plan() {
@@ -1441,20 +1464,47 @@ export default function Plan() {
                 <div style={{ padding: "1.15rem" }}>
                   <div
                     style={{
-                      display: "inline-flex",
+                      display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      width: "2.3rem",
-                      height: "2.3rem",
-                      borderRadius: "999px",
+                      gap: "0.5rem",
+                      flexWrap: "wrap",
                       marginBottom: "0.85rem",
-                      background: "rgba(237, 242, 231, 0.92)",
-                      color: "#2f4328",
-                      fontSize: "0.95rem",
-                      fontWeight: 700,
                     }}
                   >
-                    0{index + 1}
+                    <div
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "2.3rem",
+                        height: "2.3rem",
+                        borderRadius: "999px",
+                        background: "rgba(237, 242, 231, 0.92)",
+                        color: "#2f4328",
+                        fontSize: "0.95rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      0{index + 1}
+                    </div>
+                    {plant.role && (
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          borderRadius: "999px",
+                          padding: "0.36rem 0.65rem",
+                          background: "rgba(235, 241, 229, 0.95)",
+                          color: "#42563d",
+                          fontSize: "0.8rem",
+                          fontWeight: 700,
+                          letterSpacing: "0.04em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {plant.role}
+                      </span>
+                    )}
                   </div>
                   <h3
                     style={{
@@ -1480,86 +1530,62 @@ export default function Plan() {
                   )}
                   <p
                     style={{
-                      margin: "0 0 0.65rem",
+                      margin: "0 0 0.75rem",
                       fontWeight: 600,
                       color: "#35552d",
                       lineHeight: 1.45,
+                      fontSize: "1rem",
                     }}
                   >
                     {plant.benefit}
                   </p>
-                  {plant.role && (
-                    <p
-                      style={{
-                        margin: "0 0 0.7rem",
-                        fontSize: "0.84rem",
-                        letterSpacing: "0.08em",
-                        textTransform: "uppercase",
-                        color: "#73806e",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {plant.role}
-                    </p>
-                  )}
-                  <p style={{ margin: 0, color: "#566453", lineHeight: 1.6 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#566453",
+                      lineHeight: 1.58,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
                     {plant.notes}
                   </p>
-                  {plant.fitReasons && plant.fitReasons.length > 0 && (
+                  <div
+                    style={{
+                      marginTop: "0.85rem",
+                      paddingTop: "0.85rem",
+                      borderTop: "1px solid rgba(104, 130, 90, 0.12)",
+                    }}
+                  >
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
+                      {getPlantPreviewTags(plant).map((tag) => (
+                        <span
+                          key={`${plant.name}-${tag}`}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            borderRadius: "999px",
+                            padding: "0.38rem 0.65rem",
+                            background: "rgba(235, 241, 229, 0.95)",
+                            color: "#446040",
+                            fontSize: "0.82rem",
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {plant.imageSourceUrl && (
                     <div
                       style={{
-                        marginTop: "0.85rem",
-                        paddingTop: "0.85rem",
-                        borderTop: "1px solid rgba(104, 130, 90, 0.12)",
+                        marginTop: "0.8rem",
+                        fontSize: "0.85rem",
+                        color: "#687565",
                       }}
                     >
-                      <p
-                        style={{
-                          margin: "0 0 0.45rem",
-                          fontSize: "0.8rem",
-                          letterSpacing: "0.08em",
-                          textTransform: "uppercase",
-                          color: "#6b7867",
-                          fontWeight: 700,
-                        }}
-                      >
-                        Why it fits
-                      </p>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
-                        {plant.fitReasons.map((reason) => (
-                          <span
-                            key={reason}
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              borderRadius: "999px",
-                              padding: "0.38rem 0.65rem",
-                              background: "rgba(235, 241, 229, 0.95)",
-                              color: "#446040",
-                              fontSize: "0.82rem",
-                            }}
-                          >
-                            {reason}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {plant.placementNote && (
-                    <p
-                      style={{
-                        margin: "0.85rem 0 0",
-                        padding: "0.85rem 0 0",
-                        borderTop: "1px solid rgba(104, 130, 90, 0.12)",
-                        color: "#5b6857",
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      <strong style={{ color: "#40503d" }}>Placement:</strong> {plant.placementNote}
-                    </p>
-                  )}
-                  {plant.imageSourceUrl && (
-                    <p style={{ margin: "0.8rem 0 0", fontSize: "0.85rem", color: "#687565" }}>
                       <a
                         href={plant.imageSourceUrl}
                         target="_blank"
@@ -1568,7 +1594,7 @@ export default function Plan() {
                       >
                         Photo source: {plant.imageSourceLabel}
                       </a>
-                    </p>
+                    </div>
                   )}
                 </div>
               </article>
