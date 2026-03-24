@@ -77,7 +77,7 @@ const heroScenes = [
     title: "Pollinator food",
     copy: "Native bloom gives bees and butterflies a reason to stop by.",
     image:
-      "https://images.unsplash.com/photo-1621619858360-7f79b3f3b2a9?auto=format&fit=crop&w=1200&q=70",
+      "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1200&q=70",
   },
   {
     title: "Roots + structure",
