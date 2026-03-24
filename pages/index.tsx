@@ -253,6 +253,7 @@ export default function Home() {
       }}
     >
       <div
+        className="page-shell"
         style={{
           position: "relative",
           maxWidth: "1040px",
@@ -335,7 +336,7 @@ export default function Home() {
         </section>
 
         <section
-          className="fade-up delay-2"
+          className="story-section fade-up delay-2"
           style={{
             marginTop: "1rem",
             borderRadius: "40px",
@@ -409,6 +410,7 @@ export default function Home() {
             </div>
 
             <div
+              className="impact-flow"
               style={{
                 marginTop: "1.8rem",
                 borderRadius: "32px",
@@ -419,6 +421,7 @@ export default function Home() {
               }}
             >
               <div
+                className="impact-flow-list"
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
@@ -451,6 +454,7 @@ export default function Home() {
                 ].map((item, index, items) => (
                   <div
                     key={item.title}
+                    className="impact-flow-item"
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -504,6 +508,7 @@ export default function Home() {
                     {index < items.length - 1 ? (
                       <div
                         aria-hidden="true"
+                        className="impact-arrow"
                         style={{
                           width: "2.4rem",
                           height: "2.4rem",
@@ -633,7 +638,7 @@ export default function Home() {
         </section>
 
         <section
-          className="fade-up delay-4"
+          className="planner-section fade-up delay-4"
           style={{
             marginTop: "1rem",
             position: "relative",
@@ -683,6 +688,7 @@ export default function Home() {
           </div>
 
           <div
+            className="planner-header"
             style={{
               display: "flex",
               alignItems: "start",
@@ -717,6 +723,7 @@ export default function Home() {
               </h2>
             </div>
             <div
+              className="planner-header-actions"
               style={{
                 display: "flex",
                 gap: "0.7rem",
@@ -765,6 +772,7 @@ export default function Home() {
 
           {showZip && (
             <section
+              className="zip-fallback"
               style={{
                 marginBottom: "1rem",
                 borderRadius: "24px",
@@ -799,6 +807,7 @@ export default function Home() {
                 personalized plan from there.
               </p>
               <div
+                className="zip-row"
                 style={{
                   display: "flex",
                   gap: "0.8rem",
@@ -838,6 +847,7 @@ export default function Home() {
           )}
 
           <div
+            className="planner-step-tabs"
             style={{
               display: "flex",
               gap: "0.55rem",
@@ -909,6 +919,7 @@ export default function Home() {
 
             {activeStep === 0 && (
               <div
+                className="planner-choice-grid planner-choice-grid-3"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
@@ -1001,6 +1012,7 @@ export default function Home() {
 
             {activeStep === 2 && (
               <div
+                className="planner-choice-grid planner-choice-grid-2"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
@@ -1041,6 +1053,7 @@ export default function Home() {
             )}
 
             <div
+              className="planner-nav"
               style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -1165,6 +1178,87 @@ export default function Home() {
         @media (max-width: 720px) {
           main {
             overflow-x: clip;
+          }
+
+          .page-shell {
+            padding: 1.1rem 0.9rem 3rem !important;
+          }
+
+          .story-section,
+          .planner-section {
+            border-radius: 28px !important;
+            padding: 1.15rem !important;
+          }
+
+          .impact-flow {
+            padding: 0.95rem !important;
+          }
+
+          .impact-flow-list {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+
+          .impact-flow-item {
+            min-width: 0 !important;
+            max-width: none !important;
+            width: 100% !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0.6rem !important;
+          }
+
+          .impact-arrow {
+            width: 100% !important;
+            height: auto !important;
+            background: transparent !important;
+            justify-content: center !important;
+            transform: rotate(90deg);
+          }
+
+          .planner-header {
+            gap: 0.85rem !important;
+          }
+
+          .planner-header-actions {
+            width: 100% !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+
+          .planner-header-actions button {
+            width: 100% !important;
+          }
+
+          .zip-fallback {
+            padding: 1rem !important;
+          }
+
+          .zip-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+
+          .zip-row input {
+            width: 100% !important;
+          }
+
+          .planner-step-tabs {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+          }
+
+          .planner-choice-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .planner-nav {
+            flex-direction: column !important;
+          }
+
+          .planner-nav button {
+            width: 100% !important;
+            margin-left: 0 !important;
           }
 
           section[style*="grid-template-columns: repeat(3"] {

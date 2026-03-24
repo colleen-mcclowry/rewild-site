@@ -57,6 +57,7 @@ export default function Garden() {
 
   return (
     <main
+      className="garden-page"
       style={{
         minHeight: "100vh",
         fontFamily:
@@ -68,7 +69,7 @@ export default function Garden() {
         color: "#1d2a1d",
       }}
     >
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+      <div className="garden-shell" style={{ maxWidth: "1100px", margin: "0 auto" }}>
         <div
           style={{
             display: "flex",
@@ -173,6 +174,7 @@ export default function Garden() {
         </section>
 
         <section
+          className="garden-stats-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
@@ -401,7 +403,7 @@ export default function Garden() {
                     </p>
                   </div>
 
-                  <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+                  <div className="garden-card-actions" style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
                     <button
                       type="button"
                       onClick={() => router.push(plan.planUrl)}
@@ -438,6 +440,7 @@ export default function Garden() {
                 </div>
 
                 <div
+                  className="garden-metric-grid"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
@@ -486,6 +489,7 @@ export default function Garden() {
                 </div>
 
                 <div
+                  className="garden-detail-grid"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "minmax(0, 1.15fr) minmax(280px, 0.85fr)",
@@ -600,6 +604,33 @@ export default function Garden() {
           }
 
           div[style*="grid-template-columns: minmax(0, 1.15fr)"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .garden-page {
+            padding: 1rem 0.85rem 2.5rem !important;
+          }
+
+          .garden-stats-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .garden-card-actions {
+            width: 100% !important;
+            flex-direction: column !important;
+          }
+
+          .garden-card-actions button {
+            width: 100% !important;
+          }
+
+          .garden-metric-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .garden-detail-grid {
             grid-template-columns: 1fr !important;
           }
         }

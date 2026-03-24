@@ -723,6 +723,7 @@ export default function Plan() {
 
   return (
     <main
+      className="plan-page"
       style={{
         minHeight: "100vh",
         fontFamily:
@@ -734,7 +735,7 @@ export default function Plan() {
         color: "#1d2a1d",
       }}
     >
-      <div style={{ maxWidth: "1120px", margin: "0 auto" }}>
+      <div className="plan-shell" style={{ maxWidth: "1120px", margin: "0 auto" }}>
         <div
           style={{
             display: "flex",
@@ -788,6 +789,7 @@ export default function Plan() {
           }}
         >
           <header
+            className="plan-hero"
             style={{
               borderRadius: "30px",
               padding: "1.8rem",
@@ -810,6 +812,7 @@ export default function Plan() {
               }}
             />
             <div
+              className="plan-hero-tags"
               style={{
                 display: "flex",
                 flexWrap: "wrap",
@@ -968,6 +971,7 @@ export default function Plan() {
           </header>
 
           <aside
+            className="plan-sidebar"
             style={{
               borderRadius: "28px",
               padding: "1.4rem",
@@ -1061,6 +1065,7 @@ export default function Plan() {
                 Turn this starter plan into a conservation project you can revisit and grow.
               </p>
               <div
+                className="plan-action-group"
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
@@ -1142,6 +1147,7 @@ export default function Plan() {
                 Keep this version handy or send it to someone you want to rewild with.
               </p>
               <div
+                className="plan-action-group"
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
@@ -1197,6 +1203,7 @@ export default function Plan() {
         </section>
 
         <section
+          className="refine-section"
           style={{
             borderRadius: "28px",
             padding: "1.35rem",
@@ -1398,6 +1405,7 @@ export default function Plan() {
           </section>
         ) : (
           <section
+            className="plant-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
@@ -1574,6 +1582,7 @@ export default function Plan() {
 
         {plants.length > 0 && (
           <section
+            className="plan-layout-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "minmax(0, 1.05fr) minmax(280px, 0.95fr)",
@@ -1773,6 +1782,7 @@ export default function Plan() {
         )}
 
         <section
+          className="plan-weekend-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "minmax(0, 1.05fr) minmax(260px, 0.95fr)",
@@ -1912,6 +1922,10 @@ export default function Plan() {
         }
 
         @media (max-width: 920px) {
+          .plan-shell {
+            padding-bottom: 0.5rem;
+          }
+
           section[style*="grid-template-columns: minmax(0, 1.4fr)"] {
             grid-template-columns: 1fr !important;
           }
@@ -1930,6 +1944,42 @@ export default function Plan() {
         }
 
         @media (max-width: 640px) {
+          .plan-page {
+            padding: 1rem 0.85rem 2.5rem !important;
+          }
+
+          .plan-shell {
+            padding: 0 0.05rem 0.5rem !important;
+          }
+
+          .plan-hero,
+          .plan-sidebar,
+          .refine-section {
+            border-radius: 24px !important;
+            padding: 1.1rem !important;
+          }
+
+          .plan-hero-tags {
+            gap: 0.45rem !important;
+          }
+
+          .plan-action-group {
+            flex-direction: column !important;
+          }
+
+          .plan-action-group button {
+            width: 100% !important;
+          }
+
+          .plant-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .plan-layout-grid,
+          .plan-weekend-grid {
+            grid-template-columns: 1fr !important;
+          }
+
           .plan-hero-stats {
             grid-template-columns: 1fr !important;
           }
