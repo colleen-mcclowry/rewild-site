@@ -188,7 +188,7 @@ function StoryGlyph({ kind }: { kind: "leaf" | "bee" | "bird" | "globe" }) {
   );
 }
 
-function SparkGlyph({ kind }: { kind: "bloom" | "buzz" | "song" }) {
+function SparkGlyph({ kind }: { kind: "bloom" | "buzz" | "song" | "roots" }) {
   const stroke = "#30412c";
 
   if (kind === "bloom") {
@@ -214,6 +214,26 @@ function SparkGlyph({ kind }: { kind: "bloom" | "buzz" | "song" }) {
           stroke={stroke}
           strokeWidth="1.7"
           strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+
+  if (kind === "roots") {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M12 4.5v6.4M12 10.4c-1.8 0-3.2-1.4-3.2-3.2M12 10.4c1.8 0 3.2-1.4 3.2-3.2"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinecap="round"
+        />
+        <path
+          d="M12 10.9c0 2.3-.6 3.8-1.7 5.1M12 10.9c0 2.2.6 3.8 1.8 5.1M10.1 15.3c-.9.3-1.6.9-2.3 1.7M13.9 15.3c.9.3 1.6.9 2.3 1.7"
+          stroke={stroke}
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
     );
@@ -624,13 +644,14 @@ export default function Home() {
                       fontWeight: 700,
                     }}
                   >
-                    What comes back
+                    What shifts
                   </p>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem" }}>
                     {[
                       { label: "Bloom", kind: "bloom" as const },
                       { label: "Buzz", kind: "buzz" as const },
                       { label: "Song", kind: "song" as const },
+                      { label: "Roots", kind: "roots" as const },
                     ].map((item) => (
                       <div
                         key={item.label}
@@ -650,6 +671,9 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
+                  <p style={{ margin: "0.65rem 0 0", color: "#5b6a57", lineHeight: 1.55 }}>
+                    Less mowing. More rooted cover. More life above ground.
+                  </p>
                 </article>
               </div>
             </div>
@@ -930,8 +954,8 @@ export default function Home() {
               },
               {
                 kind: "globe" as const,
-                label: "Soil",
-                value: "Roots + resilience",
+                label: "Climate",
+                value: "Less mowing + roots",
               },
             ].map((item) => (
               <article

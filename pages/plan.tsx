@@ -166,6 +166,30 @@ const seasonalMomentLabels: Record<SeasonalMoment["key"], string> = {
   structure: "Year-round",
 };
 
+const spaceImpactDetails: Record<
+  SpacePreference,
+  { footprint: string; areaNote: string; climateNote: string }
+> = {
+  "small-patch": {
+    footprint: "18 to 80 sq ft",
+    areaNote: "A starter bed you can realistically plant and keep up with.",
+    climateNote:
+      "If this replaces turf, it usually means fewer weekly mowing passes for one starter zone.",
+  },
+  "medium-yard": {
+    footprint: "200 to 1,000 sq ft",
+    areaNote: "Enough planted area to make the yard feel different, not just decorated.",
+    climateNote:
+      "If this replaces turf, the drop in mowing and bare-soil exposure starts to feel noticeable.",
+  },
+  "large-yard": {
+    footprint: "1,000+ sq ft",
+    areaNote: "A larger footprint where habitat and lower-input care can start stacking up.",
+    climateNote:
+      "On a bigger patch, reduced mowing and deeper perennial roots have more room to matter.",
+  },
+};
+
 function includesAny(value: string, keywords: string[]) {
   return keywords.some((keyword) => value.includes(keyword));
 }
@@ -247,6 +271,26 @@ function getPlantPreviewTags(plant: Plant) {
   ];
 
   return [...new Set(tags)];
+}
+
+function getSeasonSpanValue(moments: SeasonalMoment[]) {
+  const activeMoments = moments.filter((moment) => moment.key !== "structure");
+
+  if (activeMoments.length >= 3) {
+    return "Spring to fall";
+  }
+
+  if (activeMoments.length === 2) {
+    return `${seasonalMomentLabels[activeMoments[0].key]} to ${
+      seasonalMomentLabels[activeMoments[1].key]
+    }`;
+  }
+
+  if (activeMoments.length === 1) {
+    return seasonalMomentLabels[activeMoments[0].key];
+  }
+
+  return "Growing season";
 }
 
 export default function Plan() {
@@ -498,6 +542,45 @@ export default function Plan() {
 
     return moments.filter((moment) => moment.plantEntries.length > 0);
   }, [plants]);
+  const impactCards = useMemo(() => {
+    const footprint = spaceImpactDetails[currentSpace];
+    const seasonSpanValue = getSeasonSpanValue(seasonalMoments);
+    const habitatLayersValue =
+      layoutZones.length >= 3 ? "3 layers" : `${Math.max(layoutZones.length, 1)} layer${layoutZones.length === 1 ? "" : "s"}`;
+    const habitatLayersNote =
+      layoutZones.length >= 3
+        ? "Low, middle, and structural plants create more ways to feed and shelter wildlife."
+        : layoutZones.length === 2
+          ? "Even two layers give the patch more habitat value than a flat planting."
+          : "One clear layer still starts replacing blank space with living cover.";
+    const seasonSpanNote =
+      seasonalMoments.filter((moment) => moment.key !== "structure").length >= 3
+        ? "The plan keeps food and habitat value moving through most of the growing season."
+        : "More than one garden moment helps the patch stay useful longer.";
+
+    return [
+      {
+        label: "Footprint",
+        value: footprint.footprint,
+        note: footprint.areaNote,
+      },
+      {
+        label: "Habitat layers",
+        value: habitatLayersValue,
+        note: habitatLayersNote,
+      },
+      {
+        label: "Season spread",
+        value: seasonSpanValue,
+        note: seasonSpanNote,
+      },
+      {
+        label: "Climate signal",
+        value: "Less mowing + roots",
+        note: footprint.climateNote,
+      },
+    ];
+  }, [currentSpace, layoutZones.length, seasonalMoments]);
 
   const renderChoiceGroup = (
     label: string,
@@ -1874,44 +1957,134 @@ export default function Plan() {
               boxShadow: "0 14px 34px rgba(51, 70, 40, 0.05)",
             }}
           >
-            <p
-              style={{
-                margin: "0 0 0.45rem",
-                fontSize: "0.82rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: "#687565",
-                fontWeight: 700,
-              }}
-              >
-                Why this matters
-              </p>
-            <h2
-              style={{
-                margin: "0 0 0.8rem",
-                fontSize: "1.9rem",
-                lineHeight: 1.03,
-                letterSpacing: "-0.05em",
-              }}
-            >
-              Tiny habitat is still habitat
-            </h2>
-            <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
-              Native plants feed insects. Insects feed birds. Your yard starts acting
-              like habitat.
-            </p>
-            <div
-              style={{
-                borderRadius: "18px",
-                background: "linear-gradient(180deg, #eef3e6 0%, #f8f5ec 100%)",
-                padding: "1rem",
-                color: "#3f5139",
-                lineHeight: 1.6,
-              }}
-            >
-              Start small, notice what shows up, and let the next patch happen from
-              there.
-            </div>
+            {plants.length > 0 ? (
+              <>
+                <p
+                  style={{
+                    margin: "0 0 0.45rem",
+                    fontSize: "0.82rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "#687565",
+                    fontWeight: 700,
+                  }}
+                >
+                  Impact snapshot
+                </p>
+                <h2
+                  style={{
+                    margin: "0 0 0.8rem",
+                    fontSize: "1.9rem",
+                    lineHeight: 1.03,
+                    letterSpacing: "-0.05em",
+                  }}
+                >
+                  What this patch starts changing
+                </h2>
+                <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
+                  More habitat is the headline. The climate upside is a lighter-input
+                  patch with more rooted perennial cover over time.
+                </p>
+                <div
+                  className="impact-mini-grid"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                    gap: "0.75rem",
+                  }}
+                >
+                  {impactCards.map((item) => (
+                    <article
+                      key={item.label}
+                      style={{
+                        borderRadius: "18px",
+                        background: "linear-gradient(180deg, #eef3e6 0%, #f8f5ec 100%)",
+                        padding: "0.95rem",
+                        color: "#3f5139",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: "0 0 0.3rem",
+                          fontSize: "0.74rem",
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                          color: "#718069",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {item.label}
+                      </p>
+                      <p
+                        style={{
+                          margin: "0 0 0.45rem",
+                          fontSize: "1.2rem",
+                          lineHeight: 1.05,
+                          letterSpacing: "-0.04em",
+                          color: "#243323",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {item.value}
+                      </p>
+                      <p style={{ margin: 0, lineHeight: 1.55, color: "#586653" }}>{item.note}</p>
+                    </article>
+                  ))}
+                </div>
+                <p
+                  style={{
+                    margin: "0.95rem 0 0",
+                    fontSize: "0.9rem",
+                    lineHeight: 1.55,
+                    color: "#687565",
+                  }}
+                >
+                  Directional, not exact: we don&apos;t turn this into a single CO2 number,
+                  because that depends on what the patch replaces.
+                </p>
+              </>
+            ) : (
+              <>
+                <p
+                  style={{
+                    margin: "0 0 0.45rem",
+                    fontSize: "0.82rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "#687565",
+                    fontWeight: 700,
+                  }}
+                >
+                  Why this matters
+                </p>
+                <h2
+                  style={{
+                    margin: "0 0 0.8rem",
+                    fontSize: "1.9rem",
+                    lineHeight: 1.03,
+                    letterSpacing: "-0.05em",
+                  }}
+                >
+                  Tiny habitat is still habitat
+                </h2>
+                <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
+                  Native plants feed insects. Insects feed birds. Your yard starts acting
+                  like habitat.
+                </p>
+                <div
+                  style={{
+                    borderRadius: "18px",
+                    background: "linear-gradient(180deg, #eef3e6 0%, #f8f5ec 100%)",
+                    padding: "1rem",
+                    color: "#3f5139",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Start small, notice what shows up, and let the next patch happen from
+                  there.
+                </div>
+              </>
+            )}
           </section>
         </section>
       </div>
@@ -2003,6 +2176,10 @@ export default function Plan() {
           }
 
           .plan-hero-stats {
+            grid-template-columns: 1fr !important;
+          }
+
+          .impact-mini-grid {
             grid-template-columns: 1fr !important;
           }
         }
