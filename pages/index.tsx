@@ -533,7 +533,7 @@ export default function Home() {
         </section>
 
         <section
-          className="fade-up delay-3"
+          className="belief-grid fade-up delay-3"
           style={{
             marginTop: "0.95rem",
             display: "grid",
@@ -1252,6 +1252,18 @@ export default function Home() {
             grid-template-columns: 1fr !important;
           }
 
+          .belief-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .belief-grid article {
+            padding: 1.2rem !important;
+          }
+
+          .belief-grid h3 {
+            font-size: 1.72rem !important;
+          }
+
           .planner-nav {
             flex-direction: column !important;
           }
@@ -1259,22 +1271,6 @@ export default function Home() {
           .planner-nav button {
             width: 100% !important;
             margin-left: 0 !important;
-          }
-
-          section[style*="grid-template-columns: repeat(3"] {
-            grid-template-columns: 1fr !important;
-          }
-
-          section[style*="grid-template-columns: repeat(2"] {
-            grid-template-columns: 1fr !important;
-          }
-
-          section[style*="grid-template-columns: minmax(0, 1.05fr)"] {
-            grid-template-columns: 1fr !important;
-          }
-
-          section[style*="grid-template-columns: minmax(0, 1.15fr)"] {
-            grid-template-columns: 1fr !important;
           }
         }
       `}</style>

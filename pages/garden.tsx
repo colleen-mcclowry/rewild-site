@@ -595,15 +595,15 @@ export default function Garden() {
       </div>
       <style jsx>{`
         @media (max-width: 920px) {
-          section[style*="grid-template-columns: repeat(3, minmax(0, 1fr))"] {
+          .garden-stats-grid {
             grid-template-columns: 1fr !important;
           }
 
-          div[style*="grid-template-columns: repeat(4, minmax(0, 1fr))"] {
+          .garden-metric-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
           }
 
-          div[style*="grid-template-columns: minmax(0, 1.15fr)"] {
+          .garden-detail-grid {
             grid-template-columns: 1fr !important;
           }
         }

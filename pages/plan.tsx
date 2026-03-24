@@ -780,6 +780,7 @@ export default function Plan() {
           </button>
         </div>
         <section
+          className="plan-top-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "minmax(0, 1.4fr) minmax(280px, 0.9fr)",
@@ -1926,11 +1927,12 @@ export default function Plan() {
             padding-bottom: 0.5rem;
           }
 
-          section[style*="grid-template-columns: minmax(0, 1.4fr)"] {
+          .plan-top-grid {
             grid-template-columns: 1fr !important;
           }
 
-          section[style*="grid-template-columns: minmax(0, 1.05fr)"] {
+          .plan-layout-grid,
+          .plan-weekend-grid {
             grid-template-columns: 1fr !important;
           }
 
