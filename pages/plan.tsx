@@ -39,10 +39,206 @@ type PlanDetails = {
   title: string;
 };
 
+type LayoutZone = {
+  key: "front" | "center" | "back";
+  title: string;
+  summary: string;
+  plantEntries: Array<{ plant: Plant; index: number }>;
+};
+
+type SeasonalMoment = {
+  key: "spring" | "summer" | "fall" | "structure";
+  title: string;
+  summary: string;
+  plantEntries: Array<{ plant: Plant; index: number }>;
+};
+
+const sunOptions: Array<{ value: SunPreference; label: string; notes: string }> = [
+  {
+    value: "full-sun",
+    label: "Full sun",
+    notes: "6+ hours of direct light",
+  },
+  {
+    value: "part-shade",
+    label: "Partial shade",
+    notes: "Morning sun or dappled light",
+  },
+  {
+    value: "mostly-shade",
+    label: "Mostly shade",
+    notes: "Protected from hot afternoon sun",
+  },
+];
+
+const spaceOptions: Array<{ value: SpacePreference; label: string; notes: string }> = [
+  {
+    value: "small-patch",
+    label: "Small patch",
+    notes: "About 3 x 6 ft to 8 x 10 ft",
+  },
+  {
+    value: "medium-yard",
+    label: "Medium yard",
+    notes: "About 200 to 1,000 sq ft",
+  },
+  {
+    value: "large-yard",
+    label: "Large yard / plot",
+    notes: "About 1,000 sq ft+",
+  },
+];
+
+const goalOptions: Array<{ value: GoalPreference; label: string; notes: string }> = [
+  {
+    value: "pollinators",
+    label: "Pollinators",
+    notes: "More nectar and insect activity",
+  },
+  {
+    value: "low-maintenance",
+    label: "Low maintenance",
+    notes: "Forgiving structure and easier care",
+  },
+  {
+    value: "bird-habitat",
+    label: "Bird habitat",
+    notes: "More cover, seed, and shelter",
+  },
+  {
+    value: "color",
+    label: "Color",
+    notes: "A brighter, bloom-forward mix",
+  },
+];
+
+function parseSunPreference(value: string | undefined): SunPreference {
+  if (value === "part-shade" || value === "mostly-shade" || value === "full-sun") {
+    return value;
+  }
+
+  return "full-sun";
+}
+
+function parseSpacePreference(value: string | undefined): SpacePreference {
+  if (value === "medium-yard" || value === "large-yard" || value === "small-patch") {
+    return value;
+  }
+
+  return "small-patch";
+}
+
+function parseGoalPreference(value: string | undefined): GoalPreference {
+  if (
+    value === "pollinators" ||
+    value === "low-maintenance" ||
+    value === "bird-habitat" ||
+    value === "color"
+  ) {
+    return value;
+  }
+
+  return "pollinators";
+}
+
+const planDetailsDefaults: PlanDetails = {
+  sun: "full-sun",
+  sunLabel: "Full sun",
+  space: "small-patch",
+  spaceLabel: "Small patch",
+  goal: "pollinators",
+  goalLabel: "Pollinators",
+  sizeRange: "About 3 x 6 ft to 8 x 10 ft",
+  strategy: "Start with one compact habitat pocket that looks intentional fast.",
+  title: "Starter plan",
+};
+
+function includesAny(value: string, keywords: string[]) {
+  return keywords.some((keyword) => value.includes(keyword));
+}
+
+function getLayoutZoneKey(plant: Plant): LayoutZone["key"] {
+  const haystack = `${plant.role ?? ""} ${plant.notes} ${plant.placementNote ?? ""}`.toLowerCase();
+
+  if (
+    includesAny(haystack, [
+      "ground layer",
+      "groundcover",
+      "front edge",
+      "front-of-bed",
+      "front of bed",
+      "lower layer",
+      "carpet",
+      "matrix",
+    ])
+  ) {
+    return "front";
+  }
+
+  if (
+    includesAny(haystack, [
+      "structure plant",
+      "habitat layer",
+      "back edge",
+      "backbone",
+      "shrub",
+      "grass",
+      "sedge",
+      "fern",
+      "outer edge",
+      "silhouette",
+    ])
+  ) {
+    return "back";
+  }
+
+  return "center";
+}
+
+function getSeasonalMomentKey(plant: Plant): SeasonalMoment["key"] {
+  const haystack = `${plant.name} ${plant.benefit} ${plant.notes} ${plant.role ?? ""}`.toLowerCase();
+
+  if (includesAny(haystack, ["spring", "early"])) {
+    return "spring";
+  }
+
+  if (includesAny(haystack, ["late-season", "late season", "fall", "seed"])) {
+    return "fall";
+  }
+
+  if (
+    includesAny(haystack, [
+      "evergreen",
+      "year-round",
+      "structure",
+      "grass",
+      "sedge",
+      "fern",
+      "shelter",
+      "cover",
+      "habitat layer",
+      "structure plant",
+    ])
+  ) {
+    return "structure";
+  }
+
+  return "summer";
+}
+
 export default function Plan() {
   const router = useRouter();
   const { zip, lat, lon, lng, sun, space, goal } = router.query;
   const longitude = typeof lon === "string" ? lon : typeof lng === "string" ? lng : undefined;
+  const currentSun = parseSunPreference(
+    typeof sun === "string" ? sun : planDetailsDefaults.sun
+  );
+  const currentSpace = parseSpacePreference(
+    typeof space === "string" ? space : planDetailsDefaults.space
+  );
+  const currentGoal = parseGoalPreference(
+    typeof goal === "string" ? goal : planDetailsDefaults.goal
+  );
 
   const [geoInfo, setGeoInfo] = useState<GeoInfo | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
@@ -53,15 +249,7 @@ export default function Plan() {
   const [isSavedToGarden, setIsSavedToGarden] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [planDetails, setPlanDetails] = useState<PlanDetails>({
-    sun: "full-sun",
-    sunLabel: "Full sun",
-    space: "small-patch",
-    spaceLabel: "Small patch",
-    goal: "pollinators",
-    goalLabel: "Pollinators",
-    sizeRange: "About 3 x 6 ft to 8 x 10 ft",
-    strategy: "Start with one compact habitat pocket that looks intentional fast.",
-    title: "Starter plan",
+    ...planDetailsDefaults,
   });
 
   useEffect(() => {
@@ -215,6 +403,198 @@ export default function Plan() {
   const shareText = `A ${planDetails.sunLabel.toLowerCase()} native planting plan for a ${planDetails.spaceLabel.toLowerCase()} with a ${planDetails.goalLabel.toLowerCase()} focus.`;
   const cardSurface = "rgba(255,255,255,0.78)";
   const warmBorder = "1px solid rgba(104, 130, 90, 0.16)";
+  const selectionMessage = plantsLoading
+    ? "Refreshing your starter palette..."
+    : "Tap a choice to update the plan without losing your location.";
+  const isRefineDisabled = plantsLoading || !router.isReady;
+  const layoutZones = useMemo<LayoutZone[]>(() => {
+    const zones: LayoutZone[] = [
+      {
+        key: "front",
+        title: "Front edge",
+        summary: "Keep the lowest or softest plants near the path so the patch feels finished.",
+        plantEntries: [],
+      },
+      {
+        key: "center",
+        title: "Center drift",
+        summary: "Cluster your anchor blooms here so the starter bed reads clearly from a distance.",
+        plantEntries: [],
+      },
+      {
+        key: "back",
+        title: "Backbone",
+        summary: "Let taller or more structural plants hold the outline and habitat value together.",
+        plantEntries: [],
+      },
+    ];
+
+    plants.forEach((plant, index) => {
+      const zone = zones.find((candidate) => candidate.key === getLayoutZoneKey(plant));
+
+      zone?.plantEntries.push({ plant, index });
+    });
+
+    return zones.filter((zone) => zone.plantEntries.length > 0);
+  }, [plants]);
+  const seasonalMoments = useMemo<SeasonalMoment[]>(() => {
+    const moments: SeasonalMoment[] = [
+      {
+        key: "spring",
+        title: "Spring wake-up",
+        summary: "Early color or foliage that makes the patch feel alive fast.",
+        plantEntries: [],
+      },
+      {
+        key: "summer",
+        title: "Summer peak",
+        summary: "Main bloom and pollinator traffic when the garden is working hardest.",
+        plantEntries: [],
+      },
+      {
+        key: "fall",
+        title: "Late-season support",
+        summary: "Plants that keep habitat value going after the first big flush.",
+        plantEntries: [],
+      },
+      {
+        key: "structure",
+        title: "Year-round shape",
+        summary: "Leaves, stems, or seed structure that help the patch hold together over time.",
+        plantEntries: [],
+      },
+    ];
+
+    plants.forEach((plant, index) => {
+      const moment = moments.find(
+        (candidate) => candidate.key === getSeasonalMomentKey(plant)
+      );
+
+      moment?.plantEntries.push({ plant, index });
+    });
+
+    return moments.filter((moment) => moment.plantEntries.length > 0);
+  }, [plants]);
+
+  const renderChoiceGroup = (
+    label: string,
+    helper: string,
+    options: Array<{ value: string; label: string; notes: string }>,
+    activeValue: string,
+    onSelect: (value: string) => void
+  ) => (
+    <section
+      style={{
+        borderRadius: "22px",
+        padding: "1rem",
+        background: "rgba(255,255,255,0.58)",
+        border: "1px solid rgba(104, 130, 90, 0.12)",
+      }}
+    >
+      <p
+        style={{
+          margin: "0 0 0.3rem",
+          fontSize: "0.8rem",
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "#667260",
+          fontWeight: 700,
+        }}
+      >
+        {label}
+      </p>
+      <p style={{ margin: "0 0 0.8rem", color: "#5d6a58", lineHeight: 1.55 }}>{helper}</p>
+      <div style={{ display: "grid", gap: "0.55rem" }}>
+        {options.map((option) => {
+          const isActive = option.value === activeValue;
+
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={isActive}
+              onClick={() => onSelect(option.value)}
+              disabled={isRefineDisabled || isActive}
+              style={{
+                borderRadius: "16px",
+                border: isActive
+                  ? "1px solid rgba(54, 85, 45, 0.26)"
+                  : "1px solid rgba(104, 130, 90, 0.12)",
+                background: isActive ? "rgba(233, 241, 226, 0.96)" : "rgba(255,255,255,0.9)",
+                color: "#31422d",
+                padding: "0.85rem 0.9rem",
+                textAlign: "left",
+                cursor: isActive ? "default" : isRefineDisabled ? "not-allowed" : "pointer",
+                opacity: isRefineDisabled && !isActive ? 0.65 : 1,
+              }}
+            >
+              <span
+                style={{
+                  display: "block",
+                  fontWeight: 700,
+                  lineHeight: 1.3,
+                }}
+              >
+                {option.label}
+              </span>
+              <span
+                style={{
+                  display: "block",
+                  marginTop: "0.18rem",
+                  fontSize: "0.86rem",
+                  color: "#667260",
+                  lineHeight: 1.4,
+                }}
+              >
+                {option.notes}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+
+  const updatePlanPreferences = (
+    nextPreferences: Partial<{
+      sun: SunPreference;
+      space: SpacePreference;
+      goal: GoalPreference;
+    }>
+  ) => {
+    if (!router.isReady) return;
+
+    const nextQuery: Record<string, string> = {
+      sun: nextPreferences.sun ?? currentSun,
+      space: nextPreferences.space ?? currentSpace,
+      goal: nextPreferences.goal ?? currentGoal,
+    };
+
+    if (typeof zip === "string" && zip.length > 0) {
+      nextQuery.zip = zip;
+    }
+
+    if (typeof lat === "string" && lat.length > 0) {
+      nextQuery.lat = lat;
+    }
+
+    if (typeof lon === "string" && lon.length > 0) {
+      nextQuery.lon = lon;
+    } else if (typeof lng === "string" && lng.length > 0) {
+      nextQuery.lng = lng;
+    }
+
+    setGardenMessage("");
+    setShareMessage("");
+    void router.replace(
+      {
+        pathname: router.pathname,
+        query: nextQuery,
+      },
+      undefined,
+      { shallow: true, scroll: false }
+    );
+  };
 
   const savePlanToGarden = () => {
     if (typeof window === "undefined" || plants.length === 0) return;
@@ -522,6 +902,7 @@ export default function Plan() {
             </p>
 
             <div
+              className="plan-hero-stats"
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
@@ -817,6 +1198,97 @@ export default function Plan() {
 
         <section
           style={{
+            borderRadius: "28px",
+            padding: "1.35rem",
+            background: cardSurface,
+            border: warmBorder,
+            boxShadow: "0 18px 40px rgba(59, 82, 42, 0.08)",
+            backdropFilter: "blur(14px)",
+            marginBottom: "1.6rem",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "end",
+              gap: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  margin: "0 0 0.45rem",
+                  fontSize: "0.82rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#667260",
+                  fontWeight: 700,
+                }}
+              >
+                Refine this plan
+              </p>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "1.9rem",
+                  lineHeight: 1.04,
+                  letterSpacing: "-0.05em",
+                  color: "#243323",
+                }}
+              >
+                Adjust the habitat recipe without starting over
+              </h2>
+            </div>
+            <p
+              aria-live="polite"
+              style={{
+                margin: 0,
+                maxWidth: "30rem",
+                color: "#5d6a58",
+                lineHeight: 1.6,
+              }}
+            >
+              {selectionMessage}
+            </p>
+          </div>
+
+          <div
+            className="refine-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+              gap: "0.9rem",
+              marginTop: "1rem",
+            }}
+          >
+            {renderChoiceGroup(
+              "Light",
+              "Match the actual conditions in the patch you want to start with.",
+              sunOptions,
+              currentSun,
+              (value) => updatePlanPreferences({ sun: value as SunPreference })
+            )}
+            {renderChoiceGroup(
+              "Space",
+              "Scale the starter set to what you can realistically plant next.",
+              spaceOptions,
+              currentSpace,
+              (value) => updatePlanPreferences({ space: value as SpacePreference })
+            )}
+            {renderChoiceGroup(
+              "Priority",
+              "Shift the mix toward the outcome you care most about right now.",
+              goalOptions,
+              currentGoal,
+              (value) => updatePlanPreferences({ goal: value as GoalPreference })
+            )}
+          </div>
+        </section>
+
+        <section
+          style={{
             marginBottom: "1.25rem",
             display: "flex",
             justifyContent: "space-between",
@@ -874,6 +1346,54 @@ export default function Plan() {
             <p style={{ margin: "0.75rem auto 0", maxWidth: "32rem", opacity: 0.7 }}>
               Matching your area with a few native plants that are beautiful,
               beginner-friendly, and useful for wildlife.
+            </p>
+          </section>
+        ) : plants.length === 0 ? (
+          <section
+            style={{
+              borderRadius: "26px",
+              background: "rgba(255,255,255,0.82)",
+              border: warmBorder,
+              padding: "2rem",
+              textAlign: "center",
+              boxShadow: "0 12px 28px rgba(41, 63, 34, 0.06)",
+              marginBottom: "1.75rem",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.82rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#667260",
+                fontWeight: 700,
+              }}
+            >
+              No starter set yet
+            </p>
+            <h3
+              style={{
+                margin: 0,
+                fontSize: "1.9rem",
+                lineHeight: 1.05,
+                letterSpacing: "-0.05em",
+                color: "#233224",
+              }}
+            >
+              Try a different light, size, or priority mix.
+            </h3>
+            <p
+              style={{
+                margin: "0.85rem auto 0",
+                maxWidth: "34rem",
+                color: "#566453",
+                lineHeight: 1.65,
+              }}
+            >
+              We couldn&apos;t build a strong starter palette for this exact combination
+              yet, but the controls above will refresh the plan without losing your
+              location.
             </p>
           </section>
         ) : (
@@ -1052,6 +1572,206 @@ export default function Plan() {
           </section>
         )}
 
+        {plants.length > 0 && (
+          <section
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1.05fr) minmax(280px, 0.95fr)",
+              gap: "1rem",
+              marginBottom: "1rem",
+            }}
+          >
+            <section
+              style={{
+                borderRadius: "26px",
+                padding: "1.5rem",
+                background: "rgba(247, 244, 234, 0.92)",
+                border: warmBorder,
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 0.45rem",
+                  fontSize: "0.82rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#687565",
+                  fontWeight: 700,
+                }}
+              >
+                Simple layout
+              </p>
+              <h2
+                style={{
+                  margin: "0 0 0.8rem",
+                  fontSize: "1.9rem",
+                  lineHeight: 1.03,
+                  letterSpacing: "-0.05em",
+                }}
+              >
+                A starter bed you can actually picture
+              </h2>
+              <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
+                Use the numbered plants from the cards above and group them by zone instead
+                of spacing everything evenly like a checklist.
+              </p>
+              <div style={{ display: "grid", gap: "0.8rem" }}>
+                {layoutZones.map((zone) => (
+                  <section
+                    key={zone.key}
+                    style={{
+                      borderRadius: "18px",
+                      background: "rgba(255,255,255,0.7)",
+                      padding: "1rem",
+                      border: "1px solid rgba(104, 130, 90, 0.1)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "start",
+                        gap: "0.8rem",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <h3
+                          style={{
+                            margin: 0,
+                            fontSize: "1.2rem",
+                            lineHeight: 1.1,
+                            color: "#243323",
+                          }}
+                        >
+                          {zone.title}
+                        </h3>
+                        <p style={{ margin: "0.35rem 0 0", color: "#5f6d58", lineHeight: 1.55 }}>
+                          {zone.summary}
+                        </p>
+                      </div>
+                      <span
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          minWidth: "2rem",
+                          height: "2rem",
+                          borderRadius: "999px",
+                          background: "rgba(232, 240, 223, 0.92)",
+                          color: "#31422d",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {zone.plantEntries.length}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.55rem", marginTop: "0.85rem" }}>
+                      {zone.plantEntries.map(({ plant, index }) => (
+                        <span
+                          key={`${zone.key}-${plant.name}`}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.45rem",
+                            borderRadius: "999px",
+                            padding: "0.42rem 0.68rem",
+                            background: "rgba(235, 241, 229, 0.95)",
+                            color: "#3f5539",
+                            fontSize: "0.86rem",
+                          }}
+                        >
+                          <strong style={{ color: "#2c4028" }}>{String(index + 1).padStart(2, "0")}</strong>
+                          {plant.name}
+                        </span>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </section>
+
+            <section
+              style={{
+                borderRadius: "26px",
+                padding: "1.5rem",
+                background: "rgba(255,253,250,0.88)",
+                border: warmBorder,
+                boxShadow: "0 14px 34px rgba(51, 70, 40, 0.05)",
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 0.45rem",
+                  fontSize: "0.82rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#687565",
+                  fontWeight: 700,
+                }}
+              >
+                Seasonal rhythm
+              </p>
+              <h2
+                style={{
+                  margin: "0 0 0.8rem",
+                  fontSize: "1.9rem",
+                  lineHeight: 1.03,
+                  letterSpacing: "-0.05em",
+                }}
+              >
+                What this patch is doing through the year
+              </h2>
+              <div style={{ display: "grid", gap: "0.8rem" }}>
+                {seasonalMoments.map((moment) => (
+                  <section
+                    key={moment.key}
+                    style={{
+                      borderRadius: "18px",
+                      background: "linear-gradient(180deg, #eef3e6 0%, #f8f5ec 100%)",
+                      padding: "1rem",
+                    }}
+                  >
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: "1.08rem",
+                        lineHeight: 1.15,
+                        color: "#2b3f2c",
+                      }}
+                    >
+                      {moment.title}
+                    </h3>
+                    <p style={{ margin: "0.35rem 0 0.75rem", color: "#596655", lineHeight: 1.55 }}>
+                      {moment.summary}
+                    </p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
+                      {moment.plantEntries.map(({ plant, index }) => (
+                        <span
+                          key={`${moment.key}-${plant.name}`}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.4rem",
+                            borderRadius: "999px",
+                            padding: "0.38rem 0.62rem",
+                            background: "rgba(255,255,255,0.82)",
+                            color: "#3d503a",
+                            fontSize: "0.84rem",
+                          }}
+                        >
+                          <strong style={{ color: "#2c4028" }}>{String(index + 1).padStart(2, "0")}</strong>
+                          {plant.name}
+                        </span>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </section>
+          </section>
+        )}
+
         <section
           style={{
             display: "grid",
@@ -1197,6 +1917,20 @@ export default function Plan() {
           }
 
           section[style*="grid-template-columns: minmax(0, 1.05fr)"] {
+            grid-template-columns: 1fr !important;
+          }
+
+          .refine-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .plan-hero-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .plan-hero-stats {
             grid-template-columns: 1fr !important;
           }
         }

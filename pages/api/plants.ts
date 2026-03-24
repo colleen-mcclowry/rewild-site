@@ -693,6 +693,203 @@ function parseGoalPreference(value: string | undefined): GoalPreference {
   return "pollinators";
 }
 
+type PlantSelectionMeta = {
+  plant: Plant;
+  haystack: string;
+  goalScore: number;
+  isStructure: boolean;
+  isGroundLayer: boolean;
+  isSeasonal: boolean;
+  isHabitat: boolean;
+  isShowy: boolean;
+  hasPollinatorSignal: boolean;
+};
+
+type PlantSlot = {
+  label: string;
+  fitSummary: string;
+  placementLead: string;
+  score: (meta: PlantSelectionMeta) => number;
+};
+
+function includesAny(value: string, keywords: string[]) {
+  return keywords.some((keyword) => value.includes(keyword));
+}
+
+function buildPlantSelectionMeta(
+  plants: Plant[],
+  goal: GoalPreference
+): PlantSelectionMeta[] {
+  const goalScores: Record<GoalPreference, string[]> = {
+    pollinators: ["pollinator", "nectar", "bees", "butterfl", "hummingbird", "insect"],
+    "low-maintenance": [
+      "forgiving",
+      "tough",
+      "reliable",
+      "structure",
+      "durable",
+      "groundcover",
+    ],
+    "bird-habitat": ["seed", "shelter", "structure", "habitat", "cover", "grass"],
+    color: ["bright", "color", "bloom", "flowers", "cheerful", "bold"],
+  };
+
+  return plants.map((plant) => {
+    const haystack = `${plant.name} ${plant.latin ?? ""} ${plant.benefit} ${plant.notes}`.toLowerCase();
+    const goalScore = goalScores[goal].reduce(
+      (sum, keyword) => sum + (haystack.includes(keyword) ? 1 : 0),
+      0
+    );
+
+    return {
+      plant,
+      haystack,
+      goalScore,
+      isStructure: includesAny(haystack, [
+        "grass",
+        "sedge",
+        "fern",
+        "shrub",
+        "evergreen",
+        "structure",
+        "cover",
+        "backbone",
+        "upright",
+      ]),
+      isGroundLayer: includesAny(haystack, [
+        "groundcover",
+        "ground layer",
+        "front edge",
+        "carpet",
+        "matrix",
+        "low, grassy",
+        "lower layer",
+      ]),
+      isSeasonal: includesAny(haystack, [
+        "spring",
+        "summer",
+        "fall",
+        "late-season",
+        "late season",
+        "color",
+        "bloom",
+        "flowers",
+        "bright",
+        "cheerful",
+        "orange",
+      ]),
+      isHabitat: includesAny(haystack, [
+        "habitat",
+        "cover",
+        "shelter",
+        "nesting",
+        "seed",
+        "wildlife",
+        "monarch",
+        "insects",
+        "birds",
+      ]),
+      isShowy: includesAny(haystack, [
+        "bright",
+        "color",
+        "bloom",
+        "flowers",
+        "cheerful",
+        "bold",
+        "magical",
+        "fragrant blooms",
+      ]),
+      hasPollinatorSignal: includesAny(haystack, [
+        "pollinator",
+        "nectar",
+        "bees",
+        "butterfl",
+        "hummingbird",
+        "insect",
+      ]),
+    };
+  });
+}
+
+function buildPlanSlots(space: SpacePreference): PlantSlot[] {
+  const anchorSlot: PlantSlot = {
+    label: "Anchor plant",
+    fitSummary: "fast visual payoff",
+    placementLead: "Place this where it reads first so the bed looks intentional right away.",
+    score: (meta) =>
+      meta.goalScore * 6 +
+      (meta.isShowy ? 5 : 0) +
+      (!meta.isStructure ? 2 : 0) +
+      (!meta.isGroundLayer ? 1 : 0),
+  };
+
+  const pollinatorSlot: PlantSlot = {
+    label: "Pollinator layer",
+    fitSummary: "steady bloom and insect activity",
+    placementLead:
+      "Repeat this near your anchor plant so bloom and wildlife activity stay concentrated.",
+    score: (meta) =>
+      meta.goalScore * 6 +
+      (meta.hasPollinatorSignal ? 5 : 0) +
+      (!meta.isStructure ? 1 : 0),
+  };
+
+  const groundLayerSlot: PlantSlot = {
+    label: "Ground layer",
+    fitSummary: "knits the planting together",
+    placementLead:
+      "Tuck this along the front edge or between taller plants so the patch feels connected.",
+    score: (meta) =>
+      meta.goalScore * 4 + (meta.isGroundLayer ? 6 : 0) + (meta.isStructure ? 1 : 0),
+  };
+
+  const seasonalLiftSlot: PlantSlot = {
+    label: "Seasonal lift",
+    fitSummary: "extra bloom or seasonal rhythm",
+    placementLead:
+      "Thread this through the middle of the patch so color or bloom isn't stuck in one corner.",
+    score: (meta) =>
+      meta.goalScore * 5 +
+      (meta.isSeasonal ? 5 : 0) +
+      (!meta.isGroundLayer ? 1 : 0),
+  };
+
+  const habitatLayerSlot: PlantSlot = {
+    label: "Habitat layer",
+    fitSummary: "more cover and wildlife value",
+    placementLead:
+      "Use this to thicken the planting and give insects or birds more places to shelter.",
+    score: (meta) =>
+      meta.goalScore * 5 + (meta.isHabitat ? 5 : 0) + (meta.isStructure ? 2 : 0),
+  };
+
+  const structureSlot: PlantSlot = {
+    label: "Structure plant",
+    fitSummary: "shape and year-round presence",
+    placementLead:
+      "Place this toward the back or outer edge so the planting keeps a clear silhouette.",
+    score: (meta) =>
+      meta.goalScore * 4 + (meta.isStructure ? 7 : 0) + (meta.isHabitat ? 1 : 0),
+  };
+
+  if (space === "small-patch") {
+    return [anchorSlot, pollinatorSlot, structureSlot];
+  }
+
+  if (space === "medium-yard") {
+    return [anchorSlot, pollinatorSlot, groundLayerSlot, seasonalLiftSlot, structureSlot];
+  }
+
+  return [
+    anchorSlot,
+    pollinatorSlot,
+    groundLayerSlot,
+    habitatLayerSlot,
+    seasonalLiftSlot,
+    structureSlot,
+  ];
+}
+
 function getPlantsForPlan(
   region: string,
   sun: SunPreference,
@@ -701,69 +898,67 @@ function getPlantsForPlan(
 ): Plant[] {
   const regionKey = getRegionKey(region);
   const availablePlants = plantCatalog[regionKey][sun];
-  const targetCount = spaceDetails[space].plantCount;
+  const enrichedPlants = availablePlants.map((plant) => {
+    const curated = curatedImageByPlantName[plant.name];
 
-  const curatedPlants = availablePlants
-    .map((plant) => {
-      const curated = curatedImageByPlantName[plant.name];
+    if (!curated) {
+      return plant;
+    }
 
-      if (!curated) {
+    return { ...plant, ...curated } satisfies CuratedPlant;
+  });
+  const selectionMeta = buildPlantSelectionMeta(enrichedPlants, goal);
+  const remainingPlants = [...selectionMeta];
+  const selectedPlants = buildPlanSlots(space)
+    .map((slot) => {
+      const bestMatch = [...remainingPlants]
+        .sort((a, b) => {
+          const scoreDifference = slot.score(b) - slot.score(a);
+
+          if (scoreDifference !== 0) return scoreDifference;
+
+          return b.goalScore - a.goalScore;
+        })
+        .at(0);
+
+      if (!bestMatch) {
         return null;
       }
 
-      return { ...plant, ...curated } satisfies CuratedPlant;
-    })
-    .filter((plant): plant is CuratedPlant => plant !== null);
-
-  const goalScores: Record<GoalPreference, string[]> = {
-    pollinators: ["pollinator", "nectar", "bees", "butterfl", "hummingbird", "insect"],
-    "low-maintenance": ["forgiving", "tough", "reliable", "structure", "durable", "groundcover"],
-    "bird-habitat": ["seed", "shelter", "structure", "habitat", "cover", "grass"],
-    color: ["bright", "color", "bloom", "flowers", "cheerful", "bold"],
-  };
-
-  const rankedPlants = curatedPlants
-    .map((plant) => {
-      const haystack = `${plant.benefit} ${plant.notes}`.toLowerCase();
-      const score = goalScores[goal].reduce(
-        (sum, keyword) => sum + (haystack.includes(keyword) ? 1 : 0),
-        0
+      const selectedIndex = remainingPlants.findIndex(
+        (candidate) => candidate.plant.name === bestMatch.plant.name
       );
 
-      return { plant, score };
-    })
-    .sort((a, b) => b.score - a.score)
-    .map((entry) => entry.plant);
+      remainingPlants.splice(selectedIndex, 1);
 
-  return rankedPlants
-    .slice(0, targetCount)
-    .map((plant, index) => {
-    const role =
-      index === 0
-        ? "Anchor plant"
-        : index === targetCount - 1
-          ? "Structure plant"
-          : "Supporting plant";
-    const placementPrefix: Record<SpacePreference, string> = {
-      "small-patch": "Use this in a tight cluster so the bed feels intentional quickly.",
-      "medium-yard": "Repeat this in a few small drifts to make the planting feel connected.",
-      "large-yard": "Use this as one layer within a larger habitat zone, not as a one-off.",
-    };
-    const fitReasons = [
+      return { meta: bestMatch, slot };
+    })
+    .filter(
+      (entry): entry is { meta: PlantSelectionMeta; slot: PlantSlot } => entry !== null
+    );
+  const placementPrefix: Record<SpacePreference, string> = {
+    "small-patch": "Use this in a tight cluster so the bed feels intentional quickly.",
+    "medium-yard": "Repeat this in a few small drifts to make the planting feel connected.",
+    "large-yard": "Use this as one layer within a larger habitat zone, not as a one-off.",
+  };
+  const goalFitReasons: Record<GoalPreference, string> = {
+    pollinators: "extra nectar and insect value",
+    "low-maintenance": "forgiving structure and repeatability",
+    "bird-habitat": "better shelter and food value",
+    color: "strong bloom and visual payoff",
+  };
+
+  return selectedPlants.map(({ meta, slot }) => ({
+    ...meta.plant,
+    role: slot.label,
+    fitReasons: [
       `${sunLabels[sun]} conditions`,
       `${spaceDetails[space].label.toLowerCase()} scale`,
-      `${goalLabels[goal].toLowerCase()} focus`,
-      index === 0 ? "fast visual payoff" : index === targetCount - 1 ? "structure and habitat" : "supports pollinators and flow",
-    ];
-    const placementNote = `${placementPrefix[space]} ${spaceDetails[space].strategy}`;
-
-    return {
-      ...plant,
-      role,
-      fitReasons,
-      placementNote,
-    };
-  });
+      goalFitReasons[goal],
+      slot.fitSummary,
+    ],
+    placementNote: `${slot.placementLead} ${placementPrefix[space]} ${spaceDetails[space].strategy}`,
+  }));
 }
 
 function buildPlanDetails(

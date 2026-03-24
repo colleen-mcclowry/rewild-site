@@ -4,6 +4,7 @@ import {
   gardenStatusLabels,
   getGardenPlans,
   type GardenPlanStatus,
+  removeGardenPlan,
   type SavedGardenPlan,
   updateGardenPlanStatus,
 } from "../lib/my-garden";
@@ -42,6 +43,16 @@ export default function Garden() {
 
   const handleStatusChange = (id: string, status: GardenPlanStatus) => {
     setPlans(updateGardenPlanStatus(id, status));
+  };
+
+  const handleRemovePlan = (plan: SavedGardenPlan) => {
+    const shouldRemove = window.confirm(
+      `Remove "${plan.title}" from My Garden? You can always save it again later.`
+    );
+
+    if (!shouldRemove) return;
+
+    setPlans(removeGardenPlan(plan.id));
   };
 
   return (
@@ -390,22 +401,40 @@ export default function Garden() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => router.push(plan.planUrl)}
-                    style={{
-                      borderRadius: "999px",
-                      border: "none",
-                      background: "#304d2e",
-                      color: "#f8f5ec",
-                      fontWeight: 600,
-                      fontSize: "0.95rem",
-                      padding: "0.82rem 1.05rem",
-                      cursor: "pointer",
-                    }}
-                  >
-                    View plan
-                  </button>
+                  <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      onClick={() => router.push(plan.planUrl)}
+                      style={{
+                        borderRadius: "999px",
+                        border: "none",
+                        background: "#304d2e",
+                        color: "#f8f5ec",
+                        fontWeight: 600,
+                        fontSize: "0.95rem",
+                        padding: "0.82rem 1.05rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      View plan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRemovePlan(plan)}
+                      style={{
+                        borderRadius: "999px",
+                        border: "1px solid rgba(148, 102, 90, 0.2)",
+                        background: "rgba(255,255,255,0.88)",
+                        color: "#7a4336",
+                        fontWeight: 600,
+                        fontSize: "0.95rem",
+                        padding: "0.82rem 1.05rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
 
                 <div
