@@ -68,22 +68,19 @@ const goalOptions: Array<{ value: GoalPreference; label: string; notes: string }
 const heroScenes = [
   {
     title: "A starter patch can look good fast.",
-    copy: "Color, movement, and habitat in one corner of the yard.",
-    image:
-      "https://images.unsplash.com/photo-1597848212624-a19eb35e2651?auto=format&fit=crop&w=1400&q=70",
-    tags: ["First-season color", "Pollinator food"],
+    copy: "Color, movement, and habitat in one real corner of the yard.",
+    image: "/home/hero-garden.jpg",
+    tags: ["Real garden", "Pollinator food"],
   },
   {
-    title: "Pollinator food",
-    copy: "Native bloom gives bees and butterflies a reason to stop by.",
-    image:
-      "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=1200&q=70",
+    title: "Who shows up",
+    copy: "Butterflies start finding the patch when the flowers do.",
+    image: "/home/hero-butterfly.jpg",
   },
   {
-    title: "Roots + structure",
-    copy: "Grasses and seedheads keep the patch useful after peak bloom.",
-    image:
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=70",
+    title: "Native bloom",
+    copy: "Even one small pocket can hold color, nectar, and momentum.",
+    image: "/home/hero-milkweed.jpg",
   },
 ] as const;
 
@@ -627,7 +624,7 @@ export default function Home() {
                     ))}
                   </div>
                   <p style={{ margin: "0.7rem 0 0", color: "#5b6a57", lineHeight: 1.55 }}>
-                    The planner below is the tool. This is the feeling you&apos;re aiming for.
+                    The planner below is the tool. This is what the shift can actually look like.
                   </p>
                 </article>
               </div>
