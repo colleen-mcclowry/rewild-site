@@ -53,6 +53,29 @@ type SeasonalMoment = {
   plantEntries: Array<{ plant: Plant; index: number }>;
 };
 
+type PlantRoleKey =
+  | "anchor"
+  | "pollinator"
+  | "ground"
+  | "seasonal"
+  | "habitat"
+  | "structure";
+
+type QuantityRange = {
+  min: number;
+  max: number;
+};
+
+type PlantingGuide = {
+  plant: Plant;
+  index: number;
+  quantity: QuantityRange;
+  quantityLabel: string;
+  spacing: string;
+  grouping: string;
+  zoneLabel: string;
+};
+
 const sunOptions: Array<{ value: SunPreference; label: string; notes: string }> = [
   {
     value: "full-sun",
@@ -185,6 +208,70 @@ const realGardenScenes = [
   },
 ] as const;
 
+const plantingHeuristics: Record<
+  PlantRoleKey,
+  {
+    spacing: string;
+    grouping: string;
+    quantities: Record<SpacePreference, QuantityRange>;
+  }
+> = {
+  anchor: {
+    spacing: "18-24 in apart",
+    grouping: "Cluster this in one bold middle drift so the bed reads fast.",
+    quantities: {
+      "small-patch": { min: 1, max: 2 },
+      "medium-yard": { min: 3, max: 5 },
+      "large-yard": { min: 5, max: 7 },
+    },
+  },
+  pollinator: {
+    spacing: "18-24 in apart",
+    grouping: "Repeat near the anchor so bloom and pollinator traffic land together.",
+    quantities: {
+      "small-patch": { min: 2, max: 3 },
+      "medium-yard": { min: 3, max: 5 },
+      "large-yard": { min: 5, max: 7 },
+    },
+  },
+  ground: {
+    spacing: "12-18 in apart",
+    grouping: "Thread this along the front edge and between taller plants.",
+    quantities: {
+      "small-patch": { min: 3, max: 4 },
+      "medium-yard": { min: 5, max: 7 },
+      "large-yard": { min: 7, max: 10 },
+    },
+  },
+  seasonal: {
+    spacing: "18-24 in apart",
+    grouping: "Echo this through the middle so color is not stuck in one corner.",
+    quantities: {
+      "small-patch": { min: 1, max: 2 },
+      "medium-yard": { min: 3, max: 4 },
+      "large-yard": { min: 4, max: 6 },
+    },
+  },
+  habitat: {
+    spacing: "18-24 in apart",
+    grouping: "Tuck this into side pockets for extra shelter and cover.",
+    quantities: {
+      "small-patch": { min: 1, max: 2 },
+      "medium-yard": { min: 3, max: 4 },
+      "large-yard": { min: 4, max: 6 },
+    },
+  },
+  structure: {
+    spacing: "24-36 in apart",
+    grouping: "Place this toward the back or outer edge for silhouette and shape.",
+    quantities: {
+      "small-patch": { min: 1, max: 2 },
+      "medium-yard": { min: 2, max: 3 },
+      "large-yard": { min: 3, max: 5 },
+    },
+  },
+};
+
 const spaceImpactDetails: Record<
   SpacePreference,
   { footprint: string; areaNote: string; climateNote: string }
@@ -310,6 +397,52 @@ function getSeasonSpanValue(moments: SeasonalMoment[]) {
   }
 
   return "Growing season";
+}
+
+function getPlantRoleKey(plant: Plant): PlantRoleKey {
+  const role = (plant.role ?? "").toLowerCase();
+
+  if (role.includes("anchor")) {
+    return "anchor";
+  }
+
+  if (role.includes("pollinator")) {
+    return "pollinator";
+  }
+
+  if (role.includes("ground")) {
+    return "ground";
+  }
+
+  if (role.includes("seasonal")) {
+    return "seasonal";
+  }
+
+  if (role.includes("habitat")) {
+    return "habitat";
+  }
+
+  return "structure";
+}
+
+function formatQuantityLabel(quantity: QuantityRange) {
+  return quantity.min === quantity.max
+    ? `${quantity.min} plant${quantity.min === 1 ? "" : "s"}`
+    : `${quantity.min}-${quantity.max} plants`;
+}
+
+function getStarterPlantCountLabel(guides: PlantingGuide[]) {
+  const totals = guides.reduce(
+    (sum, guide) => ({
+      min: sum.min + guide.quantity.min,
+      max: sum.max + guide.quantity.max,
+    }),
+    { min: 0, max: 0 }
+  );
+
+  return totals.min === totals.max
+    ? `${totals.min} plants`
+    : `${totals.min}-${totals.max} plants`;
 }
 
 export default function Plan() {
@@ -600,6 +733,112 @@ export default function Plan() {
       },
     ];
   }, [currentSpace, layoutZones.length, seasonalMoments]);
+  const plantingGuides = useMemo<PlantingGuide[]>(
+    () =>
+      plants.map((plant, index) => {
+        const roleKey = getPlantRoleKey(plant);
+        const guide = plantingHeuristics[roleKey];
+
+        return {
+          plant,
+          index,
+          quantity: guide.quantities[currentSpace],
+          quantityLabel: formatQuantityLabel(guide.quantities[currentSpace]),
+          spacing: guide.spacing,
+          grouping: guide.grouping,
+          zoneLabel: layoutZoneLabels[getLayoutZoneKey(plant)],
+        };
+      }),
+    [currentSpace, plants]
+  );
+  const starterPlantCountLabel = useMemo(
+    () => getStarterPlantCountLabel(plantingGuides),
+    [plantingGuides]
+  );
+  const weekendChecklist = useMemo(() => {
+    const zoneLabel = currentSpace === "small-patch" ? "starter patch" : "first planted zone";
+    const layersLabel =
+      layoutZones.length >= 3
+        ? "three loose layers"
+        : layoutZones.length === 2
+          ? "two clear layers"
+          : "one clear layer";
+
+    if (plants.length === 0) {
+      return [
+        {
+          title: "Claim one starter zone",
+          detail: `Start with one ${planDetails.sunLabel.toLowerCase()} ${zoneLabel} you can actually maintain.`,
+        },
+        {
+          title: "Mark the outline first",
+          detail: "Use a hose, rope, or a few stakes so the bed has a clear shape before you buy anything.",
+        },
+        {
+          title: "Go for one bed, not the whole yard",
+          detail: "A single finished patch teaches you more than scattering a few plants across the whole space.",
+        },
+        {
+          title: "Refresh the mix if needed",
+          detail: "If this combination is thin, use the refine controls above to adjust light, size, or priority without losing your location.",
+        },
+      ];
+    }
+
+    return [
+      {
+        title: "Claim one starter zone",
+        detail: `Start with one ${planDetails.sunLabel.toLowerCase()} ${zoneLabel} instead of spreading effort across the whole yard.`,
+      },
+      {
+        title: "Set everything out first",
+        detail: `Use the numbered cards to arrange ${layersLabel}: lower plants to the edge, anchor blooms in the middle, structure toward the back.`,
+      },
+      {
+        title: "Buy repeats, not singles",
+        detail: `Plan on about ${starterPlantCountLabel} total across ${plants.length} species for this first zone, using the quantities and spacing on each card.`,
+      },
+      {
+        title: "Plant, water, then mulch",
+        detail: "Water each plant in deeply right away, then add about 2 inches of mulch while keeping stems and crowns clear.",
+      },
+    ];
+  }, [
+    currentSpace,
+    layoutZones.length,
+    planDetails.sunLabel,
+    plants.length,
+    starterPlantCountLabel,
+  ]);
+  const firstSeasonCare = useMemo(() => {
+    const weekOneWatering =
+      currentSun === "full-sun"
+        ? "every 2 to 3 days"
+        : currentSun === "part-shade"
+          ? "every 3 to 4 days"
+          : "every 4 to 5 days";
+    const hotSpellWatering =
+      currentSun === "full-sun" ? "once or twice a week" : "about once a week";
+
+    return [
+      {
+        title: "Week 1",
+        detail: `If you do not get a soaking rain, water ${weekOneWatering} so the roots settle in.`,
+      },
+      {
+        title: "Weeks 2-6",
+        detail: "Pull obvious lawn grass and fast weeds early so the young natives are not crowded out.",
+      },
+      {
+        title: "Hot spells",
+        detail: `During heat, soak the bed ${hotSpellWatering} instead of giving it a light daily sprinkle.`,
+      },
+      {
+        title: "Fall to spring",
+        detail: "Leave stems and seedheads standing through winter, then cut back in early spring if you want a cleaner reset.",
+      },
+    ];
+  }, [currentSun]);
 
   const renderChoiceGroup = (
     label: string,
@@ -1680,6 +1919,47 @@ export default function Plan() {
           </p>
         </section>
 
+        {!plantsLoading && plantingGuides.length > 0 && (
+          <section
+            style={{
+              borderRadius: "24px",
+              padding: "1.15rem 1.2rem",
+              background: "linear-gradient(135deg, rgba(240,245,234,0.92), rgba(250,245,235,0.9))",
+              border: warmBorder,
+              boxShadow: "0 14px 32px rgba(49, 68, 38, 0.06)",
+              marginBottom: "1.2rem",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.35rem",
+                fontSize: "0.78rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#667260",
+                fontWeight: 700,
+              }}
+            >
+              Starter buying guide
+            </p>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "1.55rem",
+                lineHeight: 1.05,
+                letterSpacing: "-0.05em",
+                color: "#243323",
+              }}
+            >
+              Plan on {starterPlantCountLabel} for the first zone
+            </h2>
+            <p style={{ margin: "0.55rem 0 0", color: "#586653", lineHeight: 1.6 }}>
+              Use repeats and small drifts, not one of everything. The per-plant quantities
+              below are for the first bed or starter zone, not the whole yard at once.
+            </p>
+          </section>
+        )}
+
         {plantsLoading ? (
           <section
             style={{
@@ -1757,173 +2037,227 @@ export default function Plan() {
               marginBottom: "1.9rem",
             }}
           >
-            {plants.map((plant, index) => (
-              <article
-                key={plant.name}
-                style={{
-                  borderRadius: "24px",
-                  overflow: "hidden",
-                  background: "rgba(255,255,255,0.82)",
-                  border: warmBorder,
-                  boxShadow: "0 18px 44px rgba(42, 59, 32, 0.08)",
-                }}
-                className="plant-card fade-up"
-              >
-                {plant.image ? (
-                  <div style={{ position: "relative" }}>
-                    <Image
-                      src={plant.image}
-                      alt={plant.name}
-                      width={1200}
-                      height={680}
-                      style={{
-                        width: "100%",
-                        height: "220px",
-                        objectFit: "cover",
-                        display: "block",
-                      background: "#f3f3f3",
-                    }}
-                  />
-                  </div>
-                ) : null}
-                <div style={{ padding: "1.15rem" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      flexWrap: "wrap",
-                      marginBottom: "0.85rem",
-                    }}
-                  >
+            {plants.map((plant, index) => {
+              const guide = plantingGuides[index];
+
+              return (
+                <article
+                  key={plant.name}
+                  style={{
+                    borderRadius: "24px",
+                    overflow: "hidden",
+                    background: "rgba(255,255,255,0.82)",
+                    border: warmBorder,
+                    boxShadow: "0 18px 44px rgba(42, 59, 32, 0.08)",
+                  }}
+                  className="plant-card fade-up"
+                >
+                  {plant.image ? (
+                    <div style={{ position: "relative" }}>
+                      <Image
+                        src={plant.image}
+                        alt={plant.name}
+                        width={1200}
+                        height={680}
+                        style={{
+                          width: "100%",
+                          height: "220px",
+                          objectFit: "cover",
+                          display: "block",
+                          background: "#f3f3f3",
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                  <div style={{ padding: "1.15rem" }}>
                     <div
                       style={{
-                        display: "inline-flex",
+                        display: "flex",
                         alignItems: "center",
-                        justifyContent: "center",
-                        width: "2.3rem",
-                        height: "2.3rem",
-                        borderRadius: "999px",
-                        background: "rgba(237, 242, 231, 0.92)",
-                        color: "#2f4328",
-                        fontSize: "0.95rem",
-                        fontWeight: 700,
+                        gap: "0.5rem",
+                        flexWrap: "wrap",
+                        marginBottom: "0.85rem",
                       }}
                     >
-                      0{index + 1}
-                    </div>
-                    {plant.role && (
-                      <span
+                      <div
                         style={{
                           display: "inline-flex",
                           alignItems: "center",
+                          justifyContent: "center",
+                          width: "2.3rem",
+                          height: "2.3rem",
                           borderRadius: "999px",
-                          padding: "0.36rem 0.65rem",
-                          background: "rgba(235, 241, 229, 0.95)",
-                          color: "#42563d",
-                          fontSize: "0.8rem",
+                          background: "rgba(237, 242, 231, 0.92)",
+                          color: "#2f4328",
+                          fontSize: "0.95rem",
                           fontWeight: 700,
-                          letterSpacing: "0.04em",
-                          textTransform: "uppercase",
                         }}
                       >
-                        {plant.role}
-                      </span>
-                    )}
-                  </div>
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: "1.45rem",
-                      lineHeight: 1.02,
-                      letterSpacing: "-0.04em",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {plant.name}
-                  </h3>
-                  {plant.latin && (
-                    <p
+                        {String(index + 1).padStart(2, "0")}
+                      </div>
+                      {plant.role && (
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            borderRadius: "999px",
+                            padding: "0.36rem 0.65rem",
+                            background: "rgba(235, 241, 229, 0.95)",
+                            color: "#42563d",
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                            letterSpacing: "0.04em",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          {plant.role}
+                        </span>
+                      )}
+                    </div>
+                    <h3
                       style={{
-                        margin: "0.35rem 0 0.75rem",
-                        color: "#73806e",
-                        fontStyle: "italic",
+                        margin: 0,
+                        fontSize: "1.45rem",
+                        lineHeight: 1.02,
+                        letterSpacing: "-0.04em",
+                        fontWeight: 700,
                       }}
                     >
-                      {plant.latin}
+                      {plant.name}
+                    </h3>
+                    {plant.latin && (
+                      <p
+                        style={{
+                          margin: "0.35rem 0 0.75rem",
+                          color: "#73806e",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        {plant.latin}
+                      </p>
+                    )}
+                    <p
+                      style={{
+                        margin: "0 0 0.75rem",
+                        fontWeight: 600,
+                        color: "#35552d",
+                        lineHeight: 1.45,
+                        fontSize: "1rem",
+                      }}
+                    >
+                      {plant.benefit}
                     </p>
-                  )}
-                  <p
-                    style={{
-                      margin: "0 0 0.75rem",
-                      fontWeight: 600,
-                      color: "#35552d",
-                      lineHeight: 1.45,
-                      fontSize: "1rem",
-                    }}
-                  >
-                    {plant.benefit}
-                  </p>
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "#566453",
-                      lineHeight: 1.58,
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {plant.notes}
-                  </p>
-                  <div
-                    style={{
-                      marginTop: "0.85rem",
-                      paddingTop: "0.85rem",
-                      borderTop: "1px solid rgba(104, 130, 90, 0.12)",
-                    }}
-                  >
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
-                      {getPlantPreviewTags(plant).map((tag) => (
+                    {guide && (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "0.45rem",
+                          margin: "0 0 0.75rem",
+                        }}
+                      >
                         <span
-                          key={`${plant.name}-${tag}`}
                           style={{
                             display: "inline-flex",
                             alignItems: "center",
                             borderRadius: "999px",
                             padding: "0.38rem 0.65rem",
-                            background: "rgba(235, 241, 229, 0.95)",
-                            color: "#446040",
+                            background: "rgba(232, 240, 223, 0.92)",
+                            color: "#35512f",
+                            fontSize: "0.82rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          Buy {guide.quantityLabel}
+                        </span>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            borderRadius: "999px",
+                            padding: "0.38rem 0.65rem",
+                            background: "rgba(246, 242, 232, 0.96)",
+                            color: "#5b6250",
                             fontSize: "0.82rem",
                           }}
                         >
-                          {tag}
+                          {guide.spacing}
                         </span>
-                      ))}
-                    </div>
-                  </div>
-                  {plant.imageSourceUrl && (
-                    <div
+                      </div>
+                    )}
+                    <p
                       style={{
-                        marginTop: "0.8rem",
-                        fontSize: "0.85rem",
-                        color: "#687565",
+                        margin: 0,
+                        color: "#566453",
+                        lineHeight: 1.58,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
                       }}
                     >
-                      <a
-                        href={plant.imageSourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{ color: "#687565" }}
+                      {plant.notes}
+                    </p>
+                    {guide && (
+                      <p
+                        style={{
+                          margin: "0.7rem 0 0",
+                          color: "#4b5b46",
+                          lineHeight: 1.55,
+                          fontSize: "0.93rem",
+                        }}
                       >
-                        Photo source: {plant.imageSourceLabel}
-                      </a>
+                        {guide.grouping} Keep it in the {guide.zoneLabel.toLowerCase()}.
+                      </p>
+                    )}
+                    <div
+                      style={{
+                        marginTop: "0.85rem",
+                        paddingTop: "0.85rem",
+                        borderTop: "1px solid rgba(104, 130, 90, 0.12)",
+                      }}
+                    >
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.45rem" }}>
+                        {getPlantPreviewTags(plant).map((tag) => (
+                          <span
+                            key={`${plant.name}-${tag}`}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              borderRadius: "999px",
+                              padding: "0.38rem 0.65rem",
+                              background: "rgba(235, 241, 229, 0.95)",
+                              color: "#446040",
+                              fontSize: "0.82rem",
+                            }}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </article>
-            ))}
+                    {plant.imageSourceUrl && (
+                      <div
+                        style={{
+                          marginTop: "0.8rem",
+                          fontSize: "0.85rem",
+                          color: "#687565",
+                        }}
+                      >
+                        <a
+                          href={plant.imageSourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ color: "#687565" }}
+                        >
+                          Photo source: {plant.imageSourceLabel}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
           </section>
         )}
 
@@ -2152,9 +2486,9 @@ export default function Plan() {
                 color: "#687565",
                 fontWeight: 700,
               }}
-              >
-                First weekend plan
-              </p>
+            >
+              Weekend checklist
+            </p>
             <h2
               style={{
                 margin: "0 0 0.8rem",
@@ -2162,30 +2496,61 @@ export default function Plan() {
                 lineHeight: 1.03,
                 letterSpacing: "-0.05em",
               }}
-              >
-                Start with one bed
-              </h2>
+            >
+              What to do first
+            </h2>
             <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
-              {planDetails.sizeRange}. Go for momentum, not perfection.
+              {planDetails.sizeRange}. Start with one clear zone and let the rest of the
+              yard wait.
             </p>
             <div style={{ display: "grid", gap: "0.7rem" }}>
-              {[
-                `Choose a ${planDetails.sunLabel.toLowerCase()} area you can realistically maintain.`,
-                "Plant in loose clusters so the bed feels intentional quickly.",
-                planDetails.strategy,
-              ].map((step) => (
-                <div
-                  key={step}
+              {weekendChecklist.map((step, index) => (
+                <article
+                  key={step.title}
                   style={{
                     borderRadius: "16px",
                     background: "rgba(255,255,255,0.68)",
                     padding: "0.95rem 1rem",
                     color: "#41503f",
                     lineHeight: 1.55,
+                    display: "grid",
+                    gridTemplateColumns: "auto 1fr",
+                    gap: "0.8rem",
+                    alignItems: "start",
                   }}
                 >
-                  {step}
-                </div>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "2rem",
+                      height: "2rem",
+                      borderRadius: "999px",
+                      background: "rgba(232, 240, 223, 0.92)",
+                      color: "#31422d",
+                      fontWeight: 700,
+                      fontSize: "0.92rem",
+                    }}
+                  >
+                    {index + 1}
+                  </span>
+                  <div>
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: "1rem",
+                        lineHeight: 1.2,
+                        color: "#243323",
+                      }}
+                    >
+                      {step.title}
+                    </h3>
+                    <p style={{ margin: "0.3rem 0 0", color: "#5a6756", lineHeight: 1.55 }}>
+                      {step.detail}
+                    </p>
+                  </div>
+                </article>
               ))}
             </div>
           </section>
@@ -2329,6 +2694,79 @@ export default function Plan() {
             )}
           </section>
         </section>
+
+        {plants.length > 0 && (
+          <section
+            style={{
+              borderRadius: "26px",
+              padding: "1.5rem",
+              background: "rgba(247, 244, 234, 0.92)",
+              border: warmBorder,
+              marginTop: "1rem",
+              marginBottom: "0.5rem",
+            }}
+          >
+            <p
+              style={{
+                margin: "0 0 0.45rem",
+                fontSize: "0.82rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "#687565",
+                fontWeight: 700,
+              }}
+            >
+              First-season care
+            </p>
+            <h2
+              style={{
+                margin: "0 0 0.8rem",
+                fontSize: "1.9rem",
+                lineHeight: 1.03,
+                letterSpacing: "-0.05em",
+              }}
+            >
+              What to do after planting
+            </h2>
+            <p style={{ margin: "0 0 1rem", color: "#596655", lineHeight: 1.6 }}>
+              Keep the first season simple: help roots establish, keep weeds from taking
+              over, and let the patch start behaving like a living planting.
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                gap: "0.8rem",
+              }}
+            >
+              {firstSeasonCare.map((step) => (
+                <article
+                  key={step.title}
+                  style={{
+                    borderRadius: "18px",
+                    background: "rgba(255,255,255,0.72)",
+                    border: "1px solid rgba(104, 130, 90, 0.1)",
+                    padding: "1rem",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: "0 0 0.3rem",
+                      fontSize: "0.76rem",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "#6e7b69",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {step.title}
+                  </p>
+                  <p style={{ margin: 0, color: "#566453", lineHeight: 1.6 }}>{step.detail}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
       <style jsx>{`
         .fade-up {
