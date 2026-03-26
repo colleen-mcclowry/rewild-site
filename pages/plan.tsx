@@ -166,6 +166,25 @@ const seasonalMomentLabels: Record<SeasonalMoment["key"], string> = {
   structure: "Year-round",
 };
 
+const realGardenScenes = [
+  {
+    title: "Real garden, real momentum",
+    copy: "Not a render. Not a perfect meadow. Just one planted corner starting to feel alive.",
+    image: "/home/hero-garden.jpg",
+    tags: ["Real garden", "First patch", "Color + habitat"],
+  },
+  {
+    title: "Who shows up",
+    copy: "Butterflies and other pollinators start finding the flowers.",
+    image: "/home/hero-butterfly.jpg",
+  },
+  {
+    title: "Native bloom",
+    copy: "One pocket of bloom can make the whole yard feel more alive.",
+    image: "/home/hero-milkweed.jpg",
+  },
+] as const;
+
 const spaceImpactDetails: Record<
   SpacePreference,
   { footprint: string; areaNote: string; climateNote: string }
@@ -1308,6 +1327,229 @@ export default function Plan() {
         </section>
 
         <section
+          className="plan-real-garden"
+          style={{
+            borderRadius: "30px",
+            padding: "1rem",
+            background: "rgba(255,255,255,0.72)",
+            border: warmBorder,
+            boxShadow: "0 18px 40px rgba(59, 82, 42, 0.08)",
+            backdropFilter: "blur(14px)",
+            marginBottom: "1.55rem",
+          }}
+        >
+          <div
+            className="plan-real-garden-grid"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1.08fr) minmax(280px, 0.92fr)",
+              gap: "0.9rem",
+              alignItems: "stretch",
+            }}
+          >
+            <article
+              className="plan-real-garden-main"
+              style={{
+                borderRadius: "24px",
+                minHeight: "360px",
+                overflow: "hidden",
+                position: "relative",
+                color: "#f6f5ee",
+              }}
+            >
+              <Image
+                src={realGardenScenes[0].image}
+                alt={realGardenScenes[0].title}
+                fill
+                priority
+                sizes="(max-width: 920px) 100vw, 58vw"
+                style={{ objectFit: "cover" }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(180deg, rgba(15, 24, 18, 0.08) 0%, rgba(15, 24, 18, 0.32) 48%, rgba(15, 24, 18, 0.82) 100%)",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: "auto 1rem 1rem 1rem",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.76rem",
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "rgba(246,245,238,0.76)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Real Garden Cue
+                </p>
+                <h2
+                  style={{
+                    margin: "0.45rem 0 0",
+                    maxWidth: "24rem",
+                    fontSize: "clamp(1.95rem, 4vw, 2.75rem)",
+                    lineHeight: 0.98,
+                    letterSpacing: "-0.05em",
+                  }}
+                >
+                  {realGardenScenes[0].title}
+                </h2>
+                <p
+                  style={{
+                    margin: "0.6rem 0 0",
+                    maxWidth: "26rem",
+                    color: "rgba(246,245,238,0.84)",
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {realGardenScenes[0].copy}
+                </p>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "0.5rem",
+                    marginTop: "0.9rem",
+                  }}
+                >
+                  {realGardenScenes[0].tags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        borderRadius: "999px",
+                        padding: "0.42rem 0.68rem",
+                        background: "rgba(255,255,255,0.14)",
+                        backdropFilter: "blur(6px)",
+                        fontSize: "0.83rem",
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </article>
+
+            <div
+              className="plan-real-garden-side"
+              style={{
+                display: "grid",
+                gridTemplateRows: "minmax(0, 1fr) minmax(0, 1fr) auto",
+                gap: "0.8rem",
+              }}
+            >
+              {realGardenScenes.slice(1).map((scene) => (
+                <article
+                  key={scene.title}
+                  className="plan-real-garden-scene"
+                  style={{
+                    borderRadius: "24px",
+                    minHeight: "170px",
+                    position: "relative",
+                    overflow: "hidden",
+                    color: "#f6f5ee",
+                  }}
+                >
+                  <Image
+                    src={scene.image}
+                    alt={scene.title}
+                    fill
+                    sizes="(max-width: 920px) 100vw, 36vw"
+                    style={{ objectFit: "cover" }}
+                  />
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background:
+                        "linear-gradient(180deg, rgba(20, 29, 20, 0.06) 0%, rgba(20, 29, 20, 0.28) 48%, rgba(20, 29, 20, 0.78) 100%)",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: "auto 0.9rem 0.9rem 0.9rem",
+                    }}
+                  >
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: "1.15rem",
+                        lineHeight: 1.02,
+                        letterSpacing: "-0.04em",
+                      }}
+                    >
+                      {scene.title}
+                    </h3>
+                    <p
+                      style={{
+                        margin: "0.35rem 0 0",
+                        color: "rgba(246,245,238,0.82)",
+                        lineHeight: 1.45,
+                        fontSize: "0.94rem",
+                      }}
+                    >
+                      {scene.copy}
+                    </p>
+                  </div>
+                </article>
+              ))}
+
+              <article
+                style={{
+                  borderRadius: "24px",
+                  padding: "1rem",
+                  background:
+                    "linear-gradient(180deg, rgba(248, 250, 244, 0.96), rgba(243, 238, 226, 0.94))",
+                  border: "1px solid rgba(207, 216, 199, 0.9)",
+                  color: "#30422d",
+                }}
+              >
+                <p
+                  style={{
+                    margin: "0 0 0.35rem",
+                    fontSize: "0.75rem",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "#697867",
+                    fontWeight: 700,
+                  }}
+                >
+                  Ground Truth
+                </p>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "1.45rem",
+                    lineHeight: 1.03,
+                    letterSpacing: "-0.05em",
+                    color: "#243424",
+                  }}
+                >
+                  Your exact species may differ. The feeling should not.
+                </h3>
+                <p style={{ margin: "0.6rem 0 0", color: "#5b6a57", lineHeight: 1.55 }}>
+                  The plan is local to your yard. The goal is this same sense of color,
+                  movement, and life in one real patch.
+                </p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section
           className="refine-section"
           style={{
             borderRadius: "28px",
@@ -2124,6 +2366,18 @@ export default function Plan() {
             grid-template-columns: 1fr !important;
           }
 
+          .plan-real-garden-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .plan-real-garden-main {
+            min-height: 320px !important;
+          }
+
+          .plan-real-garden-side {
+            grid-template-rows: none !important;
+          }
+
           .plan-layout-grid,
           .plan-weekend-grid {
             grid-template-columns: 1fr !important;
@@ -2149,13 +2403,22 @@ export default function Plan() {
 
           .plan-hero,
           .plan-sidebar,
-          .refine-section {
+          .refine-section,
+          .plan-real-garden {
             border-radius: 24px !important;
             padding: 1.1rem !important;
           }
 
           .plan-hero-tags {
             gap: 0.45rem !important;
+          }
+
+          .plan-real-garden-main {
+            min-height: 280px !important;
+          }
+
+          .plan-real-garden-scene {
+            min-height: 180px !important;
           }
 
           .plan-action-group {
