@@ -723,6 +723,7 @@ export default function Home() {
             }}
           >
             <section
+              className="planner-form-panel"
               style={{
                 borderRadius: "30px",
                 padding: "1.15rem",
@@ -776,6 +777,7 @@ export default function Home() {
                 }}
               >
                 <section
+                  className="planner-form-card planner-form-card-wide"
                   style={{
                     gridColumn: "1 / -1",
                     borderRadius: "24px",
@@ -817,7 +819,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={handleLocation}
-                      className="cta-pop"
+                      className="cta-pop planner-location-button"
                       style={{
                         padding: "0.95rem 1.2rem",
                         fontSize: "0.98rem",
@@ -844,6 +846,7 @@ export default function Home() {
                       }}
                     >
                       <input
+                        className="planner-zip-input"
                         placeholder="Enter ZIP"
                         value={zip}
                         inputMode="numeric"
@@ -873,6 +876,7 @@ export default function Home() {
                       <button
                         type="button"
                         onClick={() => goWithZip()}
+                        className="planner-zip-button"
                         disabled={zip.length !== 5}
                         style={{
                           padding: "0.95rem 1rem",
@@ -898,6 +902,7 @@ export default function Home() {
                 </section>
 
                 <section
+                  className="planner-form-card"
                   style={{
                     borderRadius: "24px",
                     padding: "1rem",
@@ -941,6 +946,7 @@ export default function Home() {
                           key={option.value}
                           type="button"
                           onClick={() => setSun(option.value)}
+                          className="planner-choice-button"
                           style={{
                             textAlign: "left",
                             borderRadius: "18px",
@@ -987,6 +993,7 @@ export default function Home() {
                 </section>
 
                 <section
+                  className="planner-form-card"
                   style={{
                     borderRadius: "24px",
                     padding: "1rem",
@@ -1023,6 +1030,7 @@ export default function Home() {
                           key={option.value}
                           type="button"
                           onClick={() => setSpace(option.value)}
+                          className="planner-choice-button"
                           style={{
                             textAlign: "left",
                             borderRadius: "20px",
@@ -1053,6 +1061,7 @@ export default function Home() {
                 </section>
 
                 <section
+                  className="planner-form-card planner-form-card-wide"
                   style={{
                     gridColumn: "1 / -1",
                     borderRadius: "24px",
@@ -1097,6 +1106,7 @@ export default function Home() {
                           key={option.value}
                           type="button"
                           onClick={() => setGoal(option.value)}
+                          className="planner-choice-button"
                           style={{
                             textAlign: "left",
                             borderRadius: "18px",
@@ -1141,6 +1151,7 @@ export default function Home() {
             </section>
 
             <aside
+              className="planner-preview-panel"
               style={{
                 borderRadius: "30px",
                 padding: "1.1rem",
@@ -1224,6 +1235,7 @@ export default function Home() {
                 {impactPreviewCards.map((item) => (
                   <article
                     key={item.label}
+                    className="planner-impact-card"
                     style={{
                       borderRadius: "22px",
                       padding: "0.95rem",
@@ -1283,6 +1295,7 @@ export default function Home() {
               </div>
 
               <article
+                className="planner-summary-card"
                 style={{
                   marginTop: "0.9rem",
                   borderRadius: "24px",
@@ -1390,6 +1403,37 @@ export default function Home() {
           }
         }
 
+        @media (max-width: 1080px) {
+          .planner-body {
+            grid-template-columns: 1fr !important;
+          }
+
+          .planner-location-row {
+            flex-direction: column !important;
+          }
+
+          .planner-location-button {
+            width: 100% !important;
+          }
+
+          .planner-location-inline {
+            width: 100% !important;
+            flex: 1 1 auto !important;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .planner-form-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 820px) {
+          .planner-choice-grid-3 {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+        }
+
         @media (max-width: 720px) {
           main {
             overflow-x: clip;
@@ -1402,6 +1446,19 @@ export default function Home() {
           .planner-section {
             border-radius: 28px !important;
             padding: 1.15rem !important;
+          }
+
+          .planner-form-panel,
+          .planner-preview-panel {
+            border-radius: 24px !important;
+            padding: 1rem !important;
+          }
+
+          .planner-form-card,
+          .planner-impact-card,
+          .planner-summary-card {
+            border-radius: 20px !important;
+            padding: 0.95rem !important;
           }
 
           .hero-gallery-grid {
@@ -1430,6 +1487,10 @@ export default function Home() {
             flex-direction: column !important;
           }
 
+          .planner-location-inline {
+            gap: 0.55rem !important;
+          }
+
           .planner-location-inline button {
             width: 100% !important;
           }
@@ -1440,6 +1501,16 @@ export default function Home() {
 
           .planner-impact-grid {
             grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 560px) {
+          .planner-location-button,
+          .planner-zip-button,
+          .planner-zip-input,
+          .planner-choice-button {
+            padding-left: 0.9rem !important;
+            padding-right: 0.9rem !important;
           }
         }
       `}</style>
