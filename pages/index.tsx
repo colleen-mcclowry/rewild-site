@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 type SunPreference = "full-sun" | "part-shade" | "mostly-shade";
@@ -116,6 +116,13 @@ const goalPreviewCopy: Record<GoalPreference, string> = {
   "low-maintenance": "Start with a forgiving patch that feels lighter to care for over time.",
   "bird-habitat": "Start with layered shelter, seed, and more reasons for birds to stay.",
   color: "Start with a brighter patch that still works hard for habitat.",
+};
+
+const goalPreviewLabels: Record<GoalPreference, string> = {
+  pollinators: "Food first",
+  "low-maintenance": "Ease first",
+  "bird-habitat": "Shelter first",
+  color: "Color first",
 };
 
 function LightIcon({ type }: { type: SunPreference }) {
@@ -247,40 +254,86 @@ export default function Home() {
   const [sun, setSun] = useState<SunPreference>("full-sun");
   const [space, setSpace] = useState<SpacePreference>("small-patch");
   const [goal, setGoal] = useState<GoalPreference>("pollinators");
+  const [plannerStep, setPlannerStep] = useState(0);
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [geoCoords, setGeoCoords] = useState<{ lat: string; lon: string } | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const router = useRouter();
 
-  const buildPlanUrl = (params: Record<string, string>) => {
+  useEffect(() => {
+    if (!isPlannerOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isPlannerOpen]);
+
+  const hasZip = zip.length === 5;
+  const hasLocation = hasZip || Boolean(geoCoords);
+  const locationSummary = geoCoords ? "Current location" : hasZip ? `ZIP ${zip}` : "Choose patch";
+
+  const buildPlanUrl = () => {
     const search = new URLSearchParams({
-      ...params,
       sun,
       space,
       goal,
     });
 
+    if (geoCoords) {
+      search.set("lat", geoCoords.lat);
+      search.set("lon", geoCoords.lon);
+    } else if (hasZip) {
+      search.set("zip", zip);
+    }
+
     return `/plan?${search.toString()}`;
   };
 
-  const goWithZip = (value?: string) => {
-    const cleaned = (value ?? zip).trim();
+  const openPlanner = () => {
+    setLocationError(null);
+    setPlannerStep(hasLocation ? 1 : 0);
+    setIsPlannerOpen(true);
+  };
 
-    if (cleaned.length === 5) {
-      router.push(buildPlanUrl({ zip: cleaned }));
-    }
+  const closePlanner = () => {
+    setIsPlannerOpen(false);
+    setIsLocating(false);
+    setLocationError(null);
+  };
+
+  const handleZipChange = (value: string) => {
+    const cleaned = value.replace(/\D/g, "").slice(0, 5);
+    setZip(cleaned);
+    setGeoCoords(null);
+    setLocationError(null);
   };
 
   const handleLocation = () => {
+    setLocationError(null);
+
     if (!navigator.geolocation) {
-      alert("Geolocation not supported. Please enter your ZIP code instead.");
+      setLocationError("Geolocation isn't available here. Enter a ZIP instead.");
       return;
     }
 
+    setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        router.push(buildPlanUrl({ lat: String(latitude), lon: String(longitude) }));
+        setGeoCoords({ lat: String(latitude), lon: String(longitude) });
+        setZip("");
+        setIsLocating(false);
+        setPlannerStep(1);
       },
       () => {
-        alert("We couldn't access your location. Please enter your ZIP instead.");
+        setIsLocating(false);
+        setLocationError("We couldn't access your location. Enter a ZIP instead.");
       },
       {
         enableHighAccuracy: false,
@@ -288,9 +341,69 @@ export default function Home() {
       }
     );
   };
+
+  const goToNextPlannerStep = () => {
+    if (plannerStep === 0) {
+      if (!hasLocation) {
+        setLocationError("Choose your current location or enter a 5-digit ZIP.");
+        return;
+      }
+
+      setLocationError(null);
+      setPlannerStep(1);
+      return;
+    }
+
+    if (plannerStep === 3) {
+      closePlanner();
+      router.push(buildPlanUrl());
+      return;
+    }
+
+    setPlannerStep((current) => Math.min(current + 1, 3));
+  };
+
+  const goToPreviousPlannerStep = () => {
+    setLocationError(null);
+    setPlannerStep((current) => Math.max(current - 1, 0));
+  };
+
   const selectedSun = sunOptions.find((option) => option.value === sun) ?? sunOptions[0];
   const selectedSpace = spaceOptions.find((option) => option.value === space) ?? spaceOptions[0];
   const selectedGoal = goalOptions.find((option) => option.value === goal) ?? goalOptions[0];
+  const plannerFlowSteps = [
+    {
+      step: "Patch",
+      title: "Where is the patch?",
+      description: "We only use this to localize the plant list.",
+      value: locationSummary,
+    },
+    {
+      step: "Light",
+      title: "How much light?",
+      description: "Pick the light this patch gets most often.",
+      value: selectedSun.label,
+    },
+    {
+      step: "Size",
+      title: "How much space?",
+      description: "Choose a size that feels realistic for your first patch.",
+      value: selectedSpace.label,
+    },
+    {
+      step: "Focus",
+      title: "What do you want back most?",
+      description: "Choose the outcome you want this planting to lead with.",
+      value: selectedGoal.label,
+    },
+  ] as const;
+  const currentPlannerStep = plannerFlowSteps[plannerStep];
+  const plannerPreviewTags = [
+    hasLocation ? locationSummary : null,
+    selectedSun.label,
+    selectedSpace.label,
+    `${selectedGoal.label} focus`,
+  ].filter((item): item is string => Boolean(item));
 
   return (
     <main
@@ -676,11 +789,11 @@ export default function Home() {
             boxShadow: "0 32px 78px rgba(30, 46, 33, 0.18)",
             overflow: "hidden",
           }}
-        >
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
+          >
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
               top: "1rem",
               right: "1rem",
               width: "16rem",
@@ -713,16 +826,16 @@ export default function Home() {
             />
           </div>
 
-          <div
-            className="planner-body"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: "1rem",
-              alignItems: "start",
-            }}
-          >
-            <section
+            <div
+              className="planner-body"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)",
+                gap: "1rem",
+                alignItems: "start",
+              }}
+            >
+              <section
               className="planner-form-panel"
               style={{
                 borderRadius: "30px",
@@ -753,7 +866,7 @@ export default function Home() {
                     letterSpacing: "-0.05em",
                   }}
                 >
-                  Four simple choices. One patch to start.
+                  One guided path to a starter patch.
                 </h2>
                 <p
                   style={{
@@ -763,383 +876,221 @@ export default function Home() {
                     maxWidth: "34rem",
                   }}
                 >
-                  Set the patch, pick the light, choose the size, and tell us what you
-                  want back most.
+                  Answer one question at a time, then turn it into a local plan with
+                  layout and next steps.
                 </p>
               </div>
 
-              <div
-                className="planner-form-grid"
+              <article
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                  gap: "0.85rem",
+                  borderRadius: "26px",
+                  padding: "1.05rem",
+                  background:
+                    "linear-gradient(180deg, rgba(243, 221, 175, 0.16), rgba(255,255,255,0.05))",
+                  border: "1px solid rgba(243, 221, 175, 0.22)",
                 }}
               >
-                <section
-                  className="planner-form-card planner-form-card-wide"
+                <p
                   style={{
-                    gridColumn: "1 / -1",
-                    borderRadius: "24px",
-                    padding: "1rem",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
+                    margin: 0,
+                    fontSize: "0.76rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "rgba(248,245,236,0.58)",
+                    fontWeight: 700,
                   }}
                 >
+                  Guided planner
+                </p>
+                <h3
+                  style={{
+                    margin: "0.42rem 0 0",
+                    fontSize: "1.7rem",
+                    lineHeight: 0.98,
+                    letterSpacing: "-0.05em",
+                  }}
+                >
+                  {hasLocation ? "Continue where you left off." : "Start with the patch."}
+                </h3>
+                <p
+                  style={{
+                    margin: "0.65rem 0 0",
+                    color: "rgba(248,245,236,0.78)",
+                    lineHeight: 1.6,
+                    maxWidth: "28rem",
+                  }}
+                >
+                  {hasLocation
+                    ? "Your answers are already here. Open the guide to adjust them or build the full plan."
+                    : "We’ll ask about location, light, size, and the kind of life you want back most."}
+                </p>
+                <div
+                  className="planner-launch-row"
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "0.7rem",
+                    alignItems: "center",
+                    marginTop: "0.95rem",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={openPlanner}
+                    className="cta-pop planner-open-button"
+                    style={{
+                      padding: "0.98rem 1.2rem",
+                      fontSize: "0.98rem",
+                      fontWeight: 700,
+                      letterSpacing: "-0.02em",
+                      borderRadius: "18px",
+                      border: "none",
+                      backgroundColor: "#f3ddaf",
+                      color: "#213426",
+                      cursor: "pointer",
+                      boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
+                    }}
+                  >
+                    {hasLocation ? "Continue guided plan" : "Start guided plan"}
+                  </button>
                   <p
                     style={{
-                      margin: "0 0 0.3rem",
-                      fontSize: "0.78rem",
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      opacity: 0.76,
+                      margin: 0,
+                      color: "rgba(248,245,236,0.68)",
+                      lineHeight: 1.45,
+                      fontSize: "0.92rem",
                     }}
                   >
-                    1. Where is the patch?
+                    About 30 seconds. One question at a time.
                   </p>
-                  <p
-                    style={{
-                      margin: "0 0 0.85rem",
-                      color: "rgba(248,245,236,0.74)",
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    Use your location or type a ZIP. We only use this to localize the
-                    plant list.
-                  </p>
-                  <div
-                    className="planner-location-row"
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                      gap: "0.8rem",
-                      alignItems: "stretch",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={handleLocation}
-                      className="cta-pop planner-location-button"
-                      style={{
-                        padding: "0.95rem 1.2rem",
-                        fontSize: "0.98rem",
-                        fontWeight: 700,
-                        letterSpacing: "-0.02em",
-                        borderRadius: "18px",
-                        border: "none",
-                        backgroundColor: "#f3ddaf",
-                        color: "#213426",
-                        cursor: "pointer",
-                        boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
-                        width: "100%",
-                      }}
-                    >
-                      Use my location
-                    </button>
+                </div>
+              </article>
 
-                    <div
-                      className="planner-location-inline"
-                      style={{
-                        display: "flex",
-                        gap: "0.65rem",
-                        alignItems: "stretch",
-                        minWidth: 0,
-                      }}
-                    >
-                      <input
-                        className="planner-zip-input"
-                        placeholder="Enter ZIP"
-                        value={zip}
-                        inputMode="numeric"
-                        autoComplete="postal-code"
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-                          setZip(value);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && zip.length === 5) {
-                            e.preventDefault();
-                            goWithZip();
-                          }
-                        }}
+              <div style={{ marginTop: "1rem" }}>
+                <p
+                  style={{
+                    margin: "0 0 0.55rem",
+                    fontSize: "0.76rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "rgba(248,245,236,0.56)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Current answers
+                </p>
+                <div
+                  className="planner-summary-grid"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                    gap: "0.65rem",
+                  }}
+                >
+                  {plannerFlowSteps.map((item, index) => {
+                    const isLocationStep = index === 0;
+                    const isPending = isLocationStep && !hasLocation;
+
+                    return (
+                      <article
+                        key={item.step}
                         style={{
-                          flex: 1,
-                          minWidth: 0,
-                          padding: "0.95rem 1rem",
-                          fontSize: "1rem",
                           borderRadius: "18px",
-                          border: "1px solid rgba(255,255,255,0.14)",
-                          background: "rgba(255,255,255,0.08)",
-                          color: "#f8f5ec",
-                          outline: "none",
-                          width: "100%",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => goWithZip()}
-                        className="planner-zip-button"
-                        disabled={zip.length !== 5}
-                        style={{
-                          padding: "0.95rem 1rem",
-                          fontSize: "0.96rem",
-                          fontWeight: 700,
-                          borderRadius: "18px",
-                          border: "1px solid rgba(255,255,255,0.18)",
-                          background:
-                            zip.length === 5
-                              ? "rgba(255,255,255,0.12)"
-                              : "rgba(255,255,255,0.04)",
-                          color:
-                            zip.length === 5
-                              ? "#f8f5ec"
-                              : "rgba(248,245,236,0.42)",
-                          cursor: zip.length === 5 ? "pointer" : "default",
-                          flexShrink: 0,
+                          padding: "0.8rem 0.9rem",
+                          background: isPending
+                            ? "rgba(243, 221, 175, 0.12)"
+                            : "rgba(255,255,255,0.06)",
+                          border: isPending
+                            ? "1px solid rgba(243, 221, 175, 0.28)"
+                            : "1px solid rgba(255,255,255,0.1)",
                         }}
                       >
-                        Use ZIP
-                      </button>
-                    </div>
-                  </div>
-                </section>
-
-                <section
-                  className="planner-form-card"
-                  style={{
-                    borderRadius: "24px",
-                    padding: "1rem",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                  }}
-                >
-                  <p
-                    style={{
-                      margin: "0 0 0.3rem",
-                      fontSize: "0.78rem",
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      opacity: 0.76,
-                    }}
-                  >
-                    2. How much light?
-                  </p>
-                  <p
-                    style={{
-                      margin: "0 0 0.85rem",
-                      color: "rgba(248,245,236,0.74)",
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    Choose the light this patch gets most often.
-                  </p>
-                  <div
-                    className="planner-choice-grid planner-choice-grid-3"
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-                      gap: "0.7rem",
-                    }}
-                  >
-                    {sunOptions.map((option) => {
-                      const isActive = option.value === sun;
-
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => setSun(option.value)}
-                          className="planner-choice-button"
+                        <p
                           style={{
-                            textAlign: "left",
-                            borderRadius: "18px",
-                            border: isActive
-                              ? "1px solid rgba(243, 221, 175, 0.9)"
-                              : "1px solid rgba(255,255,255,0.14)",
-                            background: isActive
-                              ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
-                              : "rgba(255,255,255,0.06)",
-                            color: "#f8f5ec",
-                            padding: "0.85rem",
-                            cursor: "pointer",
-                            boxShadow: isActive
-                              ? "0 12px 26px rgba(19, 29, 21, 0.16)"
-                              : "none",
-                            minWidth: 0,
+                            margin: 0,
+                            fontSize: "0.72rem",
+                            letterSpacing: "0.1em",
+                            textTransform: "uppercase",
+                            color: "rgba(248,245,236,0.58)",
+                            fontWeight: 700,
                           }}
                         >
-                          <div
-                            style={{
-                              display: "inline-flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              width: "2.5rem",
-                              height: "2.5rem",
-                              borderRadius: "999px",
-                              marginBottom: "0.65rem",
-                              background: isActive
-                                ? "rgba(243, 221, 175, 0.18)"
-                                : "rgba(255,255,255,0.08)",
-                            }}
-                          >
-                            <LightIcon type={option.value} />
-                          </div>
-                          <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>
-                            {option.label}
-                          </div>
-                          <div style={{ fontSize: "0.88rem", opacity: 0.78, lineHeight: 1.45 }}>
-                            {option.notes}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </section>
-
-                <section
-                  className="planner-form-card"
-                  style={{
-                    borderRadius: "24px",
-                    padding: "1rem",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                  }}
-                >
-                  <p
-                    style={{
-                      margin: "0 0 0.3rem",
-                      fontSize: "0.78rem",
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      opacity: 0.76,
-                    }}
-                  >
-                    3. How much space?
-                  </p>
-                  <p
-                    style={{
-                      margin: "0 0 0.85rem",
-                      color: "rgba(248,245,236,0.74)",
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    Pick the scale that feels realistic for your first patch.
-                  </p>
-                  <div style={{ display: "grid", gap: "0.7rem" }}>
-                    {spaceOptions.map((option) => {
-                      const isActive = option.value === space;
-
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => setSpace(option.value)}
-                          className="planner-choice-button"
+                          {index + 1}. {item.step}
+                        </p>
+                        <p
                           style={{
-                            textAlign: "left",
-                            borderRadius: "20px",
-                            border: isActive
-                              ? "1px solid rgba(243, 221, 175, 0.9)"
-                              : "1px solid rgba(255,255,255,0.14)",
-                            background: isActive
-                              ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
-                              : "rgba(255,255,255,0.06)",
+                            margin: "0.32rem 0 0",
+                            fontSize: "1rem",
+                            lineHeight: 1.15,
                             color: "#f8f5ec",
-                            padding: "0.9rem 1rem",
-                            cursor: "pointer",
-                            boxShadow: isActive
-                              ? "0 12px 26px rgba(19, 29, 21, 0.16)"
-                              : "none",
+                            fontWeight: 700,
+                            letterSpacing: "-0.02em",
                           }}
                         >
-                          <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>
-                            {option.label}
-                          </div>
-                          <div style={{ fontSize: "0.9rem", opacity: 0.8, lineHeight: 1.5 }}>
-                            {option.notes}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </section>
+                          {item.value}
+                        </p>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
 
-                <section
-                  className="planner-form-card planner-form-card-wide"
-                  style={{
-                    gridColumn: "1 / -1",
-                    borderRadius: "24px",
-                    padding: "1rem",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                  }}
-                >
-                  <p
+              <div
+                className="planner-output-grid"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                  gap: "0.65rem",
+                  marginTop: "1rem",
+                }}
+              >
+                {[
+                  {
+                    label: "Local mix",
+                    copy: "Plants tuned to your patch and region.",
+                  },
+                  {
+                    label: "Simple layout",
+                    copy: "A starting arrangement you can actually plant.",
+                  },
+                  {
+                    label: "Weekend steps",
+                    copy: "Buying guide and first-season care.",
+                  },
+                ].map((item) => (
+                  <article
+                    key={item.label}
                     style={{
-                      margin: "0 0 0.3rem",
-                      fontSize: "0.78rem",
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      opacity: 0.76,
+                      borderRadius: "20px",
+                      padding: "0.9rem",
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.09)",
                     }}
                   >
-                    4. What do you want back most?
-                  </p>
-                  <p
-                    style={{
-                      margin: "0 0 0.85rem",
-                      color: "rgba(248,245,236,0.74)",
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    Choose the outcome you want this planting to lead with.
-                  </p>
-                  <div
-                    className="planner-choice-grid planner-choice-grid-2"
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                      gap: "0.7rem",
-                    }}
-                  >
-                    {goalOptions.map((option) => {
-                      const isActive = option.value === goal;
-
-                      return (
-                        <button
-                          key={option.value}
-                          type="button"
-                          onClick={() => setGoal(option.value)}
-                          className="planner-choice-button"
-                          style={{
-                            textAlign: "left",
-                            borderRadius: "18px",
-                            border: isActive
-                              ? "1px solid rgba(243, 221, 175, 0.9)"
-                              : "1px solid rgba(255,255,255,0.14)",
-                            background: isActive
-                              ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.08))"
-                              : "rgba(255,255,255,0.06)",
-                            color: "#f8f5ec",
-                            padding: "0.9rem 1rem",
-                            cursor: "pointer",
-                            boxShadow: isActive
-                              ? "0 12px 26px rgba(19, 29, 21, 0.16)"
-                              : "none",
-                            minWidth: 0,
-                          }}
-                        >
-                          <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>
-                            {option.label}
-                          </div>
-                          <div style={{ fontSize: "0.88rem", opacity: 0.8, lineHeight: 1.45 }}>
-                            {option.notes}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </section>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.74rem",
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        color: "rgba(248,245,236,0.56)",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {item.label}
+                    </p>
+                    <p
+                      style={{
+                        margin: "0.42rem 0 0",
+                        color: "#f8f5ec",
+                        lineHeight: 1.5,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {item.copy}
+                    </p>
+                  </article>
+                ))}
               </div>
 
               <p
@@ -1150,7 +1101,7 @@ export default function Home() {
                   fontSize: "0.92rem",
                 }}
               >
-                You can refine the mix again on the next screen without losing your
+                You can still refine the mix on the next screen without losing your
                 location.
               </p>
             </section>
@@ -1175,7 +1126,7 @@ export default function Home() {
                   color: "rgba(248,245,236,0.72)",
                 }}
               >
-                What rewilding does
+                Patch preview
               </p>
               <h2
                 style={{
@@ -1194,9 +1145,54 @@ export default function Home() {
                   lineHeight: 1.6,
                 }}
               >
-                Swap some lawn for native plants and you start bringing back food,
-                shelter, and seasonal life.
+                A starter patch can begin feeding, sheltering, and softening the yard
+                faster than people expect.
               </p>
+
+              <article
+                className="planner-preview-highlight"
+                style={{
+                  marginTop: "0.85rem",
+                  borderRadius: "24px",
+                  padding: "1rem",
+                  background:
+                    "linear-gradient(180deg, rgba(243, 221, 175, 0.16), rgba(255,255,255,0.05))",
+                  border: "1px solid rgba(243, 221, 175, 0.22)",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.72rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "rgba(248,245,236,0.56)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Start with
+                </p>
+                <h3
+                  style={{
+                    margin: "0.35rem 0 0",
+                    color: "#f8f5ec",
+                    lineHeight: 1,
+                    fontSize: "1.5rem",
+                    letterSpacing: "-0.04em",
+                  }}
+                >
+                  {goalPreviewLabels[goal]}
+                </h3>
+                <p
+                  style={{
+                    margin: "0.55rem 0 0",
+                    color: "rgba(248,245,236,0.82)",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {goalPreviewCopy[goal]}
+                </p>
+              </article>
 
               <div
                 style={{
@@ -1206,98 +1202,186 @@ export default function Home() {
                   marginTop: "0.9rem",
                 }}
               >
-                {[selectedSun.label, selectedSpace.label, `${selectedGoal.label} focus`].map(
-                  (item) => (
-                    <span
-                      key={item}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        borderRadius: "999px",
-                        padding: "0.42rem 0.68rem",
-                        background: "rgba(255,255,255,0.1)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        color: "#f8f5ec",
-                        fontSize: "0.84rem",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {item}
-                    </span>
-                  )
-                )}
-              </div>
-
-              <div
-                className="planner-impact-grid"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                  gap: "0.75rem",
-                  marginTop: "1rem",
-                }}
-              >
-                {impactPreviewCards.map((item) => (
-                  <article
-                    key={item.label}
-                    className="planner-impact-card"
+                {plannerPreviewTags.map((item) => (
+                  <span
+                    key={item}
                     style={{
-                      borderRadius: "22px",
-                      padding: "0.95rem",
-                      background: "rgba(255,255,255,0.08)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      borderRadius: "999px",
+                      padding: "0.42rem 0.68rem",
+                      background: "rgba(255,255,255,0.1)",
                       border: "1px solid rgba(255,255,255,0.1)",
+                      color: "#f8f5ec",
+                      fontSize: "0.84rem",
+                      fontWeight: 600,
                     }}
                   >
-                    <div
-                      style={{
-                        width: "2.8rem",
-                        height: "2.8rem",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: "999px",
-                        background: "rgba(243, 221, 175, 0.14)",
-                        marginBottom: "0.7rem",
-                      }}
-                    >
-                      <StoryGlyph kind={item.kind} />
-                    </div>
-                    <p
-                      style={{
-                        margin: "0 0 0.2rem",
-                        fontSize: "0.76rem",
-                        letterSpacing: "0.1em",
-                        textTransform: "uppercase",
-                        color: "rgba(248,245,236,0.66)",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {item.label}
-                    </p>
+                    {item}
+                  </span>
+                ))}
+              </div>
+
+              <details
+                className="planner-disclosure"
+                style={{
+                  marginTop: "1rem",
+                  borderRadius: "24px",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  overflow: "hidden",
+                }}
+              >
+                <summary
+                  style={{
+                    listStyle: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "0.9rem",
+                    padding: "1rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div>
                     <p
                       style={{
                         margin: 0,
-                        fontSize: "1.02rem",
-                        lineHeight: 1.1,
-                        letterSpacing: "-0.03em",
+                        fontSize: "0.72rem",
+                        letterSpacing: "0.1em",
+                        textTransform: "uppercase",
+                        color: "rgba(248,245,236,0.56)",
                         fontWeight: 700,
                       }}
                     >
-                      {item.value}
+                      What starts shifting
                     </p>
                     <p
                       style={{
-                        margin: "0.45rem 0 0",
-                        color: "rgba(248,245,236,0.68)",
-                        lineHeight: 1.5,
-                        fontSize: "0.88rem",
+                        margin: "0.32rem 0 0",
+                        color: "#f8f5ec",
+                        fontWeight: 700,
+                        fontSize: "1.12rem",
+                        letterSpacing: "-0.03em",
                       }}
                     >
-                      {item.copy}
+                      Bloom. Buzz. Birds. Shelter.
                     </p>
-                  </article>
-                ))}
-              </div>
+                    <p
+                      style={{
+                        margin: "0.38rem 0 0",
+                        color: "rgba(248,245,236,0.68)",
+                        lineHeight: 1.5,
+                        fontSize: "0.92rem",
+                      }}
+                    >
+                      Open the layers this patch can start to support.
+                    </p>
+                  </div>
+                  <span
+                    className="planner-disclosure-chevron"
+                    aria-hidden="true"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "2.3rem",
+                      height: "2.3rem",
+                      borderRadius: "999px",
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      flexShrink: 0,
+                      transition: "transform 180ms ease",
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path
+                        d="M4 6.2 8 10l4-3.8"
+                        stroke="#f8f5ec"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </summary>
+
+                <div
+                  style={{
+                    padding: "0 1rem 1rem",
+                  }}
+                >
+                  <div
+                    className="planner-impact-grid"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                      gap: "0.75rem",
+                    }}
+                  >
+                    {impactPreviewCards.map((item) => (
+                      <article
+                        key={item.label}
+                        className="planner-impact-card"
+                        style={{
+                          borderRadius: "20px",
+                          padding: "0.95rem",
+                          background: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "2.8rem",
+                            height: "2.8rem",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "999px",
+                            background: "rgba(243, 221, 175, 0.14)",
+                            marginBottom: "0.7rem",
+                          }}
+                        >
+                          <StoryGlyph kind={item.kind} />
+                        </div>
+                        <p
+                          style={{
+                            margin: "0 0 0.2rem",
+                            fontSize: "0.76rem",
+                            letterSpacing: "0.1em",
+                            textTransform: "uppercase",
+                            color: "rgba(248,245,236,0.66)",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {item.label}
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: "1.02rem",
+                            lineHeight: 1.1,
+                            letterSpacing: "-0.03em",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {item.value}
+                        </p>
+                        <p
+                          style={{
+                            margin: "0.45rem 0 0",
+                            fontSize: "0.88rem",
+                            lineHeight: 1.5,
+                            color: "rgba(248,245,236,0.72)",
+                          }}
+                        >
+                          {item.copy}
+                        </p>
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              </details>
 
               <article
                 className="planner-summary-card"
@@ -1321,26 +1405,602 @@ export default function Home() {
                     fontWeight: 700,
                   }}
                 >
-                  What comes back
+                  Next, we make it real
                 </p>
                 <h3
                   style={{
                     margin: 0,
-                    fontSize: "1.6rem",
+                    fontSize: "1.45rem",
                     lineHeight: 1,
                     letterSpacing: "-0.05em",
                     color: "#203126",
                   }}
                 >
-                  Bloom. Buzz. Birds. Shelter.
+                  Plants, layout, and weekend steps.
                 </h3>
-                <p style={{ margin: "0.55rem 0 0", color: "#556451", lineHeight: 1.6 }}>
-                  {goalPreviewCopy[goal]}
+                <p
+                  style={{
+                    margin: "0.55rem 0 0",
+                    color: "#556451",
+                    lineHeight: 1.6,
+                  }}
+                >
+                  The full plan turns this starter patch into a plant mix, buying
+                  guide, and first-season care.
                 </p>
               </article>
             </aside>
           </div>
         </section>
+
+        {isPlannerOpen ? (
+          <div
+            className="planner-modal-backdrop"
+            onClick={closePlanner}
+            role="presentation"
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 50,
+              background: "rgba(13, 18, 14, 0.52)",
+              backdropFilter: "blur(10px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "1rem",
+            }}
+          >
+            <div
+              className="planner-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="planner-modal-title"
+              onClick={(event) => event.stopPropagation()}
+              style={{
+                width: "min(780px, 100%)",
+                maxHeight: "calc(100vh - 2rem)",
+                overflow: "auto",
+                borderRadius: "32px",
+                padding: "1.1rem",
+                background:
+                  "linear-gradient(180deg, rgba(25, 43, 31, 0.98), rgba(49, 79, 50, 0.96))",
+                border: "1px solid rgba(255,255,255,0.14)",
+                boxShadow: "0 34px 90px rgba(12, 20, 15, 0.34)",
+                color: "#f8f5ec",
+              }}
+            >
+              <div
+                className="planner-modal-header"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "1rem",
+                  alignItems: "flex-start",
+                }}
+              >
+                <div>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.76rem",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      color: "rgba(248,245,236,0.58)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Guided planner
+                  </p>
+                  <h3
+                    id="planner-modal-title"
+                    style={{
+                      margin: "0.45rem 0 0",
+                      fontSize: "clamp(1.8rem, 4vw, 2.4rem)",
+                      lineHeight: 0.98,
+                      letterSpacing: "-0.05em",
+                    }}
+                  >
+                    {currentPlannerStep.title}
+                  </h3>
+                  <p
+                    style={{
+                      margin: "0.55rem 0 0",
+                      color: "rgba(248,245,236,0.76)",
+                      lineHeight: 1.6,
+                      maxWidth: "32rem",
+                    }}
+                  >
+                    {currentPlannerStep.description}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closePlanner}
+                  aria-label="Close guided planner"
+                  style={{
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    background: "rgba(255,255,255,0.05)",
+                    color: "#f8f5ec",
+                    width: "2.7rem",
+                    height: "2.7rem",
+                    borderRadius: "999px",
+                    cursor: "pointer",
+                    fontSize: "1.15rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div
+                className="planner-modal-progress"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                  gap: "0.6rem",
+                  marginTop: "1rem",
+                }}
+              >
+                {plannerFlowSteps.map((item, index) => {
+                  const isActive = index === plannerStep;
+                  const isComplete = index < plannerStep || (index === 0 && hasLocation);
+
+                  return (
+                    <article
+                      key={item.step}
+                      style={{
+                        borderRadius: "16px",
+                        padding: "0.75rem 0.8rem",
+                        background: isActive
+                          ? "rgba(243, 221, 175, 0.16)"
+                          : "rgba(255,255,255,0.05)",
+                        border: isActive
+                          ? "1px solid rgba(243, 221, 175, 0.3)"
+                          : "1px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "0.72rem",
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                          color: isActive || isComplete
+                            ? "rgba(248,245,236,0.78)"
+                            : "rgba(248,245,236,0.48)",
+                          fontWeight: 700,
+                        }}
+                      >
+                        {index + 1}. {item.step}
+                      </p>
+                      <p
+                        style={{
+                          margin: "0.28rem 0 0",
+                          color: "#f8f5ec",
+                          fontWeight: 700,
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {item.value}
+                      </p>
+                    </article>
+                  );
+                })}
+              </div>
+
+              <div style={{ marginTop: "1rem" }}>
+                {plannerStep === 0 ? (
+                  <div
+                    className="planner-modal-option-grid planner-modal-option-grid-2"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                      gap: "0.8rem",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={handleLocation}
+                      disabled={isLocating}
+                      style={{
+                        textAlign: "left",
+                        borderRadius: "24px",
+                        padding: "1rem",
+                        border: geoCoords
+                          ? "1px solid rgba(243, 221, 175, 0.34)"
+                          : "1px solid rgba(255,255,255,0.12)",
+                        background: geoCoords
+                          ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.06))"
+                          : "rgba(255,255,255,0.05)",
+                        color: "#f8f5ec",
+                        cursor: isLocating ? "progress" : "pointer",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "0.72rem",
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                          color: "rgba(248,245,236,0.56)",
+                          fontWeight: 700,
+                        }}
+                      >
+                        Fastest route
+                      </p>
+                      <h4
+                        style={{
+                          margin: "0.42rem 0 0",
+                          fontSize: "1.35rem",
+                          lineHeight: 1.02,
+                          letterSpacing: "-0.04em",
+                        }}
+                      >
+                        {isLocating
+                          ? "Finding your patch..."
+                          : geoCoords
+                            ? "Using current location"
+                            : "Use current location"}
+                      </h4>
+                      <p
+                        style={{
+                          margin: "0.55rem 0 0",
+                          color: "rgba(248,245,236,0.76)",
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        Let the planner localize the plant list from where the patch
+                        actually is.
+                      </p>
+                    </button>
+
+                    <div
+                      style={{
+                        borderRadius: "24px",
+                        padding: "1rem",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        background: "rgba(255,255,255,0.05)",
+                      }}
+                    >
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "0.72rem",
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                          color: "rgba(248,245,236,0.56)",
+                          fontWeight: 700,
+                        }}
+                      >
+                        Manual option
+                      </p>
+                      <label
+                        htmlFor="planner-zip"
+                        style={{
+                          display: "block",
+                          marginTop: "0.42rem",
+                          fontSize: "1.35rem",
+                          fontWeight: 700,
+                          letterSpacing: "-0.04em",
+                        }}
+                      >
+                        Enter ZIP
+                      </label>
+                      <input
+                        id="planner-zip"
+                        value={zip}
+                        inputMode="numeric"
+                        autoComplete="postal-code"
+                        placeholder="5-digit ZIP"
+                        onChange={(event) => handleZipChange(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" && hasZip) {
+                            event.preventDefault();
+                            goToNextPlannerStep();
+                          }
+                        }}
+                        style={{
+                          width: "100%",
+                          marginTop: "0.7rem",
+                          padding: "0.95rem 1rem",
+                          borderRadius: "18px",
+                          border: "1px solid rgba(255,255,255,0.14)",
+                          background: "rgba(255,255,255,0.08)",
+                          color: "#f8f5ec",
+                          fontSize: "1rem",
+                          outline: "none",
+                        }}
+                      />
+                      <p
+                        style={{
+                          margin: "0.55rem 0 0",
+                          color: "rgba(248,245,236,0.72)",
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        Best if you know the ZIP where the patch sits. Continue once
+                        it looks right.
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {plannerStep === 1 ? (
+                  <div
+                    className="planner-modal-option-grid planner-modal-option-grid-3"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(165px, 1fr))",
+                      gap: "0.75rem",
+                    }}
+                  >
+                    {sunOptions.map((option) => {
+                      const isActive = option.value === sun;
+
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setSun(option.value)}
+                          style={{
+                            textAlign: "left",
+                            borderRadius: "22px",
+                            padding: "1rem",
+                            border: isActive
+                              ? "1px solid rgba(243, 221, 175, 0.34)"
+                              : "1px solid rgba(255,255,255,0.12)",
+                            background: isActive
+                              ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.06))"
+                              : "rgba(255,255,255,0.05)",
+                            color: "#f8f5ec",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "2.7rem",
+                              height: "2.7rem",
+                              borderRadius: "999px",
+                              background: isActive
+                                ? "rgba(243, 221, 175, 0.18)"
+                                : "rgba(255,255,255,0.08)",
+                              marginBottom: "0.75rem",
+                            }}
+                          >
+                            <LightIcon type={option.value} />
+                          </div>
+                          <div style={{ fontWeight: 700, fontSize: "1.02rem" }}>
+                            {option.label}
+                          </div>
+                          <p
+                            style={{
+                              margin: "0.42rem 0 0",
+                              color: "rgba(248,245,236,0.74)",
+                              lineHeight: 1.55,
+                            }}
+                          >
+                            {option.notes}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+
+                {plannerStep === 2 ? (
+                  <div
+                    className="planner-modal-option-grid planner-modal-option-grid-3"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                      gap: "0.75rem",
+                    }}
+                  >
+                    {spaceOptions.map((option) => {
+                      const isActive = option.value === space;
+
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setSpace(option.value)}
+                          style={{
+                            textAlign: "left",
+                            borderRadius: "22px",
+                            padding: "1rem",
+                            border: isActive
+                              ? "1px solid rgba(243, 221, 175, 0.34)"
+                              : "1px solid rgba(255,255,255,0.12)",
+                            background: isActive
+                              ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.06))"
+                              : "rgba(255,255,255,0.05)",
+                            color: "#f8f5ec",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <div style={{ fontWeight: 700, fontSize: "1.02rem" }}>
+                            {option.label}
+                          </div>
+                          <p
+                            style={{
+                              margin: "0.48rem 0 0",
+                              color: "rgba(248,245,236,0.74)",
+                              lineHeight: 1.55,
+                            }}
+                          >
+                            {option.notes}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+
+                {plannerStep === 3 ? (
+                  <div
+                    className="planner-modal-option-grid planner-modal-option-grid-2"
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                      gap: "0.75rem",
+                    }}
+                  >
+                    {goalOptions.map((option) => {
+                      const isActive = option.value === goal;
+
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setGoal(option.value)}
+                          style={{
+                            textAlign: "left",
+                            borderRadius: "22px",
+                            padding: "1rem",
+                            border: isActive
+                              ? "1px solid rgba(243, 221, 175, 0.34)"
+                              : "1px solid rgba(255,255,255,0.12)",
+                            background: isActive
+                              ? "linear-gradient(180deg, rgba(243, 221, 175, 0.18), rgba(255,255,255,0.06))"
+                              : "rgba(255,255,255,0.05)",
+                            color: "#f8f5ec",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <div style={{ fontWeight: 700, fontSize: "1.02rem" }}>
+                            {option.label}
+                          </div>
+                          <p
+                            style={{
+                              margin: "0.48rem 0 0",
+                              color: "rgba(248,245,236,0.74)",
+                              lineHeight: 1.55,
+                            }}
+                          >
+                            {option.notes}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              <article
+                style={{
+                  marginTop: "0.95rem",
+                  borderRadius: "22px",
+                  padding: "0.95rem 1rem",
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.72rem",
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    color: "rgba(248,245,236,0.56)",
+                    fontWeight: 700,
+                  }}
+                >
+                  Current choice
+                </p>
+                <p
+                  style={{
+                    margin: "0.35rem 0 0",
+                    color: "#f8f5ec",
+                    lineHeight: 1.55,
+                  }}
+                >
+                  <strong>{currentPlannerStep.value}</strong>
+                  {plannerStep === 1 ? `. ${selectedSun.notes}` : null}
+                  {plannerStep === 2 ? `. ${selectedSpace.notes}` : null}
+                  {plannerStep === 3 ? `. ${selectedGoal.notes}` : null}
+                  {plannerStep === 0 && hasLocation
+                    ? ". This is the patch we will localize the plant list for."
+                    : null}
+                </p>
+              </article>
+
+              {locationError ? (
+                <p
+                  style={{
+                    margin: "0.85rem 0 0",
+                    color: "#f3ddaf",
+                    lineHeight: 1.5,
+                    fontWeight: 600,
+                  }}
+                >
+                  {locationError}
+                </p>
+              ) : null}
+
+              <div
+                className="planner-modal-footer"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "0.8rem",
+                  alignItems: "center",
+                  marginTop: "1rem",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={plannerStep === 0 ? closePlanner : goToPreviousPlannerStep}
+                  style={{
+                    padding: "0.95rem 1rem",
+                    borderRadius: "18px",
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    background: "rgba(255,255,255,0.05)",
+                    color: "#f8f5ec",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {plannerStep === 0 ? "Close" : "Back"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={goToNextPlannerStep}
+                  disabled={plannerStep === 0 && (!hasLocation || isLocating)}
+                  style={{
+                    padding: "0.95rem 1.15rem",
+                    borderRadius: "18px",
+                    border: "none",
+                    background:
+                      plannerStep === 0 && (!hasLocation || isLocating)
+                        ? "rgba(255,255,255,0.08)"
+                        : "#f3ddaf",
+                    color:
+                      plannerStep === 0 && (!hasLocation || isLocating)
+                        ? "rgba(248,245,236,0.42)"
+                        : "#213426",
+                    fontWeight: 700,
+                    cursor:
+                      plannerStep === 0 && (!hasLocation || isLocating)
+                        ? "default"
+                        : "pointer",
+                    boxShadow:
+                      plannerStep === 0 && (!hasLocation || isLocating)
+                        ? "none"
+                        : "0 18px 36px rgba(15, 24, 17, 0.18)",
+                  }}
+                >
+                  {plannerStep === 3 ? "Build my plan" : "Continue"}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
       </div>
 
@@ -1387,6 +2047,18 @@ export default function Home() {
           filter: saturate(1.02);
         }
 
+        .planner-disclosure summary::-webkit-details-marker {
+          display: none;
+        }
+
+        .planner-disclosure summary {
+          list-style: none;
+        }
+
+        .planner-disclosure[open] .planner-disclosure-chevron {
+          transform: rotate(180deg);
+        }
+
         @keyframes fadeUp {
           from {
             opacity: 0;
@@ -1408,6 +2080,12 @@ export default function Home() {
           }
         }
 
+        @media (max-width: 980px) {
+          .planner-body {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
         @media (max-width: 720px) {
           main {
             overflow-x: clip;
@@ -1423,12 +2101,12 @@ export default function Home() {
           }
 
           .planner-form-panel,
-          .planner-preview-panel {
+          .planner-preview-panel,
+          .planner-modal {
             border-radius: 24px !important;
             padding: 1rem !important;
           }
 
-          .planner-form-card,
           .planner-impact-card,
           .planner-summary-card {
             border-radius: 20px !important;
@@ -1451,35 +2129,48 @@ export default function Home() {
             min-height: 210px !important;
           }
 
-          .planner-location-row,
-          .planner-location-inline {
+          .planner-launch-row,
+          .planner-modal-header,
+          .planner-modal-footer {
             flex-direction: column !important;
-            grid-template-columns: 1fr !important;
+            align-items: stretch !important;
           }
 
-          .planner-location-inline {
-            gap: 0.55rem !important;
-          }
-
-          .planner-location-inline button {
+          .planner-open-button {
             width: 100% !important;
           }
 
-          .planner-choice-grid-3,
-          .planner-choice-grid-2,
+          .planner-modal-backdrop {
+            padding: 0.7rem !important;
+            align-items: flex-end !important;
+          }
+
+          .planner-modal {
+            width: 100% !important;
+            max-height: calc(100vh - 0.7rem) !important;
+          }
+
+          .planner-modal-progress {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          }
+
+          .planner-modal-option-grid-2,
+          .planner-modal-option-grid-3,
           .planner-impact-grid,
-          .planner-form-grid {
+          .planner-summary-grid,
+          .planner-output-grid {
             grid-template-columns: 1fr !important;
           }
         }
 
         @media (max-width: 560px) {
-          .planner-location-button,
-          .planner-zip-button,
-          .planner-zip-input,
-          .planner-choice-button {
-            padding-left: 0.9rem !important;
-            padding-right: 0.9rem !important;
+          .planner-modal-progress {
+            grid-template-columns: 1fr !important;
+          }
+
+          .planner-section,
+          .planner-modal {
+            padding: 0.95rem !important;
           }
         }
       `}</style>
