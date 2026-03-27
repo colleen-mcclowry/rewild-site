@@ -350,7 +350,7 @@ export default function Home() {
               color: "#52624d",
             }}
           >
-            Three choices. One starter patch. A native habitat plan shaped to your yard.
+            Turn a small patch into a thriving habitat.
           </p>
           <div
             className="hero-chip-row"
