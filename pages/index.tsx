@@ -717,7 +717,7 @@ export default function Home() {
             className="planner-body"
             style={{
               display: "grid",
-              gridTemplateColumns: "minmax(0, 1.08fr) minmax(300px, 0.92fr)",
+              gridTemplateColumns: "1fr",
               gap: "1rem",
               alignItems: "start",
             }}
@@ -772,7 +772,7 @@ export default function Home() {
                 className="planner-form-grid"
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
                   gap: "0.85rem",
                 }}
               >
@@ -810,10 +810,10 @@ export default function Home() {
                   <div
                     className="planner-location-row"
                     style={{
-                      display: "flex",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
                       gap: "0.8rem",
                       alignItems: "stretch",
-                      flexWrap: "wrap",
                     }}
                   >
                     <button
@@ -831,6 +831,7 @@ export default function Home() {
                         color: "#213426",
                         cursor: "pointer",
                         boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
+                        width: "100%",
                       }}
                     >
                       Use my location
@@ -842,7 +843,7 @@ export default function Home() {
                         display: "flex",
                         gap: "0.65rem",
                         alignItems: "stretch",
-                        flex: "1 1 280px",
+                        minWidth: 0,
                       }}
                     >
                       <input
@@ -871,6 +872,7 @@ export default function Home() {
                           background: "rgba(255,255,255,0.08)",
                           color: "#f8f5ec",
                           outline: "none",
+                          width: "100%",
                         }}
                       />
                       <button
@@ -893,6 +895,7 @@ export default function Home() {
                               ? "#f8f5ec"
                               : "rgba(248,245,236,0.42)",
                           cursor: zip.length === 5 ? "pointer" : "default",
+                          flexShrink: 0,
                         }}
                       >
                         Use ZIP
@@ -934,7 +937,7 @@ export default function Home() {
                     className="planner-choice-grid planner-choice-grid-3"
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
                       gap: "0.7rem",
                     }}
                   >
@@ -962,6 +965,7 @@ export default function Home() {
                             boxShadow: isActive
                               ? "0 12px 26px rgba(19, 29, 21, 0.16)"
                               : "none",
+                            minWidth: 0,
                           }}
                         >
                           <div
@@ -1094,7 +1098,7 @@ export default function Home() {
                     className="planner-choice-grid planner-choice-grid-2"
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
                       gap: "0.7rem",
                     }}
                   >
@@ -1122,6 +1126,7 @@ export default function Home() {
                             boxShadow: isActive
                               ? "0 12px 26px rgba(19, 29, 21, 0.16)"
                               : "none",
+                            minWidth: 0,
                           }}
                         >
                           <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>
@@ -1227,7 +1232,7 @@ export default function Home() {
                 className="planner-impact-grid"
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
                   gap: "0.75rem",
                   marginTop: "1rem",
                 }}
@@ -1403,37 +1408,6 @@ export default function Home() {
           }
         }
 
-        @media (max-width: 1080px) {
-          .planner-body {
-            grid-template-columns: 1fr !important;
-          }
-
-          .planner-location-row {
-            flex-direction: column !important;
-          }
-
-          .planner-location-button {
-            width: 100% !important;
-          }
-
-          .planner-location-inline {
-            width: 100% !important;
-            flex: 1 1 auto !important;
-          }
-        }
-
-        @media (max-width: 900px) {
-          .planner-form-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
-
-        @media (max-width: 820px) {
-          .planner-choice-grid-3 {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          }
-        }
-
         @media (max-width: 720px) {
           main {
             overflow-x: clip;
@@ -1477,14 +1451,10 @@ export default function Home() {
             min-height: 210px !important;
           }
 
-          .planner-body,
-          .planner-form-grid {
-            grid-template-columns: 1fr !important;
-          }
-
           .planner-location-row,
           .planner-location-inline {
             flex-direction: column !important;
+            grid-template-columns: 1fr !important;
           }
 
           .planner-location-inline {
@@ -1495,11 +1465,10 @@ export default function Home() {
             width: 100% !important;
           }
 
-          .planner-choice-grid {
-            grid-template-columns: 1fr !important;
-          }
-
-          .planner-impact-grid {
+          .planner-choice-grid-3,
+          .planner-choice-grid-2,
+          .planner-impact-grid,
+          .planner-form-grid {
             grid-template-columns: 1fr !important;
           }
         }
