@@ -84,33 +84,6 @@ const heroScenes = [
   },
 ] as const;
 
-const impactPreviewCards = [
-  {
-    kind: "leaf" as const,
-    label: "Food",
-    value: "Bloom + nectar",
-    copy: "Native plants replace blank space with life.",
-  },
-  {
-    kind: "bee" as const,
-    label: "Pollinators",
-    value: "Bees + butterflies",
-    copy: "Bees and butterflies find food again.",
-  },
-  {
-    kind: "bird" as const,
-    label: "Wildlife",
-    value: "Song + shelter",
-    copy: "Insects bring birds, movement, and shelter with them.",
-  },
-  {
-    kind: "globe" as const,
-    label: "Climate",
-    value: "Less mowing + roots",
-    copy: "Healthier soil and stronger seasonal cycles build over time.",
-  },
-] as const;
-
 const goalPreviewCopy: Record<GoalPreference, string> = {
   pollinators: "Start with bloom and nectar, and the insect activity follows.",
   "low-maintenance": "Start with a forgiving patch that feels lighter to care for over time.",
@@ -178,73 +151,6 @@ function LightIcon({ type }: { type: SunPreference }) {
         strokeWidth="1.6"
         strokeLinecap="round"
       />
-    </svg>
-  );
-}
-
-function StoryGlyph({ kind }: { kind: "leaf" | "bee" | "bird" | "globe" }) {
-  const stroke = "#38533b";
-
-  if (kind === "leaf") {
-    return (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M18.4 5.8c-5 .5-9.3 4.4-10 9.5-.2 1.3-.1 2.4.2 3.4 1 .3 2.1.4 3.4.2 5.1-.7 9-5 9.5-10 .1-.9.1-2-.1-3.1-.8-.2-1.9-.2-3-.1Z"
-          stroke={stroke}
-          strokeWidth="1.7"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9 15c2.3-2 4.3-4.2 6-6.6"
-          stroke={stroke}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  }
-
-  if (kind === "bee") {
-    return (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M8.5 9.6c-1.1-1.8-.8-4 .8-5.1 1.6-1 3.9-.5 5.1 1.1"
-          stroke={stroke}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-        />
-        <path
-          d="M15.5 9.6c1.1-1.8.8-4-.8-5.1-1.6-1-3.9-.5-5.1 1.1"
-          stroke={stroke}
-          strokeWidth="1.7"
-          strokeLinecap="round"
-        />
-        <rect x="7" y="9" width="10" height="8" rx="4" stroke={stroke} strokeWidth="1.7" />
-        <path d="M10 9v8M14 9v8" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
-        <path d="M12 17v2.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (kind === "bird") {
-    return (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M6.5 15.8c1.5-4.7 5-8 10-8.6-.5 1.5-.6 3-.5 4.4 1.3.3 2.5.8 3.5 1.6-1.4 1.6-3.1 2.7-5.2 3.3-2.7.8-5.5.5-7.8-.7Z"
-          stroke={stroke}
-          strokeWidth="1.7"
-          strokeLinejoin="round"
-        />
-        <path d="M10 12.3c1.5.1 2.8.5 4 1.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="8.4" stroke={stroke} strokeWidth="1.7" />
-      <path d="M3.9 12h16.2M12 3.8c2 2.1 3.1 5 3.1 8.2S14 18.1 12 20.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
-      <path d="M12 3.8c-2 2.1-3.1 5-3.1 8.2s1.1 6.1 3.1 8.2" stroke={stroke} strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   );
 }
@@ -404,6 +310,14 @@ export default function Home() {
     selectedSpace.label,
     `${selectedGoal.label} focus`,
   ].filter((item): item is string => Boolean(item));
+  const plannerPrimaryActionLabel =
+    plannerStep === 0
+      ? "Continue to light"
+      : plannerStep === 1
+        ? "Continue to size"
+        : plannerStep === 2
+          ? "Continue to focus"
+          : "Build my plan";
 
   return (
     <main
@@ -826,16 +740,16 @@ export default function Home() {
             />
           </div>
 
-            <div
-              className="planner-body"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)",
-                gap: "1rem",
-                alignItems: "start",
-              }}
-            >
-              <section
+          <div
+            className="planner-body"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr",
+              gap: "1rem",
+              alignItems: "start",
+            }}
+          >
+            <section
               className="planner-form-panel"
               style={{
                 borderRadius: "30px",
@@ -861,33 +775,260 @@ export default function Home() {
                 <h2
                   style={{
                     margin: 0,
-                    fontSize: "2rem",
-                    lineHeight: 0.98,
-                    letterSpacing: "-0.05em",
+                    fontSize: "clamp(2rem, 4vw, 2.9rem)",
+                    lineHeight: 0.96,
+                    letterSpacing: "-0.06em",
+                    maxWidth: "26rem",
                   }}
                 >
-                  One guided path to a starter patch.
+                  A guided start for one living patch.
                 </h2>
                 <p
                   style={{
-                    margin: "0.55rem 0 0",
+                    margin: "0.6rem 0 0",
                     color: "rgba(248,245,236,0.76)",
-                    lineHeight: 1.6,
-                    maxWidth: "34rem",
+                    lineHeight: 1.65,
+                    maxWidth: "38rem",
                   }}
                 >
-                  Answer one question at a time, then turn it into a local plan with
-                  layout and next steps.
+                  No giant form. No guessing. Just a quick guided flow that turns a
+                  real patch into a local mix, starter layout, and weekend plan.
                 </p>
+              </div>
+
+              <div
+                className="planner-intro-grid"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "minmax(0, 1.15fr) minmax(260px, 0.85fr)",
+                  gap: "0.85rem",
+                  alignItems: "stretch",
+                }}
+              >
+                <article
+                  style={{
+                    borderRadius: "26px",
+                    padding: "1.1rem",
+                    background:
+                      "linear-gradient(180deg, rgba(243, 221, 175, 0.16), rgba(255,255,255,0.05))",
+                    border: "1px solid rgba(243, 221, 175, 0.22)",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.76rem",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "rgba(248,245,236,0.58)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    Guided planner
+                  </p>
+                  <h3
+                    style={{
+                      margin: "0.45rem 0 0",
+                      fontSize: "1.9rem",
+                      lineHeight: 0.96,
+                      letterSpacing: "-0.05em",
+                      maxWidth: "24rem",
+                    }}
+                  >
+                    {hasLocation ? "Continue where you left off." : "Start with the patch."}
+                  </h3>
+                  <p
+                    style={{
+                      margin: "0.7rem 0 0",
+                      color: "rgba(248,245,236,0.8)",
+                      lineHeight: 1.62,
+                      maxWidth: "29rem",
+                    }}
+                  >
+                    {hasLocation
+                      ? "Your answers are already here. Open the guide, tweak the feel, and build the full plan."
+                      : "We’ll walk through location, light, size, and the kind of life you want back most."}
+                  </p>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "0.55rem",
+                      marginTop: "0.9rem",
+                    }}
+                  >
+                    {["~30 seconds", "4 quick choices", "Build when ready"].map((item) => (
+                      <span
+                        key={item}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          borderRadius: "999px",
+                          padding: "0.42rem 0.68rem",
+                          background: "rgba(255,255,255,0.1)",
+                          border: "1px solid rgba(255,255,255,0.12)",
+                          color: "#f8f5ec",
+                          fontSize: "0.84rem",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div
+                    className="planner-launch-row"
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "0.7rem",
+                      alignItems: "center",
+                      marginTop: "1rem",
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={openPlanner}
+                      className="cta-pop planner-open-button"
+                      style={{
+                        padding: "1rem 1.25rem",
+                        fontSize: "1rem",
+                        fontWeight: 700,
+                        letterSpacing: "-0.02em",
+                        borderRadius: "18px",
+                        border: "none",
+                        backgroundColor: "#f3ddaf",
+                        color: "#213426",
+                        cursor: "pointer",
+                        boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
+                      }}
+                    >
+                      {hasLocation ? "Continue guided plan" : "Start guided plan"}
+                    </button>
+                    <p
+                      style={{
+                        margin: 0,
+                        color: "rgba(248,245,236,0.68)",
+                        lineHeight: 1.45,
+                        fontSize: "0.92rem",
+                      }}
+                    >
+                      One question at a time, then straight into the plan.
+                    </p>
+                  </div>
+                </article>
+
+                <article
+                  style={{
+                    borderRadius: "26px",
+                    padding: "1rem",
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "0.76rem",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      color: "rgba(248,245,236,0.56)",
+                      fontWeight: 700,
+                    }}
+                  >
+                    How it unfolds
+                  </p>
+                  <div
+                    className="planner-journey-grid"
+                    style={{
+                      display: "grid",
+                      gap: "0.65rem",
+                      marginTop: "0.75rem",
+                    }}
+                  >
+                    {[
+                      {
+                        step: "1",
+                        title: "Place the patch",
+                        copy: "Use location or ZIP so the plant list fits where you are.",
+                      },
+                      {
+                        step: "2",
+                        title: "Shape the conditions",
+                        copy: "Pick the light and a size that feels realistic right now.",
+                      },
+                      {
+                        step: "3",
+                        title: "Lead with a goal",
+                        copy: "Choose food, shelter, ease, or color as the first move.",
+                      },
+                      {
+                        step: "4",
+                        title: "Build the plan",
+                        copy: "Get the mix, layout, weekend checklist, and first-season care.",
+                      },
+                    ].map((item) => (
+                      <article
+                        key={item.step}
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "2.2rem minmax(0, 1fr)",
+                          gap: "0.75rem",
+                          alignItems: "start",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "2.2rem",
+                            height: "2.2rem",
+                            borderRadius: "999px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            background: "rgba(243, 221, 175, 0.16)",
+                            color: "#f3ddaf",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {item.step}
+                        </div>
+                        <div>
+                          <p
+                            style={{
+                              margin: 0,
+                              color: "#f8f5ec",
+                              fontWeight: 700,
+                              letterSpacing: "-0.02em",
+                            }}
+                          >
+                            {item.title}
+                          </p>
+                          <p
+                            style={{
+                              margin: "0.25rem 0 0",
+                              color: "rgba(248,245,236,0.7)",
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            {item.copy}
+                          </p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </article>
               </div>
 
               <article
                 style={{
-                  borderRadius: "26px",
-                  padding: "1.05rem",
+                  marginTop: "1rem",
+                  borderRadius: "24px",
+                  padding: "1rem",
                   background:
-                    "linear-gradient(180deg, rgba(243, 221, 175, 0.16), rgba(255,255,255,0.05))",
-                  border: "1px solid rgba(243, 221, 175, 0.22)",
+                    "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))",
+                  border: "1px solid rgba(255,255,255,0.1)",
                 }}
               >
                 <p
@@ -896,73 +1037,58 @@ export default function Home() {
                     fontSize: "0.76rem",
                     letterSpacing: "0.1em",
                     textTransform: "uppercase",
-                    color: "rgba(248,245,236,0.58)",
+                    color: "rgba(248,245,236,0.56)",
                     fontWeight: 700,
                   }}
                 >
-                  Guided planner
+                  Current direction
                 </p>
                 <h3
                   style={{
-                    margin: "0.42rem 0 0",
-                    fontSize: "1.7rem",
-                    lineHeight: 0.98,
+                    margin: "0.4rem 0 0",
+                    fontSize: "1.55rem",
+                    lineHeight: 1,
                     letterSpacing: "-0.05em",
                   }}
                 >
-                  {hasLocation ? "Continue where you left off." : "Start with the patch."}
+                  {goalPreviewLabels[goal]}
                 </h3>
                 <p
                   style={{
-                    margin: "0.65rem 0 0",
+                    margin: "0.55rem 0 0",
                     color: "rgba(248,245,236,0.78)",
                     lineHeight: 1.6,
-                    maxWidth: "28rem",
+                    maxWidth: "40rem",
                   }}
                 >
-                  {hasLocation
-                    ? "Your answers are already here. Open the guide to adjust them or build the full plan."
-                    : "We’ll ask about location, light, size, and the kind of life you want back most."}
+                  {goalPreviewCopy[goal]}
                 </p>
                 <div
-                  className="planner-launch-row"
                   style={{
                     display: "flex",
                     flexWrap: "wrap",
-                    gap: "0.7rem",
-                    alignItems: "center",
-                    marginTop: "0.95rem",
+                    gap: "0.55rem",
+                    marginTop: "0.9rem",
                   }}
                 >
-                  <button
-                    type="button"
-                    onClick={openPlanner}
-                    className="cta-pop planner-open-button"
-                    style={{
-                      padding: "0.98rem 1.2rem",
-                      fontSize: "0.98rem",
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                      borderRadius: "18px",
-                      border: "none",
-                      backgroundColor: "#f3ddaf",
-                      color: "#213426",
-                      cursor: "pointer",
-                      boxShadow: "0 18px 36px rgba(15, 24, 17, 0.18)",
-                    }}
-                  >
-                    {hasLocation ? "Continue guided plan" : "Start guided plan"}
-                  </button>
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "rgba(248,245,236,0.68)",
-                      lineHeight: 1.45,
-                      fontSize: "0.92rem",
-                    }}
-                  >
-                    About 30 seconds. One question at a time.
-                  </p>
+                  {plannerPreviewTags.map((item) => (
+                    <span
+                      key={item}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        borderRadius: "999px",
+                        padding: "0.42rem 0.68rem",
+                        background: "rgba(255,255,255,0.08)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "#f8f5ec",
+                        fontSize: "0.84rem",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {item}
+                    </span>
+                  ))}
                 </div>
               </article>
 
@@ -977,7 +1103,7 @@ export default function Home() {
                     fontWeight: 700,
                   }}
                 >
-                  Current answers
+                  Your patch so far
                 </p>
                 <div
                   className="planner-summary-grid"
@@ -1039,7 +1165,7 @@ export default function Home() {
                 className="planner-output-grid"
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
                   gap: "0.65rem",
                   marginTop: "1rem",
                 }}
@@ -1062,7 +1188,7 @@ export default function Home() {
                     key={item.label}
                     style={{
                       borderRadius: "20px",
-                      padding: "0.9rem",
+                      padding: "0.95rem",
                       background: "rgba(255,255,255,0.05)",
                       border: "1px solid rgba(255,255,255,0.09)",
                     }}
@@ -1095,7 +1221,7 @@ export default function Home() {
 
               <p
                 style={{
-                  margin: "0.9rem 0 0",
+                  margin: "0.95rem 0 0",
                   color: "rgba(248,245,236,0.62)",
                   lineHeight: 1.55,
                   fontSize: "0.92rem",
@@ -1105,331 +1231,6 @@ export default function Home() {
                 location.
               </p>
             </section>
-
-            <aside
-              className="planner-preview-panel"
-              style={{
-                borderRadius: "30px",
-                padding: "1.1rem",
-                background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.06))",
-                border: "1px solid rgba(255,255,255,0.12)",
-              }}
-            >
-              <p
-                style={{
-                  margin: "0 0 0.35rem",
-                  fontSize: "0.8rem",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  fontWeight: 700,
-                  color: "rgba(248,245,236,0.72)",
-                }}
-              >
-                Patch preview
-              </p>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: "clamp(1.9rem, 4vw, 2.8rem)",
-                  lineHeight: 0.98,
-                  letterSpacing: "-0.05em",
-                }}
-              >
-                A little yard can wake up fast.
-              </h2>
-              <p
-                style={{
-                  margin: "0.7rem 0 0",
-                  color: "rgba(248,245,236,0.76)",
-                  lineHeight: 1.6,
-                }}
-              >
-                A starter patch can begin feeding, sheltering, and softening the yard
-                faster than people expect.
-              </p>
-
-              <article
-                className="planner-preview-highlight"
-                style={{
-                  marginTop: "0.85rem",
-                  borderRadius: "24px",
-                  padding: "1rem",
-                  background:
-                    "linear-gradient(180deg, rgba(243, 221, 175, 0.16), rgba(255,255,255,0.05))",
-                  border: "1px solid rgba(243, 221, 175, 0.22)",
-                }}
-              >
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "0.72rem",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "rgba(248,245,236,0.56)",
-                    fontWeight: 700,
-                  }}
-                >
-                  Start with
-                </p>
-                <h3
-                  style={{
-                    margin: "0.35rem 0 0",
-                    color: "#f8f5ec",
-                    lineHeight: 1,
-                    fontSize: "1.5rem",
-                    letterSpacing: "-0.04em",
-                  }}
-                >
-                  {goalPreviewLabels[goal]}
-                </h3>
-                <p
-                  style={{
-                    margin: "0.55rem 0 0",
-                    color: "rgba(248,245,236,0.82)",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {goalPreviewCopy[goal]}
-                </p>
-              </article>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "0.55rem",
-                  marginTop: "0.9rem",
-                }}
-              >
-                {plannerPreviewTags.map((item) => (
-                  <span
-                    key={item}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      borderRadius: "999px",
-                      padding: "0.42rem 0.68rem",
-                      background: "rgba(255,255,255,0.1)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      color: "#f8f5ec",
-                      fontSize: "0.84rem",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              <details
-                className="planner-disclosure"
-                style={{
-                  marginTop: "1rem",
-                  borderRadius: "24px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  overflow: "hidden",
-                }}
-              >
-                <summary
-                  style={{
-                    listStyle: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "0.9rem",
-                    padding: "1rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  <div>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "0.72rem",
-                        letterSpacing: "0.1em",
-                        textTransform: "uppercase",
-                        color: "rgba(248,245,236,0.56)",
-                        fontWeight: 700,
-                      }}
-                    >
-                      What starts shifting
-                    </p>
-                    <p
-                      style={{
-                        margin: "0.32rem 0 0",
-                        color: "#f8f5ec",
-                        fontWeight: 700,
-                        fontSize: "1.12rem",
-                        letterSpacing: "-0.03em",
-                      }}
-                    >
-                      Bloom. Buzz. Birds. Shelter.
-                    </p>
-                    <p
-                      style={{
-                        margin: "0.38rem 0 0",
-                        color: "rgba(248,245,236,0.68)",
-                        lineHeight: 1.5,
-                        fontSize: "0.92rem",
-                      }}
-                    >
-                      Open the layers this patch can start to support.
-                    </p>
-                  </div>
-                  <span
-                    className="planner-disclosure-chevron"
-                    aria-hidden="true"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "2.3rem",
-                      height: "2.3rem",
-                      borderRadius: "999px",
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      flexShrink: 0,
-                      transition: "transform 180ms ease",
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path
-                        d="M4 6.2 8 10l4-3.8"
-                        stroke="#f8f5ec"
-                        strokeWidth="1.7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </summary>
-
-                <div
-                  style={{
-                    padding: "0 1rem 1rem",
-                  }}
-                >
-                  <div
-                    className="planner-impact-grid"
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                      gap: "0.75rem",
-                    }}
-                  >
-                    {impactPreviewCards.map((item) => (
-                      <article
-                        key={item.label}
-                        className="planner-impact-card"
-                        style={{
-                          borderRadius: "20px",
-                          padding: "0.95rem",
-                          background: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: "2.8rem",
-                            height: "2.8rem",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            borderRadius: "999px",
-                            background: "rgba(243, 221, 175, 0.14)",
-                            marginBottom: "0.7rem",
-                          }}
-                        >
-                          <StoryGlyph kind={item.kind} />
-                        </div>
-                        <p
-                          style={{
-                            margin: "0 0 0.2rem",
-                            fontSize: "0.76rem",
-                            letterSpacing: "0.1em",
-                            textTransform: "uppercase",
-                            color: "rgba(248,245,236,0.66)",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {item.label}
-                        </p>
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: "1.02rem",
-                            lineHeight: 1.1,
-                            letterSpacing: "-0.03em",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {item.value}
-                        </p>
-                        <p
-                          style={{
-                            margin: "0.45rem 0 0",
-                            fontSize: "0.88rem",
-                            lineHeight: 1.5,
-                            color: "rgba(248,245,236,0.72)",
-                          }}
-                        >
-                          {item.copy}
-                        </p>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              </details>
-
-              <article
-                className="planner-summary-card"
-                style={{
-                  marginTop: "0.9rem",
-                  borderRadius: "24px",
-                  padding: "1rem",
-                  background:
-                    "linear-gradient(180deg, rgba(248, 250, 244, 0.96), rgba(243, 238, 226, 0.94))",
-                  border: "1px solid rgba(207, 216, 199, 0.9)",
-                  color: "#243424",
-                }}
-              >
-                <p
-                  style={{
-                    margin: "0 0 0.35rem",
-                    fontSize: "0.76rem",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    color: "#697867",
-                    fontWeight: 700,
-                  }}
-                >
-                  Next, we make it real
-                </p>
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: "1.45rem",
-                    lineHeight: 1,
-                    letterSpacing: "-0.05em",
-                    color: "#203126",
-                  }}
-                >
-                  Plants, layout, and weekend steps.
-                </h3>
-                <p
-                  style={{
-                    margin: "0.55rem 0 0",
-                    color: "#556451",
-                    lineHeight: 1.6,
-                  }}
-                >
-                  The full plan turns this starter patch into a plant mix, buying
-                  guide, and first-season care.
-                </p>
-              </article>
-            </aside>
           </div>
         </section>
 
@@ -1491,10 +1292,20 @@ export default function Home() {
                   >
                     Guided planner
                   </p>
+                  <p
+                    style={{
+                      margin: "0.45rem 0 0",
+                      color: "rgba(248,245,236,0.58)",
+                      fontSize: "0.9rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    Step {plannerStep + 1} of {plannerFlowSteps.length}
+                  </p>
                   <h3
                     id="planner-modal-title"
                     style={{
-                      margin: "0.45rem 0 0",
+                      margin: "0.35rem 0 0",
                       fontSize: "clamp(1.8rem, 4vw, 2.4rem)",
                       lineHeight: 0.98,
                       letterSpacing: "-0.05em",
@@ -1538,56 +1349,80 @@ export default function Home() {
                 className="planner-modal-progress"
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-                  gap: "0.6rem",
+                  gap: "0.7rem",
                   marginTop: "1rem",
                 }}
               >
-                {plannerFlowSteps.map((item, index) => {
-                  const isActive = index === plannerStep;
-                  const isComplete = index < plannerStep || (index === 0 && hasLocation);
+                <div
+                  className="planner-modal-progress-track"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                    gap: "0.45rem",
+                  }}
+                >
+                  {plannerFlowSteps.map((item, index) => {
+                    const isActive = index === plannerStep;
+                    const isComplete = index < plannerStep || (index === 0 && hasLocation);
 
-                  return (
-                    <article
-                      key={item.step}
-                      style={{
-                        borderRadius: "16px",
-                        padding: "0.75rem 0.8rem",
-                        background: isActive
-                          ? "rgba(243, 221, 175, 0.16)"
-                          : "rgba(255,255,255,0.05)",
-                        border: isActive
-                          ? "1px solid rgba(243, 221, 175, 0.3)"
-                          : "1px solid rgba(255,255,255,0.08)",
-                      }}
-                    >
-                      <p
+                    return (
+                      <span
+                        key={item.step}
                         style={{
-                          margin: 0,
-                          fontSize: "0.72rem",
-                          letterSpacing: "0.1em",
-                          textTransform: "uppercase",
+                          display: "block",
+                          height: "0.5rem",
+                          borderRadius: "999px",
+                          background: isActive || isComplete
+                            ? "#f3ddaf"
+                            : "rgba(255,255,255,0.12)",
+                          boxShadow: isActive
+                            ? "0 0 0 1px rgba(243, 221, 175, 0.22)"
+                            : "none",
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "0.45rem",
+                  }}
+                >
+                  {plannerFlowSteps.map((item, index) => {
+                    const isActive = index === plannerStep;
+                    const isComplete = index < plannerStep || (index === 0 && hasLocation);
+
+                    return (
+                      <span
+                        key={item.step}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.35rem",
+                          borderRadius: "999px",
+                          padding: "0.38rem 0.62rem",
+                          background: isActive
+                            ? "rgba(243, 221, 175, 0.16)"
+                            : "rgba(255,255,255,0.05)",
+                          border: isActive
+                            ? "1px solid rgba(243, 221, 175, 0.28)"
+                            : "1px solid rgba(255,255,255,0.08)",
                           color: isActive || isComplete
-                            ? "rgba(248,245,236,0.78)"
-                            : "rgba(248,245,236,0.48)",
+                            ? "#f8f5ec"
+                            : "rgba(248,245,236,0.56)",
+                          fontSize: "0.82rem",
                           fontWeight: 700,
                         }}
                       >
-                        {index + 1}. {item.step}
-                      </p>
-                      <p
-                        style={{
-                          margin: "0.28rem 0 0",
-                          color: "#f8f5ec",
-                          fontWeight: 700,
-                          lineHeight: 1.2,
-                        }}
-                      >
-                        {item.value}
-                      </p>
-                    </article>
-                  );
-                })}
+                        <span>{index + 1}.</span>
+                        <span>{item.step}</span>
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
 
               <div style={{ marginTop: "1rem" }}>
@@ -1995,7 +1830,7 @@ export default function Home() {
                         : "0 18px 36px rgba(15, 24, 17, 0.18)",
                   }}
                 >
-                  {plannerStep === 3 ? "Build my plan" : "Continue"}
+                  {plannerPrimaryActionLabel}
                 </button>
               </div>
             </div>
@@ -2047,18 +1882,6 @@ export default function Home() {
           filter: saturate(1.02);
         }
 
-        .planner-disclosure summary::-webkit-details-marker {
-          display: none;
-        }
-
-        .planner-disclosure summary {
-          list-style: none;
-        }
-
-        .planner-disclosure[open] .planner-disclosure-chevron {
-          transform: rotate(180deg);
-        }
-
         @keyframes fadeUp {
           from {
             opacity: 0;
@@ -2080,12 +1903,6 @@ export default function Home() {
           }
         }
 
-        @media (max-width: 980px) {
-          .planner-body {
-            grid-template-columns: 1fr !important;
-          }
-        }
-
         @media (max-width: 720px) {
           main {
             overflow-x: clip;
@@ -2101,16 +1918,9 @@ export default function Home() {
           }
 
           .planner-form-panel,
-          .planner-preview-panel,
           .planner-modal {
             border-radius: 24px !important;
             padding: 1rem !important;
-          }
-
-          .planner-impact-card,
-          .planner-summary-card {
-            border-radius: 20px !important;
-            padding: 0.95rem !important;
           }
 
           .hero-gallery-grid {
@@ -2140,6 +1950,10 @@ export default function Home() {
             width: 100% !important;
           }
 
+          .planner-intro-grid {
+            grid-template-columns: 1fr !important;
+          }
+
           .planner-modal-backdrop {
             padding: 0.7rem !important;
             align-items: flex-end !important;
@@ -2150,13 +1964,8 @@ export default function Home() {
             max-height: calc(100vh - 0.7rem) !important;
           }
 
-          .planner-modal-progress {
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-          }
-
           .planner-modal-option-grid-2,
           .planner-modal-option-grid-3,
-          .planner-impact-grid,
           .planner-summary-grid,
           .planner-output-grid {
             grid-template-columns: 1fr !important;
@@ -2164,8 +1973,8 @@ export default function Home() {
         }
 
         @media (max-width: 560px) {
-          .planner-modal-progress {
-            grid-template-columns: 1fr !important;
+          .planner-modal-progress-track {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
           }
 
           .planner-section,
