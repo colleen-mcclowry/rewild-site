@@ -180,8 +180,30 @@ export default function Home() {
     };
   }, [isPlannerOpen]);
 
+  useEffect(() => {
+    if (!isPlannerOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsPlannerOpen(false);
+        setIsLocating(false);
+        setLocationError(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isPlannerOpen]);
+
   const hasZip = zip.length === 5;
   const hasLocation = hasZip || Boolean(geoCoords);
+  const isZipReady = hasZip && !geoCoords;
+  const isUsingCurrentLocation = Boolean(geoCoords);
   const locationSummary = geoCoords ? "Current location" : hasZip ? `ZIP ${zip}` : "Choose patch";
 
   const buildPlanUrl = () => {
@@ -1236,7 +1258,7 @@ export default function Home() {
 
         {isPlannerOpen ? (
           <div
-            className="planner-modal-backdrop"
+            className="planner-modal-backdrop planner-overlay-fade"
             onClick={closePlanner}
             role="presentation"
             style={{
@@ -1252,7 +1274,7 @@ export default function Home() {
             }}
           >
             <div
-              className="planner-modal"
+              className="planner-modal planner-modal-enter"
               role="dialog"
               aria-modal="true"
               aria-labelledby="planner-modal-title"
@@ -1263,6 +1285,8 @@ export default function Home() {
                 overflow: "auto",
                 borderRadius: "32px",
                 padding: "1.1rem",
+                position: "relative",
+                isolation: "isolate",
                 background:
                   "linear-gradient(180deg, rgba(25, 43, 31, 0.98), rgba(49, 79, 50, 0.96))",
                 border: "1px solid rgba(255,255,255,0.14)",
@@ -1271,12 +1295,52 @@ export default function Home() {
               }}
             >
               <div
+                aria-hidden="true"
+                className="planner-modal-aura"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  pointerEvents: "none",
+                  overflow: "hidden",
+                  borderRadius: "inherit",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-3rem",
+                    right: "4rem",
+                    width: "16rem",
+                    height: "9rem",
+                    borderRadius: "999px",
+                    background: "rgba(243, 221, 175, 0.14)",
+                    filter: "blur(8px)",
+                    transform: "rotate(-12deg)",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "5rem",
+                    left: "-3rem",
+                    width: "12rem",
+                    height: "12rem",
+                    borderRadius: "999px",
+                    background: "rgba(170, 204, 149, 0.11)",
+                    filter: "blur(10px)",
+                  }}
+                />
+              </div>
+
+              <div
                 className="planner-modal-header"
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
                   gap: "1rem",
                   alignItems: "flex-start",
+                  position: "relative",
+                  zIndex: 1,
                 }}
               >
                 <div>
@@ -1329,6 +1393,7 @@ export default function Home() {
                   type="button"
                   onClick={closePlanner}
                   aria-label="Close guided planner"
+                  className="planner-modal-close"
                   style={{
                     border: "1px solid rgba(255,255,255,0.14)",
                     background: "rgba(255,255,255,0.05)",
@@ -1351,6 +1416,8 @@ export default function Home() {
                   display: "grid",
                   gap: "0.7rem",
                   marginTop: "1rem",
+                  position: "relative",
+                  zIndex: 1,
                 }}
               >
                 <div
@@ -1368,6 +1435,9 @@ export default function Home() {
                     return (
                       <span
                         key={item.step}
+                        className={`planner-progress-segment${
+                          isActive ? " planner-progress-segment-active" : ""
+                        }${isComplete ? " planner-progress-segment-complete" : ""}`}
                         style={{
                           display: "block",
                           height: "0.5rem",
@@ -1398,6 +1468,9 @@ export default function Home() {
                     return (
                       <span
                         key={item.step}
+                        className={`planner-progress-chip${isActive ? " planner-progress-chip-active" : ""}${
+                          isComplete ? " planner-progress-chip-complete" : ""
+                        }`}
                         style={{
                           display: "inline-flex",
                           alignItems: "center",
@@ -1425,7 +1498,15 @@ export default function Home() {
                 </div>
               </div>
 
-              <div style={{ marginTop: "1rem" }}>
+              <div
+                key={plannerStep}
+                className="planner-step-shell"
+                style={{
+                  marginTop: "1rem",
+                  position: "relative",
+                  zIndex: 1,
+                }}
+              >
                 {plannerStep === 0 ? (
                   <div
                     className="planner-modal-option-grid planner-modal-option-grid-2"
@@ -1439,6 +1520,9 @@ export default function Home() {
                       type="button"
                       onClick={handleLocation}
                       disabled={isLocating}
+                      className={`planner-step-card planner-step-card-button${
+                        isUsingCurrentLocation ? " planner-step-card-active" : ""
+                      }`}
                       style={{
                         textAlign: "left",
                         borderRadius: "24px",
@@ -1452,10 +1536,13 @@ export default function Home() {
                         color: "#f8f5ec",
                         cursor: isLocating ? "progress" : "pointer",
                       }}
-                    >
+                      >
+                      {isUsingCurrentLocation ? (
+                        <span className="planner-card-badge">Using this</span>
+                      ) : null}
                       <p
                         style={{
-                          margin: 0,
+                          margin: isUsingCurrentLocation ? "0.55rem 0 0" : 0,
                           fontSize: "0.72rem",
                           letterSpacing: "0.1em",
                           textTransform: "uppercase",
@@ -1492,6 +1579,7 @@ export default function Home() {
                     </button>
 
                     <div
+                      className={`planner-step-card${isZipReady ? " planner-step-card-active" : ""}`}
                       style={{
                         borderRadius: "24px",
                         padding: "1rem",
@@ -1499,9 +1587,10 @@ export default function Home() {
                         background: "rgba(255,255,255,0.05)",
                       }}
                     >
+                      {isZipReady ? <span className="planner-card-badge">Ready</span> : null}
                       <p
                         style={{
-                          margin: 0,
+                          margin: isZipReady ? "0.55rem 0 0" : 0,
                           fontSize: "0.72rem",
                           letterSpacing: "0.1em",
                           textTransform: "uppercase",
@@ -1525,6 +1614,7 @@ export default function Home() {
                       </label>
                       <input
                         id="planner-zip"
+                        className="planner-modal-input"
                         value={zip}
                         inputMode="numeric"
                         autoComplete="postal-code"
@@ -1579,6 +1669,9 @@ export default function Home() {
                           key={option.value}
                           type="button"
                           onClick={() => setSun(option.value)}
+                          className={`planner-step-card planner-step-card-button${
+                            isActive ? " planner-step-card-active" : ""
+                          }`}
                           style={{
                             textAlign: "left",
                             borderRadius: "22px",
@@ -1593,6 +1686,7 @@ export default function Home() {
                             cursor: "pointer",
                           }}
                         >
+                          {isActive ? <span className="planner-card-badge">Selected</span> : null}
                           <div
                             style={{
                               display: "inline-flex",
@@ -1601,6 +1695,7 @@ export default function Home() {
                               width: "2.7rem",
                               height: "2.7rem",
                               borderRadius: "999px",
+                              marginTop: isActive ? "0.35rem" : 0,
                               background: isActive
                                 ? "rgba(243, 221, 175, 0.18)"
                                 : "rgba(255,255,255,0.08)",
@@ -1644,6 +1739,9 @@ export default function Home() {
                           key={option.value}
                           type="button"
                           onClick={() => setSpace(option.value)}
+                          className={`planner-step-card planner-step-card-button${
+                            isActive ? " planner-step-card-active" : ""
+                          }`}
                           style={{
                             textAlign: "left",
                             borderRadius: "22px",
@@ -1658,6 +1756,7 @@ export default function Home() {
                             cursor: "pointer",
                           }}
                         >
+                          {isActive ? <span className="planner-card-badge">Selected</span> : null}
                           <div style={{ fontWeight: 700, fontSize: "1.02rem" }}>
                             {option.label}
                           </div>
@@ -1693,6 +1792,9 @@ export default function Home() {
                           key={option.value}
                           type="button"
                           onClick={() => setGoal(option.value)}
+                          className={`planner-step-card planner-step-card-button${
+                            isActive ? " planner-step-card-active" : ""
+                          }`}
                           style={{
                             textAlign: "left",
                             borderRadius: "22px",
@@ -1707,6 +1809,7 @@ export default function Home() {
                             cursor: "pointer",
                           }}
                         >
+                          {isActive ? <span className="planner-card-badge">Selected</span> : null}
                           <div style={{ fontWeight: 700, fontSize: "1.02rem" }}>
                             {option.label}
                           </div>
@@ -1727,6 +1830,7 @@ export default function Home() {
               </div>
 
               <article
+                className="planner-current-choice"
                 style={{
                   marginTop: "0.95rem",
                   borderRadius: "22px",
@@ -1790,6 +1894,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={plannerStep === 0 ? closePlanner : goToPreviousPlannerStep}
+                  className="planner-secondary-button"
                   style={{
                     padding: "0.95rem 1rem",
                     borderRadius: "18px",
@@ -1807,6 +1912,7 @@ export default function Home() {
                   type="button"
                   onClick={goToNextPlannerStep}
                   disabled={plannerStep === 0 && (!hasLocation || isLocating)}
+                  className="planner-primary-button"
                   style={{
                     padding: "0.95rem 1.15rem",
                     borderRadius: "18px",
@@ -1880,6 +1986,160 @@ export default function Home() {
           transform: translateY(-2px);
           box-shadow: 0 22px 40px rgba(15, 24, 17, 0.24);
           filter: saturate(1.02);
+        }
+
+        .planner-overlay-fade {
+          animation: plannerOverlayIn 240ms ease-out both;
+        }
+
+        .planner-modal-enter {
+          animation: plannerModalIn 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+          transform-origin: center bottom;
+        }
+
+        .planner-step-shell {
+          animation: plannerStepIn 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .planner-modal-close,
+        .planner-secondary-button,
+        .planner-primary-button,
+        .planner-step-card-button,
+        .planner-progress-chip,
+        .planner-progress-segment,
+        .planner-modal-input {
+          transition:
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            border-color 180ms ease,
+            background 180ms ease,
+            opacity 180ms ease,
+            color 180ms ease;
+        }
+
+        .planner-modal-close:hover,
+        .planner-secondary-button:hover,
+        .planner-primary-button:hover,
+        .planner-step-card-button:hover {
+          transform: translateY(-1px);
+        }
+
+        .planner-modal-close:hover {
+          box-shadow: 0 12px 24px rgba(12, 20, 15, 0.2);
+          background: rgba(255, 255, 255, 0.09) !important;
+        }
+
+        .planner-secondary-button:hover {
+          background: rgba(255, 255, 255, 0.09) !important;
+          border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .planner-primary-button:hover:not(:disabled) {
+          box-shadow: 0 22px 40px rgba(15, 24, 17, 0.24) !important;
+          filter: saturate(1.03);
+        }
+
+        .planner-modal-input:focus {
+          border-color: rgba(243, 221, 175, 0.38) !important;
+          box-shadow: 0 0 0 3px rgba(243, 221, 175, 0.12);
+        }
+
+        .planner-step-card {
+          position: relative;
+          overflow: hidden;
+          transition:
+            transform 180ms ease,
+            box-shadow 180ms ease,
+            border-color 180ms ease,
+            background 180ms ease;
+        }
+
+        .planner-step-card::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.06),
+            rgba(255, 255, 255, 0)
+          );
+          opacity: 0;
+          transition: opacity 180ms ease;
+          pointer-events: none;
+        }
+
+        .planner-step-card:hover::after,
+        .planner-step-card-active::after {
+          opacity: 1;
+        }
+
+        .planner-step-card-button:hover {
+          box-shadow: 0 18px 34px rgba(12, 20, 15, 0.18);
+        }
+
+        .planner-step-card-active {
+          box-shadow: 0 18px 36px rgba(12, 20, 15, 0.18);
+        }
+
+        .planner-card-badge {
+          display: inline-flex;
+          align-items: center;
+          border-radius: 999px;
+          padding: 0.28rem 0.52rem;
+          background: rgba(243, 221, 175, 0.16);
+          color: #f3ddaf;
+          font-size: 0.7rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          font-weight: 700;
+        }
+
+        .planner-progress-segment-active {
+          transform: scaleY(1.1);
+        }
+
+        .planner-progress-chip-active {
+          box-shadow: 0 10px 22px rgba(12, 20, 15, 0.16);
+        }
+
+        .planner-progress-chip-complete:not(.planner-progress-chip-active) {
+          color: rgba(248, 245, 236, 0.82) !important;
+          border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        .planner-current-choice {
+          animation: fadeUp 260ms ease-out both;
+        }
+
+        @keyframes plannerOverlayIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes plannerModalIn {
+          from {
+            opacity: 0;
+            transform: translateY(18px) scale(0.985);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes plannerStepIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         @keyframes fadeUp {
